@@ -5,6 +5,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script type="text/javascript" src="resources/jquery/jquery-3.1.1.min.js"></script>
         <title>Welcome to Spring Web MVC project</title>
     </head>
 

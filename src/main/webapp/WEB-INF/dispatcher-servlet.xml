@@ -12,5 +12,7 @@
         <property name="prefix" value="/WEB-INF/jsp/" />
         <property name="suffix" value=".jsp" />
     </bean>
+    
+    <mvc:resources mapping="/resources/**" location="META-INF/resources/" />
  
 </beans>
