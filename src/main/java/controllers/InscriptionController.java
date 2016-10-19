@@ -6,6 +6,7 @@
 package controllers;
 import dao.UserDao;
 import java.util.Date;
+import java.util.regex.Pattern;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +27,11 @@ public class InscriptionController {
     EntityManager em;
     UserDao userDao;
     
+    // Regex1 utilisée pour nom, prenom, pseudo
+    static String regex1 = "^([a-zA-Z]{3,50})";
+    // Regex2 utilisée pour email
+    static String regex2 = "^([\\w-\\.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([\\w-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)";
+    
     public InscriptionController(){
         em = Persistence.createEntityManagerFactory("persistenceUnitLiber8").createEntityManager();
         userDao = new UserDao(em);
@@ -40,10 +46,27 @@ public class InscriptionController {
     @RequestMapping(value="/inscription/new", method = RequestMethod.POST)
     public String newUser(HttpServletRequest request, ModelMap model){
         
+        String pseudo = request.getParameter("pseudo");
+        String mail = request.getParameter("mail");
+        String nom = request.getParameter("nom");
+        String prenom = request.getParameter("prenom");
+        
+        // Test des entrées
+        if(!testRegex(regex1, pseudo) ||
+           !testRegex(regex1, nom) ||
+           !testRegex(regex1, prenom) ||
+           !testRegex(regex2, mail))
+        {
+            model.addAttribute("Erreur", "Echec Regex");
+            return "/inscription";
+        }
+        
+        // Test d'existence pour les champs uniques (pseudo, email).
+        
+        
+        // TODO: génération de la clé mot de passe ici
+        
         em.getTransaction().begin();
-        
-        //TODO: génération de la clé mot de passe ici
-        
         User newUser = userDao.createNewUser(request.getParameter("pseudo"),
                                             request.getParameter("mail"), 
                                             request.getParameter("nom"), 
@@ -51,7 +74,7 @@ public class InscriptionController {
                                             new Date(), 
                                             new Date(),
                                             "motDePasse");
-        
+               
         if(newUser != null){
             // L'utilisateur a bien été créé
             try{
@@ -60,14 +83,18 @@ public class InscriptionController {
             }
             catch(Exception e){
                 // Erreur pendant le commit
-                // TODO: Ajout de trucs dans modelMap à afficher dans le cas erreur ici
-                return "/inscription/new";
+                model.addAttribute("Erreur", "True");
+                return "/inscription";
             }
         }
         else{
             // L'utilisateur n'a pas été créé
-            // TODO: Ajout de trucs dans modelMap à afficher ici
-            return "/inscription/new";
+            model.addAttribute("Erreur", "True");
+            return "/inscription";
         }
+    }
+    
+    private boolean testRegex(String regex, String aTester){
+        return Pattern.compile(regex).matcher(aTester).matches();
     }
 }
