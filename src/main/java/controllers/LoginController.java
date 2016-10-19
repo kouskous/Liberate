@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.lyon1.liber8.controllers;
+package controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,9 +14,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @author zekri
  */
 @Controller
-public class PrincipalController {
-    @RequestMapping(value="/", method = RequestMethod.GET)
+public class LoginController {
+    @RequestMapping(value="/login", method = RequestMethod.GET)
     public String index(){
-        return "principal";
+        return "login";
     }
+    
+ /** utilisation de JSON
+    @ResponseBody @RequestMapping(value="/login", method = RequestMethod.GET,produces = "application/json") 
+    public String login(){ 
+    return "login"; 
+     }
+  */   
+    
 }
