@@ -10,7 +10,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import models.User;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -20,31 +22,52 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 @Controller
 public class InscriptionController {
+    
+    EntityManager em;
+    UserDao userDao;
+    
+    public InscriptionController(){
+        em = Persistence.createEntityManagerFactory("persistenceUnitLiber8").createEntityManager();
+        userDao = new UserDao(em);
+    }
+    
     @RequestMapping(value="/inscription", method = RequestMethod.GET)
     public String index(){
         return "inscription";
     }
     
+    // Nouvelle inscription
     @RequestMapping(value="/inscription/new", method = RequestMethod.POST)
-    public String newUser(HttpServletRequest request){
-        
-        EntityManager em = Persistence.createEntityManagerFactory("persistenceUnitLiber8").createEntityManager();
-        UserDao userDao = new UserDao(em);
+    public String newUser(HttpServletRequest request, ModelMap model){
         
         em.getTransaction().begin();
         
-        userDao.createNewUser(request.getParameter("pseudo"),
-                request.getParameter("pseudo"), 
-                request.getParameter("pseudo"), 
-                request.getParameter("pseudo"), 
-                new Date(), 
-                new Date(),
-                "fred");
+        //TODO: génération de la clé mot de passe ici
         
+        User newUser = userDao.createNewUser(request.getParameter("pseudo"),
+                                            request.getParameter("mail"), 
+                                            request.getParameter("nom"), 
+                                            request.getParameter("prenom"), 
+                                            new Date(), 
+                                            new Date(),
+                                            "motDePasse");
         
-        em.getTransaction().commit();
-        em.close();
-        
-        return "redirect:/";
+        if(newUser != null){
+            // L'utilisateur a bien été créé
+            try{
+                em.getTransaction().commit();
+                return "redirect:/";
+            }
+            catch(Exception e){
+                // Erreur pendant le commit
+                // TODO: Ajout de trucs dans modelMap à afficher dans le cas erreur ici
+                return "/inscription/new";
+            }
+        }
+        else{
+            // L'utilisateur n'a pas été créé
+            // TODO: Ajout de trucs dans modelMap à afficher ici
+            return "/inscription/new";
+        }
     }
 }

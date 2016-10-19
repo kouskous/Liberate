@@ -53,6 +53,8 @@ public class UserDao {
     }
        
     // Création d'un nouvel utilisateur
+    // Renvoie l'utilisateur si réussite
+    // Renvoie null sinon
     public User createNewUser(String pseudo, String email, String nom, String prenom, 
             Date dateCreation, Date dateModification, String cleMotDePasse){
         
@@ -70,6 +72,80 @@ public class UserDao {
             System.out.println(e.getMessage());
             return null;
         }
-    }   
+    } 
+    
+    // Suppression d'un utilisateur de la base de données
+    // Renvoie vrai si la suppression a réussie
+    // Renvoie faux sinon.
+    public boolean deleteUserByEmail(String email){
+        
+        try{
+            User userToDelete;
+            // On cherche l'utilisateur 
+            userToDelete = getUserByEmail(email);
+            
+            // Si on l'a trouvé, on le supprime
+            if(userToDelete != null){
+                em.remove(userToDelete);
+                return true;
+            }
+            else{
+                // On n'a pas trouvé l'utilisateur dans la BDD
+                return false;
+            }
+        }
+        catch(Exception e){
+            System.out.println("Erreur dans la suppression d'un utilisateur");
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+    
+    // Modifie l'adresse email d'un utilisateur
+    // Renvoie vrai si réussi
+    // Renvoie faux sinon (pas d'utilisateur avec oldEmail, ou déjà un utilisateur avec newEmail
+    public boolean changeUserEmail(String oldEmail, String newEmail){
+        
+        // On vérifie que l'adresse mail n'existe pas déjà dans la Bdd.
+        try{
+            User alreadyUsedEmail = getUserByEmail(newEmail);
+            
+            // On a trouvé un utilisateur avec la même adresse email
+            if(alreadyUsedEmail != null){
+                return false;
+            }
+        }
+        catch(Exception e){
+            System.out.println("Erreur dans la modification d'email");
+            System.out.println(e.getMessage());
+            return false;
+        }
+        
+        try{
+            User userToChange;
+            
+            // On cherche l'utilisateur 
+            userToChange = getUserByEmail(oldEmail);
+            
+            // Si on l'a trouvé, on change son email
+            if(userToChange != null){
+                userToChange.setEmail(newEmail);
+                em.persist(userToChange);
+                return true;
+            }
+            else{
+                // On n'a pas trouvé l'utilisateur dans la BDD
+                return false;
+            }
+        }
+        catch(Exception e){
+            System.out.println("Erreur dans la suppression d'un utilisateur");
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+    
+    // TODO: toutes les autres fonctions de modification qu'on aura besoin.
+    //sur le modèle de changeUserEmail
     
 }
