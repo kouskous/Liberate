@@ -46,7 +46,7 @@
                 </div>
                     
                 <div class="span8">
-                    <form class="form-horizontal login-box inscription" action="index.html" method="post">
+                    <form class="form-horizontal login-box inscription" action="inscription/new" method="post">
 			<fieldset>				
                             <div class="input-prepend" title="Nom et prénom">
                                 <p>Entrez votre nom et votre prénom</p>
