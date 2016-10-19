@@ -33,7 +33,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "UserProjet.findByDateCreation", query = "SELECT u FROM UserProjet u WHERE u.dateCreation = :dateCreation"),
     @NamedQuery(name = "UserProjet.findByDateModification", query = "SELECT u FROM UserProjet u WHERE u.dateModification = :dateModification"),
     @NamedQuery(name = "UserProjet.findByIdU", query = "SELECT u FROM UserProjet u WHERE u.userProjetPK.idUser = :idU"),
-    @NamedQuery(name = "UserProjet.findByIdP", query = "SELECT u FROM UserProjet u WHERE u.userProjetPK.idProjet = :idP")})
+    @NamedQuery(name = "UserProjet.findByIdP", query = "SELECT u FROM UserProjet u WHERE u.userProjetPK.idProjet = :idP"),
+    @NamedQuery(name = "UserProjet.findByIdUAndIdP", query = "SELECT u FROM UserProjet u WHERE u.userProjetPK.idProjet = :idP AND u.userProjetPK.idUser = :idU")
+})
 public class UserProjet implements Serializable {
 
     @EmbeddedId

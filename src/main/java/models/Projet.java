@@ -121,6 +121,12 @@ public class Projet implements Serializable {
         this.langage = langage;
     }
 
+    public Integer getIdProjet() {
+        return idProjet;
+    }
+
+    
+    
     @XmlTransient
     public Collection<UserProjet> getUserProjetCollection() {
         return userProjetCollection;
