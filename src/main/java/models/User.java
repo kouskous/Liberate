@@ -65,6 +65,10 @@ public class User implements Serializable {
     private String prenom;
     
     @Basic(optional = false)
+    @Column(name = "cleMotDePasse")
+    private String cleMotDePasse;
+    
+    @Basic(optional = false)
     @Column(name = "dateCreation")
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateCreation;
@@ -101,7 +105,8 @@ public class User implements Serializable {
     public User() {
     }
 
-    public User(String pseudo, String email, String nom, String prenom, Date dateCreation, Date dateModification) {
+    public User(String pseudo, String email, String nom, String prenom, Date dateCreation, 
+            Date dateModification) {
         this.pseudo = pseudo;
         this.email = email;
         this.nom = nom;
@@ -109,7 +114,8 @@ public class User implements Serializable {
         this.dateCreation = dateCreation;
         this.dateModification = dateModification;
     }
-
+    
+    // Getters and setters
     public String getPseudo() {
         return pseudo;
     }
@@ -158,6 +164,14 @@ public class User implements Serializable {
         this.dateModification = dateModification;
     }
 
+    public String getCleMotDePasse() {
+        return cleMotDePasse;
+    }
+
+    public void setCleMotDePasse(String cleMotDePasse) {
+        this.cleMotDePasse = cleMotDePasse;
+    }
+    
     @XmlTransient
     public Collection<UserProjet> getUserProjetCollection() {
         return userProjetCollection;
