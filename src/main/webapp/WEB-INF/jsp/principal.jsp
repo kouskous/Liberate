@@ -38,9 +38,6 @@
 	<link rel="shortcut icon" href="/Liber8/resources/metro/img/favicon.ico">
 	<!-- end: Favicon -->
 	
-		
-		
-		
 </head>
 
 <body>
@@ -51,42 +48,42 @@
 								
 				<!-- start: Header Menu -->
 				<div class="nav-no-collapse header-nav">
-                                    <ul class="nav pull-right">
+                                    <ul class="nav pull-left menu-options">
                                         <li class="btn_action">
-                                            <a href="#">Nouveau Projet +</a>
+                                            <a href="/Liber8/newProjet"><i class="halflings-icon white plus-sign"></i>Projet </a>
                                         </li>
                                         
                                         <li class="btn_action">
-                                            <a href="#">Nouveau Dossier #</a>
+                                            <a href="#"><i class="halflings-icon white plus-sign"></i>Dossier </a>
                                         </li>
                                         
                                         <li class="btn_action">
-                                            <a href="#">Nouveau Fichier -</a>
+                                            <a href="#"><i class="halflings-icon white plus-sign"></i>Fichier </a>
                                         </li>
                                         
                                         <li class="btn_action">
-                                            <a href="#">Importer</a>
+                                            <a href="#"><i class="icon-signin"></i>Importer</a>
                                         </li>
                                         
                                         <li class="btn_action">
-                                            <a href="#">Exporter</a>
+                                            <a href="#"><i class="icon-signout"></i>Exporter</a>
                                         </li>
                                         
                                         <li class="btn_action">
-                                            <a href="#">Push</a>
+                                            <a href="#"><i class="icon-upload-alt"></i>Push</a>
                                         </li>
                                         
                                         <li class="btn_action">
-                                            <a href="#">Enregistrer</a>
+                                            <a href="#"><i class="icon-save"></i>Enregistrer</a>
                                         </li>
                                         
                                         <li class="btn_action">
-                                            <a href="#">Compiler</a>
+                                            <a href="#"><i class="icon-play"></i>Compiler</a>
                                         </li>
 
                                         <li class="dropdown hidden-phone">
                                                 <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                                                    <span>Options</span>
+                                                    <span><i class="halflings-icon cog white"></i>Options </span><span class="caret"></span>
                                                 </a>
                                                 <ul class="dropdown-menu notifications">	
                                                     <li>
@@ -129,15 +126,12 @@
 
                                         <li class="dropdown">
                                                     <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                                                            <i class="halflings-icon white user"></i> ${sessionScope.pseudo}
+                                                            <i class="halflings-icon white user"></i> ${sessionScope.user.pseudo}
                                                             <span class="caret"></span>
                                                     </a>
                                                     <ul class="dropdown-menu">
-                                                            <li class="dropdown-menu-title">
-                                                                    <span>Mon Compte</span>
-                                                            </li>
                                                             <li><a href="#"><i class="halflings-icon user"></i> Profile</a></li>
-                                                            <li><a href="/Liber8/resources/metro/login.html"><i class="halflings-icon off"></i> Déconnexion</a></li>
+                                                            <li><a href="/Liber8/logout"><i class="halflings-icon off"></i> Déconnexion</a></li>
                                                     </ul>
                                         </li>
                                     </ul>
@@ -213,10 +207,10 @@
 	
 	<div class="clearfix"></div>
 	
-	<footer>
+	<footer class="principal-footer">
 
 		<p>
-			<span style="text-align:left;float:left">&copy; 2013 <a href="http://jiji262.github.io/Bootstrap_Metro_Dashboard/" alt="Bootstrap_Metro_Dashboard">Bootstrap Metro Dashboard</a></span>
+			<span style="text-align:left;float:left">&copy; 2013 Liberate technology</span>
 			
 		</p>
 

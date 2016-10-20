@@ -32,8 +32,15 @@ public class LoginController {
     }
     
     @RequestMapping(value="/login", method = RequestMethod.GET)
-    public String index(){
-        return "login";
+    public String index(HttpServletRequest request){
+        // On vérifie qu'une session n'est pas déjà ouverte
+        HttpSession session= request.getSession();
+        User user = (User)session.getAttribute("user");
+ 
+        if(user == null) // Pas de session ouverte
+            return "login";
+        else // Une session déjà ouverte
+            return "redirect:/";
     }
    
     @RequestMapping(value="/login", method = RequestMethod.POST)
@@ -46,7 +53,7 @@ public class LoginController {
                 error = "Aucun compte n'est rattaché à ce pseudo";
             } else if (request.getParameter("password").equals((userDao.getUserByPseudo(request.getParameter("username"))).getCleMotDePasse())) {
                 HttpSession session = request.getSession();
-                session.setAttribute("pseudo", (String)request.getParameter("username"));
+                session.setAttribute("user", userDb);
                 return "redirect:/";
             } else {
                 error = "mot de passe incorrect";
@@ -56,6 +63,14 @@ public class LoginController {
         }
         model.addAttribute("error", error);
 
+        return "login";
+            
+    }
+    
+    @RequestMapping(value="/logout", method = RequestMethod.GET)
+    public String logout(HttpServletRequest request){
+        HttpSession session = request.getSession();
+        session.invalidate();
         return "login";
             
     }

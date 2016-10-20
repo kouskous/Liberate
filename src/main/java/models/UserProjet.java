@@ -73,6 +73,9 @@ public class UserProjet implements Serializable {
         this.dateModification = dateModification;
         this.user = user;
         this.projet = projet;
+        userProjetPK = new UserProjetPK();
+        userProjetPK.setIdProjet(projet.getIdProjet());
+        userProjetPK.setIdUser(user.getIdUser());
     }
     
     public void setUserProjetPK(int idProj, int idUser){

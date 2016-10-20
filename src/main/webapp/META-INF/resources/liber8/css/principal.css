@@ -37,6 +37,7 @@ and open the template in the editor.
 
     #sidebar-left {
         height: 110% !important;
+        background-color: white !important;
     }
 }
 
@@ -48,6 +49,7 @@ and open the template in the editor.
     
     #sidebar-left {
         height: 110% !important;
+        background-color: white !important;
     }
 }
 
@@ -150,12 +152,14 @@ li.btn_action a {
 #editeur {
     width: 97%;
     height: 100%;
-    border: 1px solid blue;
+    border: 1px solid black;
     border-radius: 5px;
     /*border-color: blue;*/
     overflow: auto;
     word-wrap: break-word;
     padding-left: 3%;
+    background: black;
+    color: white;
 }
 
 #lignes {
@@ -178,4 +182,21 @@ li.btn_action a {
 
 .file {
     color: green;
+}
+
+.header-nav {
+    font-size: 12px;
+    
+}
+
+.menu-options{
+    margin-left: 50px !important;
+}
+
+footer {
+    color:white;
+    background: #CC3939 !important;
+    position:fixed;
+    bottom: 0px;
+    width:100%;
 }
