@@ -170,6 +170,34 @@ public class UserDao {
         }
     }
     
+    // Cherche si l'email est déjà utilisé dans la BDD
+    // - Vrai si oui
+    // - Faux sinon
+    public boolean emailAlreadyUsed(String email) throws Exception{
+
+        User testEmail = getUserByEmail(email);
+
+        if(testEmail != null){
+            // Email déjà utilisé
+            return true;
+        }
+        return false;
+    }
+    
+    // Cherche si le pseudo est déjà utilisé dans la BDD
+    // - Vrai si oui
+    // - Faux sinon
+    public boolean pseudoAlreadyUsed(String pseudo) throws Exception{
+
+        User testPseudo = getUserByPseudo(pseudo);
+
+        if(testPseudo != null){
+            // Pseudo déjà utilisé
+            return true;
+        }
+        return false;
+    }
+    
     // TODO: toutes les autres fonctions de modification qu'on aura besoin.
     //sur le modèle de changeUserEmail
     

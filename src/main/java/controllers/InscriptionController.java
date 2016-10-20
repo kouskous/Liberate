@@ -50,12 +50,14 @@ public class InscriptionController {
         String mail = request.getParameter("mail");
         String nom = request.getParameter("nom");
         String prenom = request.getParameter("prenom");
+        String motDePasse = request.getParameter("password");
         
         // Test regex des entrées
         if(!testRegex(regex1, pseudo) ||
            !testRegex(regex1, nom) ||
            !testRegex(regex1, prenom) ||
-           !testRegex(regex2, mail))
+           !testRegex(regex2, mail) ||
+           motDePasse.length() < 6)
         {
             model.addAttribute("Erreur", "Echec Regex");
             return "inscription";
@@ -63,16 +65,12 @@ public class InscriptionController {
         
         // Test d'existence pour les champs uniques (pseudo, email).
         try{
-            User testEmail = userDao.getUserByEmail(mail);
-            if(testEmail != null){
+            if(userDao.emailAlreadyUsed(mail)){
                 // Email déjà utilisé
                 model.addAttribute("Erreur", "Email déjà utilisé");
                 return "inscription";
             }
-            
-            //try
-            User testPseudo = userDao.getUserByPseudo(pseudo);
-            if(testPseudo != null){
+            if(userDao.pseudoAlreadyUsed(pseudo)){
                 // Email déjà utilisé
                 model.addAttribute("Erreur", "Pseudo déjà utilisé");
                 return "inscription";
@@ -94,7 +92,7 @@ public class InscriptionController {
                                             request.getParameter("prenom"), 
                                             new Date(), 
                                             new Date(),
-                                            "motDePasse");
+                                            motDePasse);
                
         if(newUser != null){
             // L'utilisateur a bien été créé
