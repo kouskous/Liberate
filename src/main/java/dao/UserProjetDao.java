@@ -35,21 +35,21 @@ public class UserProjetDao {
     // - exception si il y a plusieurs UserProjets avec la même paire user/projet.
     public UserProjet getUserProjetByUIdPId(int idUser, int idProjet) throws Exception{
         
-        // Recherche du projet par nom (unique)
+        // Recherche du UserProjet par idUser et idProjet (unique)
         TypedQuery<UserProjet> query = em.createNamedQuery("UserProjet.findByIdUAndIdP", UserProjet.class);
         query.setParameter("idP", idProjet);
         query.setParameter("idU", idUser);
         List<UserProjet> results = query.getResultList();
         
-        // Si aucun projet n'est trouvé avec ce nom
+        // Si aucun UserProjet n'est trouvé avec ces ID
         if(results.isEmpty()){
             return null;
         }
-        // Un projet a été trouvé
+        // Un UserProjet a été trouvé
         else if(results.size() == 1){
             return results.get(0);
         }
-        // Anomalie: plusieurs projets ont été trouvé avec le même nom
+        // Anomalie: plusieurs UserProjet ont été trouvé avec le même nom
         else{
             throw new Exception("Erreur BDD: plusieurs UserProjets avec la même paire User/Projet");
         }
@@ -108,4 +108,58 @@ public class UserProjetDao {
         }
     }
     
+    
+    // Change les droits d'un userProjet existant, ou le créé avec ces droits sinon.
+    // TypeDroit doit faire partie de {"Admin", "Dev", "Reporter"}
+    // - Renvoie vrai si réussite
+    // - Faux sinon
+    public boolean changeDroitsUserProjet(String typeDroit, int idUser, int idProjet){
+        
+        // On teste que typeDroit est une chaine de caractère valide
+        if (typeDroit.equals("Admin") || typeDroit.equals("Dev") || typeDroit.equals("Reporter")){
+            try{
+                UserProjet userProjet = getUserProjetByUIdPId(idUser, idProjet);
+
+                if(userProjet == null) // Le userProjet n'a pas été trouvé
+                    return false;
+                else{
+                    return changeDroitsUserProjet(typeDroit, userProjet);
+                }
+            }
+            catch(Exception e){
+                System.out.println("Erreur lors du changement de droits d'utilisateur");
+                System.out.println(e.getMessage());
+                return false;
+            }
+        }
+        else{ // La chaine typeDroit n'est pas valide
+            return false;
+        }
+    }
+    
+    // Change les droits d'un userProjet existant, ou le créé avec ces droits sinon.
+    // TypeDroit doit faire partie de {"Admin", "Dev", "Reporter"}
+    // - Renvoie vrai si réussite
+    // - Faux sinon
+    public boolean changeDroitsUserProjet(String typeDroit, UserProjet userProjet){
+        
+        // Vérification que typeDroit est une chaine de caractère valide
+        if (typeDroit.equals("Admin") || typeDroit.equals("Dev") || typeDroit.equals("Reporter")){
+            userProjet.setTypeDroit(typeDroit);
+      
+            try{
+                em.persist(em);
+                return true;
+            }
+            catch (Exception e){
+                System.out.println("Erreur lors du changement de droits utilisateur projet");
+                System.out.println(e.getMessage());
+                return false;
+            }
+        }
+        else{ // typeDroit n'est pas une chaine de caractères valide
+            return false;
+        }
+        
+    }
 }
