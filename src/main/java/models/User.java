@@ -171,6 +171,12 @@ public class User implements Serializable {
     public void setCleMotDePasse(String cleMotDePasse) {
         this.cleMotDePasse = cleMotDePasse;
     }
+
+    public Integer getIdUser() {
+        return idUser;
+    }
+    
+    
     
     @XmlTransient
     public Collection<UserProjet> getUserProjetCollection() {

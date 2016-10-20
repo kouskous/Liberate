@@ -51,7 +51,7 @@ public class UserDao {
             throw new Exception("Erreur BDD: plusieurs utilisateurs avec le même email");
         }
     }
-       
+    
     // Cherche l'utilisateur dans la BDD
     // - renvoie null si il n'y est pas.
     // - renvoie l'user si il y est
@@ -62,7 +62,7 @@ public class UserDao {
         TypedQuery<User> query = em.createNamedQuery("User.findByPseudo", User.class);
         query.setParameter("pseudo", pseudo);
         List<User> results = query.getResultList();
-        
+
         // Si aucun utilisateur n'est trouvé avec ce pseudo
         if(results.isEmpty()){
             return null;
@@ -168,6 +168,34 @@ public class UserDao {
             System.out.println(e.getMessage());
             return false;
         }
+    }
+    
+    // Cherche si l'email est déjà utilisé dans la BDD
+    // - Vrai si oui
+    // - Faux sinon
+    public boolean emailAlreadyUsed(String email) throws Exception{
+
+        User testEmail = getUserByEmail(email);
+
+        if(testEmail != null){
+            // Email déjà utilisé
+            return true;
+        }
+        return false;
+    }
+    
+    // Cherche si le pseudo est déjà utilisé dans la BDD
+    // - Vrai si oui
+    // - Faux sinon
+    public boolean pseudoAlreadyUsed(String pseudo) throws Exception{
+
+        User testPseudo = getUserByPseudo(pseudo);
+
+        if(testPseudo != null){
+            // Pseudo déjà utilisé
+            return true;
+        }
+        return false;
     }
     
     // TODO: toutes les autres fonctions de modification qu'on aura besoin.
