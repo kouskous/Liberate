@@ -1,0 +1,47 @@
+.logo {
+	text-align: center;
+	margin: 15% 0;
+}
+.logo img {
+	width:250px;
+	margin-bottom: 20px
+}
+.bouton {
+	float: right;
+    margin: 30px 0;
+}
+.logo p {
+	color: #fff;
+    font-size: 16px;
+}
+.inscription .input-prepend p {
+	font-size: 14px;
+	text-align: left;
+}
+.inscription .input-prepend {
+	padding: 0;
+}
+.login-box.inscription input[type="text"], .login-box.inscription input[type="password"] {
+	border-left: 1px solid #eee !important;
+}
+.login-box.inscription {
+	width: 500px;
+}
+.row-fluid .inscription input[class*="span"].offset1 {
+margin-left: 10.638297872340425%!important;
+}
+.error_name .alert, .error_prenom .alert, .error_pseudo .alert, .error_mail .alert, #result, #resultconfirm, #emptyform , .alert-error {
+	font-size: 11px;
+	margin-top: 10px;
+	text-align: center;
+}
+.error_name .alert i , .error_prenom .alert i, .error_pseudo .alert i, .error_mail .alert i , #result, #resultconfirm i, #emptyform, .alert-error i {
+	padding-right: 6px;
+}
+.login-box.inscription p {
+	margin: 10px 20px;
+}
+.login-box.inscription input[type="text"].bordure, .login-box.inscription input[type="password"].bordure{
+	border-color: #f27b81 !important;
+	border-left-color: #f27b81 !important;
+}

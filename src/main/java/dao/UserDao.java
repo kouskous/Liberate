@@ -62,17 +62,15 @@ public class UserDao {
         TypedQuery<User> query = em.createNamedQuery("User.findByPseudo", User.class);
         query.setParameter("pseudo", pseudo);
         List<User> results = query.getResultList();
-        
+
         // Si aucun utilisateur n'est trouvé avec ce pseudo
         if(results.isEmpty()){
             return null;
         }
-
         // Un utilisateur a été trouvé
         else if(results.size() == 1){
             return results.get(0);
         }
-
         // Anomalie: plusieurs utilisateurs ont été trouvé avec le même pseudo
         else{
             throw new Exception("Erreur BDD: plusieurs utilisateurs avec le même pseudo");
