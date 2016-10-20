@@ -93,7 +93,7 @@ public class UserDao {
             return newUser;
         }
         catch(Exception e){
-            System.out.println("Erreur lors de l'ajout d'un nouvel user");
+            System.out.println("Erreur lors de l'ajout d'un nouvel user :");
             System.out.println(e.getMessage());
             return null;
         }
@@ -164,7 +164,7 @@ public class UserDao {
             }
         }
         catch(Exception e){
-            System.out.println("Erreur dans la suppression d'un utilisateur");
+            System.out.println("Erreur dans la modification d'un email d'un utilisateur");
             System.out.println(e.getMessage());
             return false;
         }

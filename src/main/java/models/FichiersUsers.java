@@ -36,7 +36,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "FichiersUsers.findByNomPhysique", query = "SELECT f FROM FichiersUsers f WHERE f.nomPhysique = :nomPhysique"),
     @NamedQuery(name = "FichiersUsers.findByNomReel", query = "SELECT f FROM FichiersUsers f WHERE f.nomReel = :nomReel"),
     @NamedQuery(name = "FichiersUsers.findByDateCreation", query = "SELECT f FROM FichiersUsers f WHERE f.dateCreation = :dateCreation"),
-    @NamedQuery(name = "FichiersUsers.findByType", query = "SELECT f FROM FichiersUsers f WHERE f.type = :type")})
+    @NamedQuery(name = "FichiersUsers.findByType", query = "SELECT f FROM FichiersUsers f WHERE f.type = :type"),
+    @NamedQuery(name = "FichiersUsers.findByUser", query = "SELECT f FROM FichiersUsers f WHERE f.user = :user")})
 public class FichiersUsers implements Serializable {
 
     @Id
@@ -73,9 +74,8 @@ public class FichiersUsers implements Serializable {
     public FichiersUsers() {
     }
 
-    public FichiersUsers(Integer idF, String pathLogique, String nomPhysique, String nomReel, Date dateCreation, 
+    public FichiersUsers(String pathLogique, String nomPhysique, String nomReel, Date dateCreation,
             boolean type, User user) {
-        this.idFichierUser = idF;
         this.pathLogique = pathLogique;
         this.nomPhysique = nomPhysique;
         this.nomReel = nomReel;
