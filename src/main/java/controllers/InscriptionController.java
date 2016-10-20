@@ -11,6 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import models.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -38,13 +39,28 @@ public class InscriptionController {
     }
     
     @RequestMapping(value="/inscription", method = RequestMethod.GET)
-    public String index(){
-        return "inscription";
+    public String index(HttpServletRequest request){
+        
+        // On vérifie qu'une session n'est pas déjà ouverte
+        HttpSession session= request.getSession();
+        String pseudo = (String)session.getAttribute("pseudo");
+ 
+        if(pseudo == null) // Pas de session ouverte
+            return "inscription";
+        else // Une session déjà ouverte
+            return "redirect:/";
     }
     
     // Nouvelle inscription
     @RequestMapping(value="/inscription", method = RequestMethod.POST)
     public String newUser(HttpServletRequest request, ModelMap model){
+        
+        // On vérifie qu'une session n'est pas déjà ouverte
+        HttpSession session= request.getSession();
+        String pseudonyme = (String)session.getAttribute("pseudo");
+ 
+        if(pseudonyme != null) // Pas de session ouverte
+            return "redirect:/";
         
         String pseudo = request.getParameter("pseudo");
         String mail = request.getParameter("mail");
@@ -71,7 +87,7 @@ public class InscriptionController {
                 return "inscription";
             }
             if(userDao.pseudoAlreadyUsed(pseudo)){
-                // Email déjà utilisé
+                // Pseudo déjà utilisé
                 model.addAttribute("Erreur", "Pseudo déjà utilisé");
                 return "inscription";
             }
@@ -99,7 +115,7 @@ public class InscriptionController {
             try{
                 em.getTransaction().commit();
                 // Réussite, redirection page principale
-                return "redirect:/";
+                return "redirect:/login";
             }
             catch(Exception e){
                 // Erreur pendant le commit
