@@ -43,7 +43,7 @@ public class InscriptionController {
     }
     
     // Nouvelle inscription
-    @RequestMapping(value="/inscription/new", method = RequestMethod.POST)
+    @RequestMapping(value="/inscription", method = RequestMethod.POST)
     public String newUser(HttpServletRequest request, ModelMap model){
         
         String pseudo = request.getParameter("pseudo");
@@ -58,7 +58,7 @@ public class InscriptionController {
            !testRegex(regex2, mail))
         {
             model.addAttribute("Erreur", "Echec Regex");
-            return "/inscription";
+            return "inscription";
         }
         
         // Test d'existence pour les champs uniques (pseudo, email).
@@ -67,21 +67,21 @@ public class InscriptionController {
             if(testEmail != null){
                 // Email déjà utilisé
                 model.addAttribute("Erreur", "Email déjà utilisé");
-                return "/inscription";
+                return "inscription";
             }
             
             //try
-            User testPseudo = userDao.getUserByEmail(pseudo);
+            User testPseudo = userDao.getUserByPseudo(pseudo);
             if(testPseudo != null){
                 // Email déjà utilisé
                 model.addAttribute("Erreur", "Pseudo déjà utilisé");
-                return "/inscription";
+                return "inscription";
             }
         }
         catch(Exception e){
             // Erreur pendant le requetage.
             model.addAttribute("Erreur", "Communication BDD");
-            return "/inscription";
+            return "inscription";
         }
         
         // TODO: génération de la clé mot de passe ici
@@ -106,13 +106,13 @@ public class InscriptionController {
             catch(Exception e){
                 // Erreur pendant le commit
                 model.addAttribute("Erreur", "Communication BDD");
-                return "/inscription";
+                return "inscription";
             }
         }
         else{
             // L'utilisateur n'a pas été créé
             model.addAttribute("Erreur", "Communication BDD");
-            return "/inscription";
+            return "inscription";
         }
     }
     

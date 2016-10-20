@@ -130,7 +130,6 @@ $('#passwordconfirm').on('keyup',function(e)
 			$('#resultconfirm').removeClass()
 			$('#resultconfirm').addClass('offset3 span6 alert alert-danger')
 			return 'Vos mots de passe ne correspendent pas';
-			valid = false;
 			
 		}
 		else 
@@ -198,11 +197,12 @@ $('#passwordconfirm').on('keyup',function(e)
 		else {
 			$('#passwordconfirm').removeClass("bordure");
 		}
-		alert(valid)
+		/*alert(valid);
 		alert(valid1);
 		 if(!valid  || !valid1) {
 		return false;
-	}
+        
+            }*/
 	});
 
 });

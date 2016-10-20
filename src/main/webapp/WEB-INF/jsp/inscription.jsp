@@ -37,6 +37,7 @@
     </head>
     <body>
         <div class="container-fluid">
+            ${Erreur}
             <div class="row-fluid">
                 <div class="span4 logo">
                     <div class="vertically">
@@ -46,7 +47,7 @@
                 </div>
                     
                 <div class="span8">
-                    <form class="form-horizontal login-box inscription" action="inscription/new" method="post">
+                    <form class="form-horizontal login-box inscription" action="inscription" method="post">
                         <fieldset>
                             <div id="emptyform"></div>
                             <div class="input-prepend" title="Nom et prénom">
