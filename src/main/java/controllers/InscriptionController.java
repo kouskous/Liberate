@@ -43,9 +43,9 @@ public class InscriptionController {
         
         // On vérifie qu'une session n'est pas déjà ouverte
         HttpSession session= request.getSession();
-        String pseudo = (String)session.getAttribute("pseudo");
+        User user = (User)session.getAttribute("user");
  
-        if(pseudo == null) // Pas de session ouverte
+        if(user == null) // Pas de session ouverte
             return "inscription";
         else // Une session déjà ouverte
             return "redirect:/";
@@ -59,9 +59,9 @@ public class InscriptionController {
         
         // On vérifie qu'une session n'est pas déjà ouverte
         HttpSession session= request.getSession();
-        String pseudonyme = (String)session.getAttribute("pseudo");
+        User user = (User)session.getAttribute("user");
  
-        if(pseudonyme != null) // Pas de session ouverte
+        if(user != null) // Pas de session ouverte
             return "redirect:/";
         
         String pseudo = request.getParameter("pseudo");
