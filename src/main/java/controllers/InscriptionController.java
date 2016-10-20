@@ -70,6 +70,7 @@ public class InscriptionController {
                 return "/inscription";
             }
             
+            //try
             User testPseudo = userDao.getUserByEmail(pseudo);
             if(testPseudo != null){
                 // Email déjà utilisé
