@@ -78,8 +78,7 @@ public class UserDao {
             throw new Exception("Erreur BDD: plusieurs utilisateurs avec le même pseudo");
         }
     }
-
-       
+    
     // Création d'un nouvel utilisateur
     // Renvoie l'utilisateur si réussite
     // Renvoie null sinon
