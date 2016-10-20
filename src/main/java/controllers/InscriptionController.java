@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  *
- * @author sofiafaddi
+ * @author Luc Di Sanza
  */
 @Controller
 public class InscriptionController {
