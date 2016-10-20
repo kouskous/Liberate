@@ -95,7 +95,6 @@ public class ProjetController {
                     
                     // TODO: ajouter les autres users projet ici
                     // TODO: ajouter tous les fichiers de base du projet ici
-                    
                     try{
                         em.getTransaction().commit();
                         // Réussite, redirection page principale
