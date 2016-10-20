@@ -36,6 +36,8 @@ public class InscriptionController {
         return "inscription";
     }
     
+    //try
+    
     // Nouvelle inscription
     @RequestMapping(value="/inscription/new", method = RequestMethod.POST)
     public String newUser(HttpServletRequest request, ModelMap model){
