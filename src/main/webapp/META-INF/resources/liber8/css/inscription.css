@@ -41,7 +41,7 @@ margin-left: 10.638297872340425%!important;
 .login-box.inscription p {
 	margin: 10px 20px;
 }
-.login-box.inscription input[type="text"].bordure{
+.login-box.inscription input[type="text"].bordure, .login-box.inscription input[type="password"].bordure{
 	border-color: #f27b81 !important;
 	border-left-color: #f27b81 !important;
 }

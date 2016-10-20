@@ -8,12 +8,14 @@ $('#nom').bind('blur',function(e){
   if (!$(this).val().match(regexname)) 
 	{
 		$(this).next(".error_name").html("<div class='alert alert-error' role='alert'><i class='icon-exclamation-sign' aria-hidden='true'></i><span>Veuillez entrer un nom correct</div>");
-		valid =false;
+		valid = false;
 	}
 
 	else {
         $(this).next('.error_name').html("");
         $('#nom').removeClass("bordure");
+       
+
 	}
 });
 $('#prenom').bind('blur',function(e){ 
@@ -25,6 +27,7 @@ $('#prenom').bind('blur',function(e){
 	}
 	else {
         $(this).next('.error_prenom').fadeOut();
+         $('#prenom').removeClass("bordure");
 	}	
 });
 $('#pseudo').bind('blur',function(e){ 
@@ -36,6 +39,7 @@ if (!$(this).val().match(regexname))
 	}
 	else {
         $(this).next('.error_pseudo').fadeOut();
+         $('#pseudo').removeClass("bordure");
 	}	
 });
 $('#mail').bind('blur',function(e){ 
@@ -48,6 +52,7 @@ if (!$(this).val().match(expr))
 	}
 	else {
         $(this).next('.error_mail').fadeOut();
+         $('#mail').removeClass("bordure");
 	}	
 });
 
@@ -55,11 +60,13 @@ if (!$(this).val().match(expr))
 $('#password').on('keyup',function(e)
 	{
 		$('#result').html(checkStrength($('#password').val()))
+		 $('#password').removeClass("bordure");
 	
 	});	
 $('#passwordconfirm').on('keyup',function(e)
 	{
 		$('#resultconfirm').html(checkequals($('#password').val(),$('#passwordconfirm').val()))
+		 $('#passwordconfirm').removeClass("bordure");
 	});	
 	/*
 		checkStrength is function which will do the 
@@ -117,11 +124,13 @@ $('#passwordconfirm').on('keyup',function(e)
 		}
 	}
 	function checkequals(password,passwordconfirm) {
+
 		if(password!=passwordconfirm)
 		{
 			$('#resultconfirm').removeClass()
 			$('#resultconfirm').addClass('offset3 span6 alert alert-danger')
 			return 'Vos mots de passe ne correspendent pas';
+			valid = false;
 			
 		}
 		else 
@@ -131,65 +140,69 @@ $('#passwordconfirm').on('keyup',function(e)
 			return 'Vos mots de passe correspendent';
 		}
 	}
+	
 	$(".inscription .bouton").click(function(e){
-		if($('#nom').val()==''){
+		valid1 = true;
+		if(!$('#nom').val()){
 			$('#nom').addClass("bordure");
-			valid=false;
-		$("#emptyform").html("<div class='alert alert-error offset2 span8' role='alert'><i class='icon-exclamation-sign' aria-hidden='true'></i><span>Il y a des champs vides</div>");	
-		}
+			valid1=false;
+				$("#emptyform").html("<div class='alert alert-error offset2 span8' role='alert'><i class='icon-exclamation-sign' aria-hidden='true'></i><span>Il y a des champs vides</div>");	
+			}
+
 		else {
 			$('#nom').removeClass("bordure");
 		}
-		 if($('#prenom').val()=='') {
+		if(!$('#prenom').val()){
 			$('#prenom').addClass("bordure");
-			valid=false;
-			$("#emptyform").html("<div class='alert alert-error offset2 span8' role='alert'><i class='icon-exclamation-sign' aria-hidden='true'></i><span>Il y a des champs vides</div>");
-		
-		}
+			valid1=false;
+				$("#emptyform").html("<div class='alert alert-error offset2 span8' role='alert'><i class='icon-exclamation-sign' aria-hidden='true'></i><span>Il y a des champs vides</div>");	
+			}
+
 		else {
-			$(this).css("border","1px solid #eee");
+			$('#prenom').removeClass("bordure");
 		}
-		if($('#pseudo').val()=='') {
-			$(this).css("border","1px solid f27b81");
-			valid=false;
-			$("#emptyform").html("<div class='alert alert-error offset2 span8' role='alert'><i class='icon-exclamation-sign' aria-hidden='true'></i><span>Il y a des champs vides</div>");
 		
-		}
+	if(!$('#pseudo').val()){
+			$('#pseudo').addClass("bordure");
+			valid1=false;
+				$("#emptyform").html("<div class='alert alert-error offset2 span8' role='alert'><i class='icon-exclamation-sign' aria-hidden='true'></i><span>Il y a des champs vides</div>");	
+			}
+
 		else {
-			$(this).css("border","1px solid #eee");
-			valid=false;
-			$("#emptyform").html("<div class='alert alert-error offset2 span8' role='alert'><i class='icon-exclamation-sign' aria-hidden='true'></i><span>Il y a des champs vides</div>");
-		
+			$('#pseudo').removeClass("bordure");
 		}
-		if( $('#mail').val()=='')
-		{
-			$(this).css("border","1px solid f27b81");
-			valid=false;
-			$("#emptyform").html("<div class='alert alert-error offset2 span8' role='alert'><i class='icon-exclamation-sign' aria-hidden='true'></i><span>Il y a des champs vides</div>");
-		
-		}
+	if(!$('#mail').val()){
+			$('#mail').addClass("bordure");
+			valid1=false;
+				$("#emptyform").html("<div class='alert alert-error offset2 span8' role='alert'><i class='icon-exclamation-sign' aria-hidden='true'></i><span>Il y a des champs vides</div>");	
+			}
+
 		else {
-			$(this).css("border","1px solid #eee");
+			$('#password').removeClass("bordure");
 		}
-		if($('#password').val()=='') {
-			$(this).css("border","1px solid f27b81");
-			valid=false;
-			$("#emptyform").html("<div class='alert alert-error offset2 span8' role='alert'><i class='icon-exclamation-sign' aria-hidden='true'></i><span>Il y a des champs vides</div>");
-		
-		}
+		if(!$('#password').val()){
+			$('#password').addClass("bordure");
+			valid1=false;
+				$("#emptyform").html("<div class='alert alert-error offset2 span8' role='alert'><i class='icon-exclamation-sign' aria-hidden='true'></i><span>Il y a des champs vides</div>");	
+			}
+
 		else {
-			$(this).css("border","1px solid #eee");
+			$('#password').removeClass("bordure");
 		}
-		if($('#passwordconfirm').val()=='') {
-			$(this).css("border","1px solid f27b81");
-			valid=false;
-			$("#emptyform").html("<div class='alert alert-error offset2 span8' role='alert'><i class='icon-exclamation-sign' aria-hidden='true'></i><span>Il y a des champs vides</div>");
-		
-		}
+		if(!$('#passwordconfirm').val()){
+			$('#passwordconfirm').addClass("bordure");
+			valid1=false;
+				$("#emptyform").html("<div class='alert alert-error offset2 span8' role='alert'><i class='icon-exclamation-sign' aria-hidden='true'></i><span>Il y a des champs vides</div>");	
+			}
+
 		else {
-			$(this).css("border","1px solid #eee");
+			$('#passwordconfirm').removeClass("bordure");
 		}
-		return valid;
+		alert(valid)
+		alert(valid1);
+		 if(!valid  || !valid1) {
+		return false;
+	}
 	});
 
 });
