@@ -47,7 +47,7 @@
 			<div class="row-fluid">
 				<div class="login-box">
 					<h2>Connexion à votre compte</h2>
-					<form class="form-horizontal" action="login/connexion" method="post">
+					<form class="form-horizontal" action="login" method="post">
 						<fieldset>
 							<div>
                                                             ${error}

@@ -129,15 +129,15 @@
 
                                         <li class="dropdown">
                                                     <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                                                            <i class="halflings-icon white user"></i> Dennis Ji
+                                                            <i class="halflings-icon white user"></i> ${sessionScope.pseudo}
                                                             <span class="caret"></span>
                                                     </a>
                                                     <ul class="dropdown-menu">
                                                             <li class="dropdown-menu-title">
-                                                                    <span>Account Settings</span>
+                                                                    <span>Mon Compte</span>
                                                             </li>
                                                             <li><a href="#"><i class="halflings-icon user"></i> Profile</a></li>
-                                                            <li><a href="/Liber8/resources/metro/login.html"><i class="halflings-icon off"></i> Logout</a></li>
+                                                            <li><a href="/Liber8/resources/metro/login.html"><i class="halflings-icon off"></i> Déconnexion</a></li>
                                                     </ul>
                                         </li>
                                     </ul>

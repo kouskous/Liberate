@@ -58,12 +58,12 @@ public class UserDao {
     // - exception si il y a plusieurs utilisateur avec ce pseudo dans la bdd
     public User getUserByPseudo(String pseudo) throws Exception{
         
-        // Recherche de l'user par email (unique)
+        // Recherche de l'user par pseudo (unique)
         TypedQuery<User> query = em.createNamedQuery("User.findByPseudo", User.class);
         query.setParameter("pseudo", pseudo);
         List<User> results = query.getResultList();
         
-        // Si aucun utilisateur n'est trouvé avec cet email
+        // Si aucun utilisateur n'est trouvé avec ce pseudo
         if(results.isEmpty()){
             return null;
         }
@@ -71,9 +71,9 @@ public class UserDao {
         else if(results.size() == 1){
             return results.get(0);
         }
-        // Anomalie: plusieurs utilisateurs ont été trouvé avec le même email
+        // Anomalie: plusieurs utilisateurs ont été trouvé avec le même pseudo
         else{
-            throw new Exception("Erreur BDD: plusieurs utilisateurs avec le même email");
+            throw new Exception("Erreur BDD: plusieurs utilisateurs avec le même pseudo");
         }
     }
     

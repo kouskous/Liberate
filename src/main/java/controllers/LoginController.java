@@ -9,6 +9,7 @@ import dao.UserDao;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import models.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -34,25 +35,29 @@ public class LoginController {
     public String index(){
         return "login";
     }
-    
-    @RequestMapping(value="/login/connexion", method = RequestMethod.POST)
+   
+    @RequestMapping(value="/login", method = RequestMethod.POST)
     public String connexion(HttpServletRequest request, ModelMap model){
         String error;
         try {
-            User userDb = userDao.getUserByPseudo(request.getParameter("pseudo"));
+            User userDb = userDao.getUserByPseudo(request.getParameter("username"));
+
             if(userDb == null){
                 error = "Aucun compte n'est rattaché à ce pseudo";
-            } else if (userDb.getCleMotDePasse().equals(request.getParameter("pseudo"))) {
+            } else if (request.getParameter("password").equals((userDao.getUserByPseudo(request.getParameter("username"))).getCleMotDePasse())) {
+                HttpSession session = request.getSession();
+                session.setAttribute("pseudo", (String)request.getParameter("username"));
                 return "redirect:/";
             } else {
                 error = "mot de passe incorrect";
             }
         } catch (Exception e) {
-            error = "probleme de base de données/ mapping";
+            error = "Erreur : plusieurs utilisateurs ont le même pseudo !";
         }
         model.addAttribute("error", error);
-        
+
         return "login";
+            
     }
  /** utilisation de JSON
     @ResponseBody @RequestMapping(value="/login", method = RequestMethod.GET,produces = "application/json") 
