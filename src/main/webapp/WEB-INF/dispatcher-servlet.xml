@@ -13,6 +13,6 @@
         <property name="suffix" value=".jsp" />
     </bean>
     
-    <mvc:resources mapping="/Liber8/resources/**" location="META-INF/resources/" />
+    <mvc:resources mapping="/resources/**" location="META-INF/resources/" />
  
 </beans>
