@@ -6,10 +6,13 @@
 package controllers;
 
 import dao.FichierUserDao;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.Date;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import models.FichiersUsers;
@@ -102,17 +105,20 @@ public class FileController {
                             em.close();
                             
                             // TODO: création du fichier sur le disque ici
-                            /*try{
-                                PrintWriter writer = new PrintWriter("~/" + fileName, "UTF-8");
-                                writer.print("");
-                                writer.close();
+                            //File file = new File("~/" + fileName);
+                            try{                          
+                                ServletContext ctx = request.getServletContext();
+                                String path = ctx.getRealPath("/");
+                                
+                                // TODO: change this path when deploying to server
+                                FileOutputStream out = new FileOutputStream(path + "/../" + fileName);
                             }
                             catch(Exception e){
-                                returnObject.put("errors",e.getMessage());
+                                returnObject.put("response",e.getMessage());
                                 return returnObject.toString();
-                            }*/
+                            }
                             
-                            returnObject.put("response","true");
+                            returnObject.put("response",true);
                             return returnObject.toString();
                         }
                         catch(Exception e){
@@ -193,7 +199,7 @@ public class FileController {
                         try{
                             em.persist(fichier);
                             em.close();
-                            returnObject.put("response","true");
+                            returnObject.put("response",true);
                             return returnObject.toString();
                         }
                         catch(Exception e){
