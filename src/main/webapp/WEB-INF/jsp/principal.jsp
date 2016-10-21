@@ -17,7 +17,11 @@
 	<link id="base-style-responsive" href="/Liber8/resources/metro/css/style-responsive.css" rel="stylesheet">
         <link id="base-style-responsive" href="/Liber8/resources/liber8/css/principal.css" rel="stylesheet">
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&subset=latin,cyrillic-ext,latin-ext' rel='stylesheet' type='text/css'>
-	<!-- end: CSS -->
+	
+        <link rel="stylesheet" href="/Liber8/resources/highlight/styles/darcula.css">
+        <script src="/Liber8/resources/highlight/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <!-- end: CSS -->
 	
 
 	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -181,7 +185,7 @@
                                         <li><a href="#">index.html</a></li>
                                     </ul>
                                 </div>
-                            <div id="editeur" contentEditable ></div>
+                            <pre id="editeur"><code  contenteditable="">var x = 5;</code></pre>
                             <div id="lignes" displayLignes ></div>
                         </div>
                     </div>
@@ -206,7 +210,7 @@
 	<footer class="principal-footer">
 
 		<p>
-			<span style="text-align:left;float:left">&copy; 2013 Liberate technology</span>
+			<span style="text-align:left;float:left">&copy; 2016 Liberate technology</span>
 			
 		</p>
 
@@ -268,6 +272,8 @@
 		<script src="/Liber8/resources/metro/js/retina.js"></script>
 
 		<script src="/Liber8/resources/metro/js/custom.js"></script>
+                
+     		<script src="/Liber8/resources/liber8/js/principal.js"></script>           
 	<!-- end: JavaScript-->
 	
 </body>
