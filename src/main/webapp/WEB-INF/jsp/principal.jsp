@@ -161,8 +161,11 @@
                                                                     </div>
                                                                 </ul>
                                                             </div>
-                                                            <div class="folder"><a class="dropmenu" href="#"><i class="icon-folder-close-alt"></i><span class="folder"> html</span></a></div>
-                                                            <li><i class="icon-file-alt"></i><span class="file"> Mon_Fichier</span></li>
+                                                            <div class="folder"><a class="dropmenu" href="#"><i class="icon-folder-close-alt"></i><span class="folder"> html</span></a>
+                                                                <ul>
+                                                                    <li><i class="icon-file-alt"></i><span class="file"> Mon_Fichier</span></li>
+                                                                </ul>
+                                                            </div>
 							</ul>
                                                         </div>
                                                     <div><a class="dropmenu" href="#"><i class="icon-folder-close-alt"></i><span class="project"> Project2</span><span class="glyphicon glyphicon-lock"></span></a></div>
