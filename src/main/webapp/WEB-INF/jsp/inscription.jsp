@@ -1,7 +1,7 @@
 <%-- 
     Document   : inscription
     Created on : 18 oct. 2016, 17:06:40
-    Author     : macair
+    Author     : sofiafaddi
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>

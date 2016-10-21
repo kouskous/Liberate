@@ -5,10 +5,6 @@
 	<!-- start: Meta -->
 	<meta charset="utf-8">
 	<title># L!BER8</title>
-	<meta name="description" content="Bootstrap Metro Dashboard">
-	<meta name="author" content="Dennis Ji">
-	<meta name="keyword" content="Metro, Metro UI, Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina">
-	<!-- end: Meta -->
 	
 	<!-- start: Mobile Specific -->
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -141,18 +137,18 @@
             
 	<!-- start: Header -->
 	
-		<div class="container-fluid-full">
+		<div class="container-fluid-full heightfull">
                     <div class="row-fluid">
 				
 			<!-- start: Main Menu -->
 			<div id="sidebar-left" class="span2">
-				<div class="nav-collapse sidebar-nav">
+				<div class="nav-collapse sidebar-nav overscrollfolder">
 					<ul class="nav nav-tabs nav-stacked main-menu">
-                                            <div id="volet">
-                                                <a href="#" id="Sources">Sources</a>
+                                           <div id="volet" class="box-header">
+                                                <a href="#" id="Sources" class="active">Sources</a>
                                                 <a href="#" id="Versions">Versions</a>
                                             </div>
-                                                <li>
+                                                <li class="mainfile">
 							<div><a class="dropmenu" href="#"><i class="icon-folder-close-alt"></i><span class="project"> Project1</span><span class="glyphicon glyphicon-lock"></span></a>
 							<ul>
                                                             <div><a class="dropmenu" href="#"><i class="icon-folder-close-alt"></i><span class="folder"> src</span></a>
@@ -177,7 +173,7 @@
 			<!-- end: Main Menu -->
                         
                         <!-- start: Content -->	
-                        <div id="box_editeur">
+                        <div id="content" class="span10">
                                 <div id="menu">
                                     <ul id="onglets">
                                         <li class="active"><a href="#">poney.java</a></li>
