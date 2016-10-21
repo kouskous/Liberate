@@ -71,7 +71,7 @@ public class FichierUserDao {
      * @param user l'utilisateur dont on veux l'arborescence
      * @return Renvoie l'arborescence complete depuis la racine de l'utilisateur
      */
-    public ArrayList<Map.Entry<String, Boolean>> getArborescence(User user){
+    public Map<String, Boolean> getArborescence(User user){
         return getArborescence(user, null);
     }
 
@@ -84,10 +84,10 @@ public class FichierUserDao {
      *                si null depuis la racine de l'utilisateur
      * @return Renvoie l'arborescence depuis le dossier en question, ou null si le dossier est un fichier
      */
-    public ArrayList<Map.Entry<String, Boolean>> getArborescence(User user, FichiersUsers dossier){
+    public Map<String, Boolean> getArborescence(User user, FichiersUsers dossier){
         //TODO changer le Type de fichier en enumeration
         try {
-            ArrayList<Map.Entry<String, Boolean>> arborescence = new ArrayList<>();
+            Map<String, Boolean> arborescence = new Hashtable<>();
             Collection<FichiersUsers> fichiers;
 
             if(dossier == null) {
@@ -106,7 +106,7 @@ public class FichierUserDao {
             }
 
             for (FichiersUsers fichier : fichiers) {
-                arborescence.add(new AbstractMap.SimpleEntry<>(fichier.getPathLogique(), fichier.getType()));
+                arborescence.put(fichier.getPathLogique(), fichier.getType());
             }
 
             return arborescence;
