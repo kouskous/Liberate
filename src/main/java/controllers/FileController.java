@@ -5,12 +5,16 @@
  */
 package controllers;
 
-import dao.ProjetDao;
+import dao.FichierUserDao;
+import java.util.Date;
 import javax.persistence.EntityManager;
+import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import models.FichiersUsers;
 import models.User;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -23,30 +27,44 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class FileController {
     EntityManager em;
-    ProjetDao projetDao;
+    FichierUserDao fichierUserDao;
     
-    private Function ExtractFileName(String path) {
-        String filename = Mid(path, InStrRev(path, "\\") + 1);
-    }            
+    private String extractFileName(String path) {
+        String filename = path.substring(path.lastIndexOf("/")+1); 
+        return filename;
+    }
     
-    @RequestMapping(value="/newFile", method = RequestMethod.POST)
-    public String newProject(HttpServletRequest request){
-        String format = "dd/MM/yy H:mm:ss";
-        java.text.SimpleDateFormat formater = new java.text.SimpleDateFormat( format );
-        java.util.Date date = new java.util.Date(); 
+    @RequestMapping(value="/newFichier", method = RequestMethod.POST)
+    public String newFile(HttpServletRequest request, ModelMap model){
+        Date d = new Date();
         
-        
+        em = Persistence.createEntityManagerFactory("persistenceUnitLiber8").createEntityManager();
+        fichierUserDao = new FichierUserDao(em);
         
         // On vérifie si une session est déjà ouverte
         HttpSession session= request.getSession();
         User user = (User)session.getAttribute("user");
  
+        em.getTransaction().begin();
+        
         if(user == null) // Pas de session ouverte
             return "redirect:/login";
-        else // Une session déjà ouverte
+        else {// Une session déjà ouverte
+            FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathFichier"), 
+                    extractFileName((String)request.getParameter("pathFichier")), 
+                    extractFileName((String)request.getParameter("pathFichier")), 
+                    d, 
+                    true, 
+                    user);
+            em.getTransaction().commit();
+            em.close();
             
-            
-            /*createNewFichierUser((String)request.getParameter("pathFile"), nomPhysique, nomReel, dateCreation,
-                                     type, user);*/
+            return "newFichier";
+        }
+    }
+    
+    @RequestMapping(value="/newFichier", method = RequestMethod.GET)
+    public String newIndex(HttpServletRequest request, ModelMap model){
+        return "newFichier";
     }
 }
