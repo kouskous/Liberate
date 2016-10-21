@@ -49,6 +49,7 @@ public class FichierUserDao {
         // Recherche des fichiers
         TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByUserAndPath", FichiersUsers.class);
         query.setParameter("user", user);
+        query.setParameter("pathLogique", pathLogique);
         List<FichiersUsers> results = query.getResultList();
 
         // Si aucun fichier n'est trouvé avec cet user et ce path

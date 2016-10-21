@@ -49,6 +49,10 @@ public class FileController {
         return "newFichier";
     }
     
+    @RequestMapping(value="/saveFichier", method = RequestMethod.GET)
+    public String indexSave(HttpServletRequest request, ModelMap model){
+        return "saveFichier";
+    }
     
     // Création d'un fichier vide
     // Renvoie un Json avec clés "response" et "errors"
@@ -104,8 +108,6 @@ public class FileController {
                             em.getTransaction().commit();
                             em.close();
                             
-                            // TODO: création du fichier sur le disque ici
-                            //File file = new File("~/" + fileName);
                             try{                          
                                 ServletContext ctx = request.getServletContext();
                                 String path = ctx.getRealPath("/");
@@ -134,6 +136,7 @@ public class FileController {
             System.out.println("Erreur JSON");
             System.out.println(e.getMessage());
             
+            //TODO: ce try-catch ne sert qu'à afficher les erreurs
             try{
                 JSONObject obj = new JSONObject();
                 obj.put("errors",e.getMessage());
@@ -152,8 +155,11 @@ public class FileController {
     // - errors contient retour d'erreur si echec
     // - renvoie null si erreur avec le JSON
     @ResponseBody 
-    @RequestMapping(value="/saveFile", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value="/saveFichier", method = RequestMethod.POST, produces = "application/json")
     public String saveFile(HttpServletRequest request, ModelMap model){
+        
+        em = Persistence.createEntityManagerFactory("persistenceUnitLiber8").createEntityManager();
+        fichierUserDao = new FichierUserDao(em);
         
         // On créé l'objet à retourner
         JSONObject returnObject = new JSONObject();   
@@ -163,6 +169,7 @@ public class FileController {
             returnObject.put("errors", "");
             
             String pathFichier = (String)request.getParameter("pathFichier");
+            String fileName = extractFileName((String)request.getParameter("pathFichier"));
             String contenuFichier = (String)request.getParameter("contenuFichier");
             
             // On vérifie les paramètres de la requête
@@ -194,7 +201,18 @@ public class FileController {
                         // Mise à jour date
                         fichier.setDateCreation(new Date());
                         
-                        // TODO: le mettre à jour sur le disque ici
+                        // Enregistrement du fichier sur le disque ici
+                        try{
+                            ServletContext ctx = request.getServletContext();
+                            String path = ctx.getRealPath("/");
+                            
+                            FileOutputStream out = new FileOutputStream(path + "/../" + fileName);
+                            out.write(contenuFichier.getBytes());
+                        }
+                        catch(Exception e){
+                            returnObject.put("errors","Erreur pendant l'enregistrement sur le serveur");
+                            return returnObject.toString();
+                        }
 
                         try{
                             em.persist(fichier);
@@ -214,6 +232,17 @@ public class FileController {
         catch(Exception e){
             System.out.println("Erreur JSON");
             System.out.println(e.getMessage());
+            
+            //TODO: ce try-catch ne sert qu'à afficher les erreurs
+            try{
+                JSONObject obj = new JSONObject();
+                obj.put("errors",e.getMessage());
+                return obj.toString();
+            }
+            catch(Exception er){
+                
+            }
+            
             return null;
         }
     }
