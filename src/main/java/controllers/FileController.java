@@ -6,6 +6,7 @@
 package controllers;
 
 import dao.FichierUserDao;
+import java.io.PrintWriter;
 import java.util.Date;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  *
@@ -31,8 +33,7 @@ public class FileController {
     FichierUserDao fichierUserDao;
     
     public FileController(){
-        em = Persistence.createEntityManagerFactory("persistenceUnitLiber8").createEntityManager();
-        fichierUserDao = new FichierUserDao(em);
+        
     }
     
     private String extractFileName(String path) {
@@ -45,29 +46,97 @@ public class FileController {
         return "newFichier";
     }
     
-    @RequestMapping(value="/newFichier", method = RequestMethod.POST)
-    public String newFile(HttpServletRequest request, ModelMap model){
-        Date d = new Date();
-
-        // On vérifie si une session est déjà ouverte
-        HttpSession session= request.getSession();
-        User user = (User)session.getAttribute("user");
- 
-        em.getTransaction().begin();
-        
-        if(user == null) // Pas de session ouverte
-            return "redirect:/login";
-        else {// Une session déjà ouverte
-            FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathFichier"), 
-                    extractFileName((String)request.getParameter("pathFichier")), 
-                    extractFileName((String)request.getParameter("pathFichier")), 
-                    d, 
-                    true, 
-                    user);
-            em.getTransaction().commit();
-            em.close();
+    
+    // Création d'un fichier vide
+    // Renvoie un Json avec clés "response" et "errors"
+    // - response contient true si réussite
+    // - errors contient retour d'erreur si echec
+    // - renvoie null si erreur Json
+    @ResponseBody 
+    @RequestMapping(value="/newFichier", method = RequestMethod.POST, produces = "application/json")
+    public String newFile(HttpServletRequest request, ModelMap model){           
             
-            return "newFichier";
+        em = Persistence.createEntityManagerFactory("persistenceUnitLiber8").createEntityManager();
+        fichierUserDao = new FichierUserDao(em);
+        
+        // On créé l'objet à retourner
+        JSONObject returnObject = new JSONObject();   
+        
+        try{
+            returnObject.put("response", "");
+            returnObject.put("errors", "");
+            
+            // On vérifie qu'une session est bien ouverte
+            HttpSession session= request.getSession();
+            User user = (User)session.getAttribute("user");
+
+            if(user == null){
+                returnObject.put("errors", "No user");
+                return returnObject.toString();
+            }
+            else{
+                String pathFichier = (String)request.getParameter("pathFichier");
+                
+                if(pathFichier == null){
+                    returnObject.put("errors", "No filepath");
+                    return returnObject.toString();
+                }
+                else{
+                    em.getTransaction().begin();
+                    
+                    String fileName = extractFileName((String)request.getParameter("pathFichier"));
+                    
+                    FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathFichier"), 
+                    fileName, 
+                    fileName, 
+                    new Date(), true, user);
+                    
+                    if(newFile == null){
+                        returnObject.put("errors", "Failed to create file");
+                        return returnObject.toString();
+                    }
+                    else{
+                        try{
+                            em.persist(newFile);
+                            em.getTransaction().commit();
+                            em.close();
+                            
+                            // TODO: création du fichier sur le disque ici
+                            /*try{
+                                PrintWriter writer = new PrintWriter("~/" + fileName, "UTF-8");
+                                writer.print("");
+                                writer.close();
+                            }
+                            catch(Exception e){
+                                returnObject.put("errors",e.getMessage());
+                                return returnObject.toString();
+                            }*/
+                            
+                            returnObject.put("response","true");
+                            return returnObject.toString();
+                        }
+                        catch(Exception e){
+                            em.close();
+                            returnObject.put("errors","Erreur BDD");
+                            return returnObject.toString();
+                        }
+                    }
+                }
+            }
+        }
+        catch(Exception e){
+            System.out.println("Erreur JSON");
+            System.out.println(e.getMessage());
+            
+            try{
+                JSONObject obj = new JSONObject();
+                obj.put("errors",e.getMessage());
+                return obj.toString();
+            }
+            catch(Exception er){
+                
+            }
+            return null;
         }
     }
         
@@ -76,6 +145,7 @@ public class FileController {
     // - reponse contient true sur réussite
     // - errors contient retour d'erreur si echec
     // - renvoie null si erreur avec le JSON
+    @ResponseBody 
     @RequestMapping(value="/saveFile", method = RequestMethod.POST, produces = "application/json")
     public String saveFile(HttpServletRequest request, ModelMap model){
         
@@ -91,7 +161,7 @@ public class FileController {
             
             // On vérifie les paramètres de la requête
             if(pathFichier == null || contenuFichier == null){ 
-                returnObject.put("errors","Empty parameter");
+                returnObject.put("errors","No filepath or content");
                 return returnObject.toString();
             }
             else{
@@ -101,7 +171,7 @@ public class FileController {
                 
                 // On vérifie l'utilisateur
                 if(user == null){
-                    returnObject.put("errors","Empty user");
+                    returnObject.put("errors","No user");
                     return returnObject.toString();
                 }
                 else{
