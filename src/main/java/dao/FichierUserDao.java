@@ -5,9 +5,7 @@ import models.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Florian on 20/10/2016.
@@ -63,6 +61,60 @@ public class FichierUserDao {
         // Anomalie: plusieurs fichiers ont été trouvé avec le même nom physique
         else{
             throw new Exception("Erreur BDD: plusieurs fichiers d'utilisateur ont le même nom physique");
+        }
+    }
+
+    /**
+     * @author Florian
+     *
+     * Cherche l'arborescence de fichiers d'un utilisateur depuis sa racine
+     * @param user l'utilisateur dont on veux l'arborescence
+     * @return Renvoie l'arborescence complete depuis la racine de l'utilisateur
+     */
+    public ArrayList<Map.Entry<String, Boolean>> getArborescence(User user){
+        return getArborescence(user, null);
+    }
+
+    /**
+     * @author Florian
+     *
+     * Cherche l'arborescence de fichiers d'un utilisateur
+     * @param user l'utilisateur dont on veux l'arborescence
+     * @param dossier le dossier à partir duquel on veux l'arborescence,
+     *                si null depuis la racine de l'utilisateur
+     * @return Renvoie l'arborescence depuis le dossier en question, ou null si le dossier est un fichier
+     */
+    public ArrayList<Map.Entry<String, Boolean>> getArborescence(User user, FichiersUsers dossier){
+        //TODO changer le Type de fichier en enumeration
+        try {
+            ArrayList<Map.Entry<String, Boolean>> arborescence = new ArrayList<>();
+            Collection<FichiersUsers> fichiers;
+
+            if(dossier == null) {
+                fichiers = user.getFichiersUsersCollection();
+            }
+
+            //si le fichier n'est pas un dossier
+            else if (dossier.getType() == true) {
+                throw new IllegalArgumentException();
+            }
+            else {
+                // Recupération des fichiers user descendants du dossier
+                TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findDescendantsDossier", FichiersUsers.class);
+                query.setParameter("pathLogiqueDossier", dossier.getPathLogique() + "/%");
+                fichiers = query.getResultList();
+            }
+
+            for (FichiersUsers fichier : fichiers) {
+                arborescence.add(new AbstractMap.SimpleEntry<>(fichier.getPathLogique(), fichier.getType()));
+            }
+
+            return arborescence;
+        }
+        catch(IllegalArgumentException e){
+            System.out.println(e.getMessage());
+            System.out.println("Erreur pour récupérer l'arborescence de fichiers de l'utilisateur : le dossier est un fichier");
+            return null;
         }
     }
 
