@@ -46,14 +46,10 @@ html, body, .container-fluid-full, .row-fluid{
 =================================================================== */
 @media (min-width: 1200px) {
     #content {
-        //padding: 28px !important;
     }
 
     #sidebar-left {
-        //height: calc(100% - 41px) !important;
         background-color: white !important;
-        //position: relative !important;
-        // ajout 
        
     }
 }
