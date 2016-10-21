@@ -5,14 +5,10 @@
  */
 package controllers;
 
-import dao.FichierUserDao;
-import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
 import dao.FichierUserDao;
-import dao.UserDao;
-import models.FichiersUsers;
 import models.User;
 import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
@@ -20,6 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.Map;
+import javax.persistence.EntityManager;
+import javax.persistence.Persistence;
+import org.json.JSONArray;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  *
@@ -27,10 +27,12 @@ import java.util.Map;
  */
 @Controller
 public class PrincipalController {
+    EntityManager em;
     FichierUserDao fichierUserDao;
     
     public PrincipalController(){
-       fichierUserDao = new FichierUserDao();
+       em = Persistence.createEntityManagerFactory("persistenceUnitLiber8").createEntityManager();
+       fichierUserDao = new FichierUserDao(em);
     }
     
     @RequestMapping(value="/", method = RequestMethod.GET)
@@ -43,11 +45,11 @@ public class PrincipalController {
         if (user == null) // Pas de session ouverte
             return "login";
          // Une session déjà ouverte
-         return "redirect:/";
+         return "principal";
 
     }
-    
-        @RequestMapping(value="/", method = RequestMethod.GET,produces = "application/json")
+    @ResponseBody
+    @RequestMapping(value="/getTree", method = RequestMethod.GET,produces = "application/json")
     public String currentTree(HttpServletRequest request){
             // On vérifie qu'une session n'est pas déjà ouverte
     HttpSession session= request.getSession();
@@ -55,16 +57,28 @@ public class PrincipalController {
     // Pas de session ouverte
     if(user == null) return "redirect:/login";
 
-    JSONObject response = new JSONObject();
+    
+    
+    JSONArray list = new JSONArray();
+        
     Map<String, Boolean> arborescence = fichierUserDao.getArborescence(user);
     for (Map.Entry<String, Boolean> fichier: arborescence.entrySet()) {
-        try{
-            response.put(fichier.getKey(), fichier.getValue());
-        } catch(Exception e){
+        JSONObject response = new JSONObject();
+        if(fichier.getValue() == true){
+            try{
+                response.put(fichier.getKey(), "fichier");
+            } catch(Exception e){
+            }
+        }else {
+            try{
+                response.put(fichier.getKey(), "dossier");
+            } catch(Exception e){
+            }
         }
+        list.put(response);
     }
 
-    return  response.toString();
+    return  list.toString();
 
        
     }
