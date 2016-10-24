@@ -17,7 +17,8 @@
 	<link id="base-style-responsive" href="/Liber8/resources/metro/css/style-responsive.css" rel="stylesheet">
         <link id="base-style-responsive" href="/Liber8/resources/liber8/css/principal.css" rel="stylesheet">
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&subset=latin,cyrillic-ext,latin-ext' rel='stylesheet' type='text/css'>
-	
+	<link rel="stylesheet" href="/Liber8/resources/jquery/jquery-ui.min.css">
+        <script src="/Liber8/resources/jquery/jquery-ui.min.js"></script>
         <link rel="stylesheet" href="/Liber8/resources/highlight/styles/darcula.css">
         <script src="/Liber8/resources/highlight/highlight.pack.js"></script>
         <script>hljs.initHighlightingOnLoad();</script>
@@ -145,7 +146,7 @@
                     <div class="row-fluid">
 				
 			<!-- start: Main Menu -->
-			<div id="sidebar-left" class="span2">
+			<div id="sidebar-left" class="span2 ui-widget-content">
 				<div class="nav-collapse sidebar-nav overscrollfolder">
 					<ul class="nav nav-tabs nav-stacked main-menu">
                                            <div id="volet" class="box-header">
@@ -177,7 +178,7 @@
 			<!-- end: Main Menu -->
                         
                         <!-- start: Content -->	
-                        <div id="content" class="span10">
+                        <div id="content" >
                                 <div id="menu">
                                     <ul id="onglets">
                                         <li class="active"><a href="#">poney.java</a></li>

@@ -121,7 +121,7 @@ li.btn_action a {
 #menu
 {
     height: 30px;
-    padding-top: 10px;
+    padding-top: 3px;
 }
 
 
@@ -136,6 +136,7 @@ li.btn_action a {
 
 #onglets li
 {
+    border-radius: 10px 10px 0px 0px;
     float : left;
     height : 23px; /* à modifier suivant la taille de la police pour centrer le texte dans l'onglet */
     background-color: #F4F9FD;
@@ -160,7 +161,7 @@ li.btn_action a {
 
 #onglets a:hover
 {
-    background : #fff;
+   
 }
 
 
@@ -222,4 +223,8 @@ footer {
 
 #editeur code {
     height: 100%;
+}
+
+.main-menu{
+    min-width: 300px;
 }
