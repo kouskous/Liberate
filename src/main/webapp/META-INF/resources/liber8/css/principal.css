@@ -228,3 +228,11 @@ footer {
 .main-menu{
     min-width: 300px;
 }
+
+.easytree-container{
+    border: 0 !important ;
+}
+
+.arbre{
+    margin-top: 10px;
+}

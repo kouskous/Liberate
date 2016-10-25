@@ -17,8 +17,7 @@
 	<link id="base-style-responsive" href="/Liber8/resources/metro/css/style-responsive.css" rel="stylesheet">
         <link id="base-style-responsive" href="/Liber8/resources/liber8/css/principal.css" rel="stylesheet">
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&subset=latin,cyrillic-ext,latin-ext' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" href="/Liber8/resources/jquery/jquery-ui.min.css">
-        <script src="/Liber8/resources/jquery/jquery-ui.min.js"></script>
+        <link rel="stylesheet" href="/Liber8/resources/EasyTree/skin-win8/ui.easytree.css">
         <link rel="stylesheet" href="/Liber8/resources/highlight/styles/darcula.css">
         <script src="/Liber8/resources/highlight/highlight.pack.js"></script>
         <script>hljs.initHighlightingOnLoad();</script>
@@ -148,32 +147,13 @@
 			<!-- start: Main Menu -->
 			<div id="sidebar-left" class="span2 ui-widget-content">
 				<div class="nav-collapse sidebar-nav overscrollfolder">
-					<ul class="nav nav-tabs nav-stacked main-menu">
-                                           <div id="volet" class="box-header">
-                                                <a href="#" id="Sources" class="active">Sources</a>
-                                                <a href="#" id="Versions">Versions</a>
-                                            </div>
-                                                <li class="mainfile">
-							<div><a class="dropmenu" href="#"><i class="icon-folder-close-alt"></i><span class="project"> Project1</span><span class="glyphicon glyphicon-lock"></span></a>
-							<ul>
-                                                            <div><a class="dropmenu" href="#"><i class="icon-folder-close-alt"></i><span class="folder"> src</span></a>
-                                                                <ul>
-                                                                    <div class="folder"><a class="dropmenu" href="#"><i class="icon-folder-close-alt"></i><span class="folder"> model</span></a>
-                                                                        <ul>
-                                                                            <li><i class="icon-file-alt"></i><span class="file"> Poney.java</span></li>
-                                                                            <li><i class="icon-file-alt"></i><span class="file"> Controller.java</span></li>
-                                                                        </ul>
-                                                                    </div>
-                                                                </ul>
-                                                            </div>
-                                                            <div class="folder"><a class="dropmenu" href="#"><i class="icon-folder-close-alt"></i><span class="folder"> html</span></a></div>
-                                                            <li><i class="icon-file-alt"></i><span class="file"> Mon_Fichier</span></li>
-							</ul>
-                                                        </div>
-                                                    <div><a class="dropmenu" href="#"><i class="icon-folder-close-alt"></i><span class="project"> Project2</span><span class="glyphicon glyphicon-lock"></span></a></div>
-						</li>
-					</ul>
+                                    <div id="arbre">
+                                        <ul id ="Root">
+
+                                        </ul>
+                                    </div>
 				</div>
+
 			</div>
 			<!-- end: Main Menu -->
                         
@@ -220,11 +200,8 @@
 	<!-- start: JavaScript-->
 
 		<script src="/Liber8/resources/metro/js/jquery-1.9.1.min.js"></script>
-	<script src="/Liber8/resources/metro/js/jquery-migrate-1.0.0.min.js"></script>
-	
-		<script src="/Liber8/resources/metro/js/jquery-ui-1.10.0.custom.min.js"></script>
-	
-		<script src="/Liber8/resources/metro/js/jquery.ui.touch-punch.js"></script>
+                
+                <script src="/Liber8/resources/metro/js/jquery-migrate-1.0.0.min.js"></script>
 	
 		<script src="/Liber8/resources/metro/js/modernizr.js"></script>
 	
@@ -237,10 +214,14 @@
 		<script src='/Liber8/resources/metro/js/jquery.dataTables.min.js'></script>
 
 		<script src="/Liber8/resources/metro/js/excanvas.js"></script>
-	<script src="/Liber8/resources/metro/js/jquery.flot.js"></script>
-	<script src="/Liber8/resources/metro/js/jquery.flot.pie.js"></script>
-	<script src="/Liber8/resources/metro/js/jquery.flot.stack.js"></script>
-	<script src="/Liber8/resources/metro/js/jquery.flot.resize.min.js"></script>
+                
+                <script src="/Liber8/resources/metro/js/jquery.flot.js"></script>
+                
+                <script src="/Liber8/resources/metro/js/jquery.flot.pie.js"></script>
+                
+                <script src="/Liber8/resources/metro/js/jquery.flot.stack.js"></script>
+                
+                <script src="/Liber8/resources/metro/js/jquery.flot.resize.min.js"></script>
 	
 		<script src="/Liber8/resources/metro/js/jquery.chosen.min.js"></script>
 	
@@ -274,7 +255,15 @@
 
 		<script src="/Liber8/resources/metro/js/custom.js"></script>
                 
-     		<script src="/Liber8/resources/liber8/js/principal.js"></script>           
+                <script src="/Liber8/resources/metro/js/jquery-ui-1.10.0.custom.min.js"></script>
+	
+		<script src="/Liber8/resources/metro/js/jquery.ui.touch-punch.js"></script>
+                
+                <script src="/Liber8/resources/EasyTree/jquery.easytree.js"></script>  
+                
+                <script src="/Liber8/resources/liber8/js/principal.js"></script>
+                 
+                
 	<!-- end: JavaScript-->
 	
 </body>

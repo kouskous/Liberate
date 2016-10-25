@@ -66,12 +66,14 @@ public class PrincipalController {
         JSONObject response = new JSONObject();
         if(fichier.getValue() == true){
             try{
-                response.put(fichier.getKey(), "fichier");
+                response.put("path","/Root"+fichier.getKey());
+                response.put("type","fichier");
             } catch(Exception e){
             }
         }else {
             try{
-                response.put(fichier.getKey(), "dossier");
+                response.put("path", "/Root"+fichier.getKey());
+                response.put("type","dossier");
             } catch(Exception e){
             }
         }
