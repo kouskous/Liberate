@@ -50,7 +50,7 @@
 				<div class="nav-no-collapse header-nav">
                                     <ul class="nav pull-left menu-options">
                                         <li class="btn_action">
-                                            <a href="#"><i class="halflings-icon white plus-sign"></i>Projet </a>
+                                            <a data-toggle="modal" data-target="#projet"><i class="halflings-icon white plus-sign"></i>Projet </a>
                                         </li>
                                         
                                         <li class="btn_action">
@@ -265,6 +265,14 @@
                  
                 
 	<!-- end: JavaScript-->
-	
+<div class="modal fade" id="projet" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+    </div>
+  </div>
+</div>	
 </body>
 </html>
