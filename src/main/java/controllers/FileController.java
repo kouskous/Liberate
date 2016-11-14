@@ -18,6 +18,7 @@ import javax.servlet.http.HttpSession;
 import models.FichiersUsers;
 import models.User;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,11 +32,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class FileController {
-    EntityManager em;
+    
+    @Autowired
     FichierUserDao fichierUserDao;
     
     public FileController(){
-        
     }
     
     private String extractFileName(String path) {
@@ -64,9 +65,8 @@ public class FileController {
     @ResponseBody 
     @RequestMapping(value="/newFichier", method = RequestMethod.POST, produces = "application/json")
     public String newFile(HttpServletRequest request, ModelMap model){           
-            
-        em = Persistence.createEntityManagerFactory("persistenceUnitLiber8").createEntityManager();
-        fichierUserDao = new FichierUserDao(em);
+        
+        EntityManager em = fichierUserDao.getEntityManager();
         
         // On créé l'objet à retourner
         JSONObject returnObject = new JSONObject();   
@@ -161,9 +161,8 @@ public class FileController {
     @ResponseBody 
     @RequestMapping(value="/saveFichier", method = RequestMethod.POST, produces = "application/json")
     public String saveFile(HttpServletRequest request, ModelMap model){
-        
-        em = Persistence.createEntityManagerFactory("persistenceUnitLiber8").createEntityManager();
-        fichierUserDao = new FichierUserDao(em);
+                
+        EntityManager em = fichierUserDao.getEntityManager();
         
         // On créé l'objet à retourner
         JSONObject returnObject = new JSONObject();   
