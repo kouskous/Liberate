@@ -8,6 +8,7 @@ package dao;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 import models.Projet;
 import models.User;
@@ -24,9 +25,17 @@ public class ProjetDao {
         
     }
     
-    public ProjetDao(EntityManager em){
-        this.em = em;
+    public ProjetDao(String persistenceUnitName){
+        em = Persistence.createEntityManagerFactory(persistenceUnitName).createEntityManager();
     }
+    
+    public EntityManager getEntityManager(){
+        return this.em;
+    }
+    
+    /*public ProjetDao(EntityManager em){
+        this.em = em;
+    }*/
     
     // Cherche le projet dans la BDD
     // - renvoie null si il n'y est pas.

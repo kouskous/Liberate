@@ -19,6 +19,7 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import org.json.JSONArray;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -27,12 +28,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 public class PrincipalController {
-    EntityManager em;
+    
+    @Autowired
     FichierUserDao fichierUserDao;
     
     public PrincipalController(){
-       em = Persistence.createEntityManagerFactory("persistenceUnitLiber8").createEntityManager();
-       fichierUserDao = new FichierUserDao(em);
     }
     
     @RequestMapping(value="/", method = RequestMethod.GET)

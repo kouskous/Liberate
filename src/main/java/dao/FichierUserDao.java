@@ -6,6 +6,7 @@ import models.User;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.util.*;
+import javax.persistence.Persistence;
 
 /**
  * Created by Florian on 20/10/2016.
@@ -16,10 +17,18 @@ public class FichierUserDao {
     EntityManager em;
 
     public FichierUserDao(){}
-
-    public FichierUserDao(EntityManager em){
-        this.em = em;
+    
+    public FichierUserDao(String persistenceUnitName){
+        em = Persistence.createEntityManagerFactory(persistenceUnitName).createEntityManager();
     }
+    
+    public EntityManager getEntityManager(){
+        return this.em;
+    }
+
+    /*public FichierUserDao(EntityManager em){
+        this.em = em;
+    }*/
 
     // Cherche les fichiers d'un utilisateur dans la BDD
     // - renvoie null s'il n'y a pas de fichiers pour cet user.

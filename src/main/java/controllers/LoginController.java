@@ -11,6 +11,7 @@ import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import models.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,13 +23,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 @Controller
 public class LoginController {
-        
-    EntityManager em;
+    
+    @Autowired
     UserDao userDao;
     
     public LoginController(){
-        em = Persistence.createEntityManagerFactory("persistenceUnitLiber8").createEntityManager();
-        userDao = new UserDao(em);
+
     }
     
     @RequestMapping(value="/login", method = RequestMethod.GET)

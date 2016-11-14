@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import models.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class InscriptionController {
     
-    EntityManager em;
+    @Autowired
     UserDao userDao;
     
     // Regex1 utilisée pour nom, prenom, pseudo
@@ -34,8 +35,6 @@ public class InscriptionController {
     static String regex2 = "^([\\w-\\.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([\\w-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)";
     
     public InscriptionController(){
-        em = Persistence.createEntityManagerFactory("persistenceUnitLiber8").createEntityManager();
-        userDao = new UserDao(em);
     }
     
     @RequestMapping(value="/inscription", method = RequestMethod.GET)
@@ -51,11 +50,11 @@ public class InscriptionController {
             return "redirect:/";
     }
     
-    //try
-    
     // Nouvelle inscription
     @RequestMapping(value="/inscription", method = RequestMethod.POST)
     public String newUser(HttpServletRequest request, ModelMap model){
+       
+        EntityManager em = userDao.getEntityManager();
         
         // On vérifie qu'une session n'est pas déjà ouverte
         HttpSession session= request.getSession();

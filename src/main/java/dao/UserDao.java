@@ -8,6 +8,7 @@ package dao;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 import models.User;
 
@@ -23,9 +24,17 @@ public class UserDao {
         
     }
     
-    public UserDao(EntityManager em){
-        this.em = em;
+    public UserDao(String persistenceUnitName){
+        em = Persistence.createEntityManagerFactory(persistenceUnitName).createEntityManager();
     }
+    
+    public EntityManager getEntityManager(){
+        return this.em;
+    }
+    
+    /*public UserDao(EntityManager em){
+        this.em = em;
+    }*/
     
     // Cherche l'utilisateur dans la BDD
     // - renvoie null si il n'y est pas.
