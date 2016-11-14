@@ -26,9 +26,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  *
- * @author Kilian
+ * @author Kilian & Luc Di Sanza
  */
-//(String)request.getParameter("pathFile");
 
 @Controller
 public class FileController {
@@ -55,6 +54,9 @@ public class FileController {
     }
     
     // Création d'un fichier vide
+    // Création d'un fichier
+    // - Nécessite le champs "pathFichier" dans la requête
+    //
     // Renvoie un Json avec clés "response" et "errors"
     // - response contient true si réussite
     // - errors contient retour d'erreur si echec
@@ -150,6 +152,8 @@ public class FileController {
     }
         
     // Enregistre un fichier
+    // - Nécessite les champs "pathFichier" et "contenuFichier" dans la requête
+    //
     // Renvoie un Json avec clé response et errors
     // - reponse contient true sur réussite
     // - errors contient retour d'erreur si echec
@@ -246,8 +250,4 @@ public class FileController {
             return null;
         }
     }
-
-    
-    
-    
 }
