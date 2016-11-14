@@ -38,6 +38,29 @@ public class FichierUserDao {
         // Des fichiers ont été trouvés
         return results;
     }
+    
+    // Cherche les fichiers d'un utilisateur dans la BDD
+    // - renvoie null s'il n'a pas été trouvé
+    // - renvoie le fichier si il a été trouvé
+    public FichiersUsers getFichiersByUserAndPath(User user, String pathLogique){
+
+        // Recherche des fichiers
+        TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByUserAndPath", FichiersUsers.class);
+        query.setParameter("user", user);
+        query.setParameter("pathLogique", pathLogique);
+        List<FichiersUsers> results = query.getResultList();
+
+        // Si aucun fichier n'est trouvé avec cet user et ce path
+        if(results.isEmpty()){
+            return null;
+        }
+        else if(results.size() == 1){
+            return results.get(0);
+        }
+        else{ // Anomalie, plus d'un résultat
+            return null;
+        }
+    }
 
     // Cherche un fichier dans la BDD par son nom
     // - renvoie null si il n'y est pas.

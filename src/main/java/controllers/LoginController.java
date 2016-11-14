@@ -75,7 +75,7 @@ public class LoginController {
             
     }
  /** utilisation de JSON
-    @ResponseBody @RequestMapping(value="/login", method = RequestMethod.GET,produces = "application/json") 
+    @ResponseBody @RequestMapping(value="/login", method = RequestMethod.GET, produces = "application/json") 
     public String login(){ 
     return "login"; 
      }

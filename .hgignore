@@ -7,6 +7,7 @@ pom.xml.releaseBackup
 pom.xml.versionsBackup
 pom.xml.next
 release.properties
+<<<<<<< local
 
 # Liber8
 src/main/resources/META-INF/persistence.xml
@@ -67,3 +68,10 @@ nbdist/
 nbactions.xml
 nb-configuration.xml
 
+=======
+\.orig\..*$
+\.orig$
+\.chg\..*$
+\.rej$
+\.conflict\~$
+>>>>>>> other
