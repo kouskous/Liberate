@@ -66,7 +66,7 @@
                             <div class="control-group">
 								<label class="control-label userline span4" for="selectErrortype">Langage</label>
 								<div class="controls userline">
-								  <select id="selectErrortype" data-rel="chosen" name="langage">
+								  <select id="selectErrortype" data-rel="chosen" name="langageProjet">
 									<option>Java</option>
 									<option>C++</option>
 									<option>C</option>
