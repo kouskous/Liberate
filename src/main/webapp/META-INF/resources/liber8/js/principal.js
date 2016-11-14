@@ -2,7 +2,7 @@
     var App = new Object();
     App.currentOnglet = "";
     App.currentVoletElement = "";
-    App.onglets = new Array() ;
+    App.onglets = new Array() ; 
     /********************************************/
 
 
@@ -23,6 +23,7 @@ $( document ).ready(function() {
     });
     
     
+    defineOngletsEvents();
     //Recuperation de l'arboresance de l'utilisateur
     $.ajax({ 
           url      : "/Liber8/getTree",
@@ -52,27 +53,60 @@ $( document ).ready(function() {
     
     //definition des evenements sur l'arbre:
     function defineArbreEvents(){
-        
         //double click sur un fichier
         $(".isFile").dblclick(function(){
             id = $(this).attr("id");
             id = id.replace(/-/g,'/');
             App.currentOnglet = id;
             App.currentVoletElement = id;
+            if(typeof App.onglets[id] === 'undefined'){
+                fileName = id.split('/');
+                fileName = fileName[fileName.length - 1];
+                $("#onglets").append('<li class="onglet" data-id="'+ id +'" ><a href="#">'+fileName+' <i data-id="'+ id +'" class="icon-remove close-onglet"></i></a></li>');
+                App.onglets[id] = id;
+                $("#editeur code").html(App.onglets[id]);
+            }
         });
         
-        $(".branche-arbre").click(function(){
+        //selection d'un fichier
+        $(".branche-arbre").bind("click");
+        $(".branche-arbre").on("click", function(){
             id = $(this).attr("id");
             id = id.replace(/-/g,'/');
             App.currentVoletElement = id;
         });
+        
+
+        
     }
-
-
-
-
-
-
+    
+    function defineOngletsEvents(){
+        $("#onglets").on("click", ".onglet", function(){
+            id = $(this).data("id");
+            $("#editeur code").html(App.onglets[id]);
+            App.currentOnglet = id;
+        });
+        
+        $("#onglets").on("click", ".close-onglet", function(){
+            id = $(this).data("id");
+            id = App.onglets[id];
+            delete App.onglets[id];
+            $(".onglet[data-id='"+ id +"']").remove();
+            App.currentOnglet = "";
+            for (var key in App.onglets) {
+                App.currentOnglet = key;
+                break;
+            }
+            if (App.currentOnglet !== ""){
+                $("#editeur code").html(App.onglets[App.currentOnglet]);
+            } else {
+                $("#editeur code").html("");
+            }
+            
+            
+        });
+    }
+    
 });
 
 

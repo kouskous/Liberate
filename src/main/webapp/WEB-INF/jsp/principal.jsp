@@ -161,9 +161,6 @@
                         <div id="content" >
                                 <div id="menu">
                                     <ul id="onglets">
-                                        <li class="active"><a href="#">poney.java</a></li>
-                                        <li><a href="#">controller.java</a></li>
-                                        <li><a href="#">index.html</a></li>
                                     </ul>
                                 </div>
                             <pre id="editeur"><code  contenteditable="">var x = 5;</code></pre>
