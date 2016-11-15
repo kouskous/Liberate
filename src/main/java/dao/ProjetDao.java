@@ -108,6 +108,15 @@ public class ProjetDao {
             return false;
         }
     }
-    
+
+    public boolean projetNameAlreadyUsed(String nom) throws Exception{
+        Projet testProjet = getProjetByName(nom);
+
+        if(testProjet != null){
+            // Nom déjà utilisé
+            return true;
+        }
+        return false;
+    }
     
 }

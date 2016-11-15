@@ -110,9 +110,9 @@ public class InscriptionController {
                                             new Date(), 
                                             new Date(),
                                             motDePasse);
-               
+           
+        // Si l'utilisateur a bien été créé
         if(newUser != null){
-            // L'utilisateur a bien été créé
             try{
                 em.getTransaction().commit();
                 // Réussite, redirection page principale
