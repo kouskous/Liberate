@@ -23,6 +23,7 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -55,14 +56,15 @@ public class PrincipalController {
     }
     @ResponseBody
     @RequestMapping(value="/getTree", method = RequestMethod.GET,produces = "application/json")
-    public String currentTree(HttpServletRequest request){
+    public String currentTree(HttpServletRequest request, HttpServletResponse res){
             // On vérifie qu'une session n'est pas déjà ouverte
     HttpSession session= request.getSession();
     User user = (User)session.getAttribute("user");
     // Pas de session ouverte
     if(user == null) return "redirect:/login";
-
-    
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+        res.setHeader("Pragma", "no-cache"); // HTTP 1.0
+        res.setDateHeader("Expires", 0); // Proxies
     
     JSONArray list = new JSONArray();
         

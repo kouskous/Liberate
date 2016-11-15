@@ -44,14 +44,14 @@ public class FileController {
         return filename;
     }
     
-    @RequestMapping(value="/newFichier", method = RequestMethod.GET)
+    @RequestMapping(value="/newFile", method = RequestMethod.GET)
     public String index(HttpServletRequest request, ModelMap model){
-        return "newFichier";
+        return "newFile";
     }
     
-    @RequestMapping(value="/saveFichier", method = RequestMethod.GET)
+    @RequestMapping(value="/saveFile", method = RequestMethod.GET)
     public String indexSave(HttpServletRequest request, ModelMap model){
-        return "saveFichier";
+        return "saveFile";
     }
     
     // Création d'un fichier vide
@@ -63,7 +63,7 @@ public class FileController {
     // - errors contient retour d'erreur si echec
     // - renvoie null si erreur Json
     @ResponseBody 
-    @RequestMapping(value="/newFichier", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value="/newFile", method = RequestMethod.POST, produces = "application/json")
     public String newFile(HttpServletRequest request, ModelMap model){           
         
         EntityManager em = fichierUserDao.getEntityManager();
@@ -228,7 +228,7 @@ public class FileController {
     // - errors contient retour d'erreur si echec
     // - renvoie null si erreur avec le JSON
     @ResponseBody 
-    @RequestMapping(value="/saveFichier", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value="/saveFile", method = RequestMethod.POST, produces = "application/json")
     public String saveFile(HttpServletRequest request, ModelMap model){
                 
         EntityManager em = fichierUserDao.getEntityManager();

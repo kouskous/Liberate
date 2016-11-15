@@ -50,15 +50,15 @@
 				<div class="nav-no-collapse header-nav">
                                     <ul class="nav pull-left menu-options">
                                         <li class="btn_action">
-                                            <a data-toggle="modal" data-target="#projet"><i class="halflings-icon white plus-sign"></i>Projet </a>
+                                            <a class="user-action" href="#" data-toggle="modal" data-target="#projet" data-url=""><i class="halflings-icon white plus-sign"></i>Projet </a>
                                         </li>
                                         
                                         <li class="btn_action">
-                                            <a href="#"><i class="halflings-icon white plus-sign"></i>Dossier </a>
+                                            <a class="user-action" href="#" data-toggle="modal" data-target="#projet" data-url=""><i class="halflings-icon white plus-sign"></i>Dossier </a>
                                         </li>
                                         
                                         <li class="btn_action">
-                                            <a href="#"><i class="halflings-icon white plus-sign"></i>Fichier </a>
+                                            <a class="user-action" href="#" data-toggle="modal" data-target="#projet" data-url="newFile"><i class="halflings-icon white plus-sign"></i>Fichier </a>
                                         </li>
                                         
                                         <li class="btn_action">
@@ -168,20 +168,6 @@
                         </div>
                     </div>
 		</div>
-		
-	<div class="modal hide fade" id="myModal">
-		<div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal">×</button>
-			<h3>Settings</h3>
-		</div>
-		<div class="modal-body">
-			<p>Here settings can be configured...</p>
-		</div>
-		<div class="modal-footer">
-			<a href="#" class="btn" data-dismiss="modal">Close</a>
-			<a href="#" class="btn btn-primary">Save changes</a>
-		</div>
-	</div>
 	
 	<div class="clearfix"></div>
 	
@@ -267,6 +253,8 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div id="modal_content">
       </div>
     </div>
   </div>

@@ -118,7 +118,17 @@ $( document ).ready(function() {
             
         });
     }
-    
+   
+    $(".user-action").click(function(){
+        url = $(this).data("url");
+        $.ajax({ 
+        url      : "/Liber8/"+ url,
+        dataType : "html",
+        success  : function(data) {  
+                        $("#modal_content").html(data);
+                    }       
+    });
+    });
 });
 
 
