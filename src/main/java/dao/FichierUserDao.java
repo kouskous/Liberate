@@ -95,6 +95,19 @@ public class FichierUserDao {
             throw new Exception("Erreur BDD: plusieurs fichiers d'utilisateur ont le même nom physique");
         }
     }
+    
+    public String getPathByPathLogique(User user,String pathLogique){
+        TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByUserAndPath", FichiersUsers.class);
+        query.setParameter("user", user);
+        query.setParameter("pathLogique", pathLogique);
+        List<FichiersUsers> results = query.getResultList();
+        
+        if(results.size()==1){
+            if(results.get(0).getType())
+             return results.get(0).getNomPhysique();
+        }
+        return null;
+    }
 
     /**
      * @author Florian

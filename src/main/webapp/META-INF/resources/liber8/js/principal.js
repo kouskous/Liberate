@@ -57,15 +57,28 @@ $( document ).ready(function() {
         $(".isFile").dblclick(function(){
             id = $(this).attr("id");
             id = id.replace(/-/g,'/');
+            id2 = id.replace("Root",'');
+            $.ajax({ 
+                url      : "/Liber8/getFile",
+                dataType : "json",
+                type     : "POST",
+                data     : "pathLogique="+id2,
+                success  : function(data) {
+                content=data["content"];
+                
+                
             App.currentOnglet = id;
             App.currentVoletElement = id;
             if(typeof App.onglets[id] === 'undefined'){
                 fileName = id.split('/');
                 fileName = fileName[fileName.length - 1];
                 $("#onglets").append('<li class="onglet" data-id="'+ id +'" ><a href="#">'+fileName+' <i data-id="'+ id +'" class="icon-remove close-onglet"></i></a></li>');
-                App.onglets[id] = id;
+                App.onglets[id] = content;
                 $("#editeur code").html(App.onglets[id]);
             }
+            }
+            });
+            
         });
         
         //selection d'un fichier
@@ -89,7 +102,6 @@ $( document ).ready(function() {
         
         $("#onglets").on("click", ".close-onglet", function(){
             id = $(this).data("id");
-            id = App.onglets[id];
             delete App.onglets[id];
             $(".onglet[data-id='"+ id +"']").remove();
             App.currentOnglet = "";

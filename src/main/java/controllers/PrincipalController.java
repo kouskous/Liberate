@@ -9,6 +9,10 @@ package controllers;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import dao.FichierUserDao;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import models.User;
 import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
@@ -18,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
+import javax.servlet.ServletContext;
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -81,6 +86,57 @@ public class PrincipalController {
     }
 
     return  list.toString();
+
+       
+    }
+    
+    @ResponseBody
+    @RequestMapping(value="/getFile", method = RequestMethod.POST,produces = "application/json")
+    public String contentFile(HttpServletRequest request){
+            // On vérifie qu'une session n'est pas déjà ouverte
+    HttpSession session= request.getSession();
+    User user = (User)session.getAttribute("user");
+    // Pas de session ouverte
+    if(user == null) return "redirect:/login";
+
+    
+    
+    JSONArray list = new JSONArray();
+        
+    String pathPhysique = fichierUserDao.getPathByPathLogique(user,request.getParameter("pathLogique"));
+        JSONObject response = new JSONObject();
+        if(pathPhysique != null){
+            try{
+            response.put("pathLogique",request.getParameter("pathLogique"));
+            response.put("pathPhysique",pathPhysique);
+            }		
+                catch (Exception e){
+                    System.out.println(e.toString());
+                }
+            try{
+                ServletContext ctx = request.getServletContext();
+                String path = ctx.getRealPath("/");
+                InputStream flux=new FileInputStream(path+"/../" +pathPhysique); 
+                InputStreamReader lecture=new InputStreamReader(flux);
+                BufferedReader buff=new BufferedReader(lecture);
+                String ligne;
+                String contenuPage="";
+                
+                while ((ligne=buff.readLine())!=null){
+                    contenuPage=contenuPage +ligne+"\n";
+                }
+                buff.close();
+                
+                response.put("content",contenuPage);
+                }		
+                catch (Exception e){
+                    return e.toString();
+                }
+        }
+       
+    
+
+    return  response.toString();
 
        
     }
