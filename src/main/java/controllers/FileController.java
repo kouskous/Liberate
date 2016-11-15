@@ -150,6 +150,75 @@ public class FileController {
             return null;
         }
     }
+    
+    @ResponseBody 
+    @RequestMapping(value="/newDossier", method = RequestMethod.POST, produces = "application/json")
+    public String newDossier(HttpServletRequest request, ModelMap model){           
+        
+        EntityManager em = fichierUserDao.getEntityManager();
+        
+        // On créé l'objet à retourner
+        JSONObject returnObject = new JSONObject();   
+        
+        try{
+            returnObject.put("response", "");
+            returnObject.put("errors", "");
+            
+            // On vérifie qu'une session est bien ouverte
+            HttpSession session= request.getSession();
+            User user = (User)session.getAttribute("user");
+
+            if(user == null){
+                returnObject.put("errors", "No user");
+                return returnObject.toString();
+            }
+            else{
+                    em.getTransaction().begin();
+                    
+                    String fileName = extractFileName((String)request.getParameter("pathFichier"));
+                    System.out.print(fileName);
+                    FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathFichier"), 
+                    null, 
+                    fileName, 
+                    new Date(), false, user);
+                    
+                    if(newFile == null){
+                        returnObject.put("errors", "Failed to create file");
+                        return returnObject.toString();
+                    }
+                    else{
+                        try{
+                            em.persist(newFile);
+                            em.getTransaction().commit();
+                            em.close();
+                            
+                            returnObject.put("response",true);
+                            return returnObject.toString();
+                        }
+                        catch(Exception e){
+                            em.close();
+                            returnObject.put("errors","Erreur BDD");
+                            return returnObject.toString();
+                        }
+                    }
+            }
+        }
+        catch(Exception e){
+            System.out.println("Erreur JSON");
+            System.out.println(e.getMessage());
+            
+            //TODO: ce try-catch ne sert qu'à afficher les erreurs
+            try{
+                JSONObject obj = new JSONObject();
+                obj.put("errors",e.getMessage());
+                return obj.toString();
+            }
+            catch(Exception er){
+                
+            }
+            return null;
+        }
+    }
         
     // Enregistre un fichier
     // - Nécessite les champs "pathFichier" et "contenuFichier" dans la requête

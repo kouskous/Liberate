@@ -53,7 +53,7 @@ public class FichiersUsers implements Serializable {
     @Column(name = "pathLogique")
     private String pathLogique;
     
-    @Basic(optional = false)
+    @Basic(optional = true)
     @Column(name = "nomPhysique")
     private String nomPhysique;
     
