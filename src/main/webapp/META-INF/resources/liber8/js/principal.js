@@ -130,18 +130,21 @@ $( document ).ready(function() {
     
     /** Sauvegarder le fichier dont l'onglet est sélectionné **/
     $("#saveAction").click(function(){
-       content = $("#editeur").val();
+        /* TODO */
+       content = "toto";
        path = (App.currentOnglet).slice(4);
-       alert(content);
-    });
-    $.ajax({ 
-      url      : "/Liber8/saveFichier",
+       
+       $.ajax({ 
+      url      : "/Liber8/saveFile",
       type     : 'POST',
       dataType : "json",
       data     :{
                     pathFichier: path,
                     contenuFichier: content
-                } 
+                },
+      success  : function(data) {  
+                    }       
+        });
     });
     
 });
