@@ -64,19 +64,17 @@ $( document ).ready(function() {
                 type     : "POST",
                 data     : "pathLogique="+id2,
                 success  : function(data) {
-                content=data["content"];
-                
-                
-            App.currentOnglet = id;
-            App.currentVoletElement = id;
-            if(typeof App.onglets[id] === 'undefined'){
-                fileName = id.split('/');
-                fileName = fileName[fileName.length - 1];
-                $("#onglets").append('<li class="onglet" data-id="'+ id +'" ><a href="#">'+fileName+' <i data-id="'+ id +'" class="icon-remove close-onglet"></i></a></li>');
-                App.onglets[id] = content;
-                $("#editeur code").html(App.onglets[id]);
-            }
-            }
+                    content=data["content"];
+                    App.currentOnglet = id;
+                    App.currentVoletElement = id;
+                    if(typeof App.onglets[id] === 'undefined'){
+                        fileName = id.split('/');
+                        fileName = fileName[fileName.length - 1];
+                        $("#onglets").append('<li class="onglet" data-id="'+ id +'" ><a href="#">'+fileName+' <i data-id="'+ id +'" class="icon-remove close-onglet"></i></a></li>');
+                        App.onglets[id] = content;
+                        $("#editeur code").html(App.onglets[id]);
+                    }
+                }
             });
             
         });
@@ -129,6 +127,26 @@ $( document ).ready(function() {
                     }       
     });
     });
+    
+    /** Sauvegarder le fichier dont l'onglet est sélectionné **/
+    $("#saveAction").click(function(){
+        /* TODO */
+       content = "toto";
+       path = (App.currentOnglet).slice(4);
+       
+       $.ajax({ 
+      url      : "/Liber8/saveFile",
+      type     : 'POST',
+      dataType : "json",
+      data     :{
+                    pathFichier: path,
+                    contenuFichier: content
+                },
+      success  : function(data) {  
+                    }       
+        });
+    });
+    
 });
 
 

@@ -6,8 +6,12 @@
 package controllers;
 
 import dao.FichierUserDao;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Date;
 import javax.persistence.EntityManager;
@@ -18,6 +22,7 @@ import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import models.FichiersUsers;
 import models.User;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -110,7 +115,7 @@ public class FileController {
                                 String path = ctx.getRealPath("/");
                                 
                                 // TODO: change this path when deploying to server
-                                FileOutputStream out = new FileOutputStream(path + "/../" + fileName);
+                                FileOutputStream out = new FileOutputStream(path + "/../../files/" + fileName);
                             }
                             catch(Exception e){
                                 returnObject.put("response",e.getMessage());
@@ -271,7 +276,7 @@ public class FileController {
                             ServletContext ctx = request.getServletContext();
                             String path = ctx.getRealPath("/");
                             
-                            FileOutputStream out = new FileOutputStream(path + "/../" + fileName);
+                            FileOutputStream out = new FileOutputStream(path + "/../../files/" + fileName);
                             out.write(contenuFichier.getBytes());
                         }
                         catch(Exception e){
@@ -307,5 +312,59 @@ public class FileController {
             
             return null;
         }
+    }
+    
+    @ResponseBody
+    @RequestMapping(value="/getFile", method = RequestMethod.POST,produces = "application/json")
+    public String contentFile(HttpServletRequest request){
+            // On vérifie qu'une session n'est pas déjà ouverte
+    HttpSession session= request.getSession();
+    User user = (User)session.getAttribute("user");
+    // Pas de session ouverte
+    if(user == null) return "redirect:/login";
+
+    
+    
+    JSONArray list = new JSONArray();
+        
+    String pathPhysique = fichierUserDao.getPathByPathLogique(user,request.getParameter("pathLogique"));
+        JSONObject response = new JSONObject();
+         try{
+            response.put("pathLogique","");
+            response.put("pathPhysique","");
+            response.put("content","");
+            }
+         catch (Exception e){
+                }
+        if(pathPhysique != null){
+            try{
+            response.put("pathLogique",request.getParameter("pathLogique"));
+            response.put("pathPhysique",pathPhysique);
+            }		
+                catch (Exception e){
+                    System.out.println(e.toString());
+                }
+            try{
+                ServletContext ctx = request.getServletContext();
+                String path = ctx.getRealPath("/");
+                InputStream flux=new FileInputStream(path+"/../../files/" +pathPhysique); 
+                InputStreamReader lecture=new InputStreamReader(flux);
+                BufferedReader buff=new BufferedReader(lecture);
+                String ligne;
+                String contenuPage="";
+                
+                while ((ligne=buff.readLine())!=null){
+                    contenuPage=contenuPage +ligne+"\n";
+                }
+                buff.close();
+                
+                response.put("content",contenuPage);
+                }		
+                catch (Exception e){
+                    return e.toString();
+                }
+        }
+    return  response.toString();
+       
     }
 }
