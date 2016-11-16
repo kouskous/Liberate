@@ -52,7 +52,7 @@
 						
 					</div>
                 <h2>${Erreur}</h2>
-                    <form action = "getUsers" method="post" id="newprojet">
+                    <form action = "newProjet" method="GET" id="newprojet">
                         <div class="box span6">
                             <div class="box-header" data-original-title="">
 						<h2><i class="halflings-icon edit"></i><span class="break"></span>Général</h2>
@@ -66,11 +66,11 @@
                             <div class="control-group">
 								<label class="control-label userline span4" for="selectErrortype">Langage</label>
 								<div class="controls userline">
-								  <select id="selectErrortype" data-rel="chosen" name="langage">
-									<option>Java</option>
-									<option>C++</option>
-									<option>C</option>
-									<option>Javascript</option>
+								  <select id="selectErrortype" data-rel="chosen" name="langageProjet">
+									<option value="java">Java</option>
+									<option value="c++">C++</option>
+									<option value="c">C</option>
+									<option value="javascript">Javascript</option>
 								  </select>
 								</div>
 							  </div>
@@ -194,7 +194,7 @@ $( function() {
                source: availableTags
              });
     
-            var max_input     = 20; //le nombre maximun des input
+            var max_input     = 10; //le nombre maximun des input
             var adduser       = $("#adduser"); // div contenant tout les utilisateurs
             var add_button      = $("#adduserbouton"); //Ajouter bouton id
             $('#listuser .modal-body .alert-error').css('display','none');
@@ -205,17 +205,14 @@ $( function() {
             arrname.push(this.innerHTML); });
                });
           
-            numberinput=1;
+            numberinput=0;
             $(add_button).click(function(e){ //on add input button click
                  e.preventDefault();
                 $('#listuser').css("display","block");
                 if(numberinput < max_input){ //max input box allowed
                     numberinput++; //text box increment
-                   var getname=$('#usersname').val();
-                   if (jQuery.inArray(getname,arrname) === -1) {
-                       console.log(arrname);
-                   }
                    
+                   var getname=$('#usersname').val();
                      
            	        	if (jQuery.inArray(getname,availableTags) === -1  || getname ==="") {
                             $('#listuser .modal-body .alert-error').css('display','block');
@@ -228,16 +225,29 @@ $( function() {
                             $('#usersname').val("");
            			             $(".usernew").append('<li><div class="control-group">\n\
 				                  	<label class="control-label userline" for="selectError'+numberinput+'">'+getname+'</label>\n\
-					                   <div class="controls userline"><select id="selectError'+numberinput+'" data-rel="chosen" name="userprojet[]"><option>admin</option>\n\
-					                   <option>reporteur</option><option>developpeur</option></select><a class="remove_field"><i class="icon-trash"></i></a></div></div>'); //add input box
-                        		}
+					                   <div class="controls userline"><select id="selectError'+numberinput+'" data-rel="chosen" name="droit'+numberinput+'"><option value="admin">admin</option>\n\
+					                   <option value="reporteur">reporteur</option><option class="developpeur">developpeur</option></select><a class="remove_field"><input type="hidden" value="'+getname+'" name="utilisateur'+numberinput+'"><i class="icon-trash"></i></a></div></div>'); //add input box
+                        		for(var i = availableTags.length - 1; i >= 0; i--) {
+    if(availableTags[i] === getname) {
+       availableTags.splice(i, 1);
+    }
+}
+
+            
+            }
             
                 }
                                         
            
         });
     $(adduser).on("click",".remove_field", function(e){ //user click on remove text
-        e.preventDefault(); $(this).parents('li').remove(); numberinput--;
+        
+          
+        e.preventDefault(); 
+        var valeursupprimer = $(this).parents('li').find('input[type=hidden]').val();
+        $(this).parents('li').remove(); 
+        availableTags.push(valeursupprimer );
+        numberinput--;
     });
     $("#submitaddusrer").click(function(e){
         if(!$('#nomProjet').val()){
