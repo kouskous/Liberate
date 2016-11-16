@@ -222,12 +222,7 @@ public class UserDao {
         query.setParameter("name", "%" + pseudo + "%");
         List<String> results = query.getResultList();
         
-        if(results.isEmpty()){
-            return null;
-        }
-        else{
-            return results;
-        }
+        return results;
     }
     
 }
