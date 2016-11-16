@@ -5,6 +5,7 @@
  */
 package dao;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -88,7 +89,6 @@ public class UserDao {
     // Création d'un nouvel utilisateur
     // Renvoie l'utilisateur si réussite
     // Renvoie null sinon
-    @Transactional
     public User createNewUser(String pseudo, String email, String nom, String prenom, 
             Date dateCreation, Date dateModification, String cleMotDePasse){
         
@@ -142,7 +142,6 @@ public class UserDao {
     // Modifie l'adresse email d'un utilisateur
     // Renvoie vrai si réussi
     // Renvoie faux sinon (pas d'utilisateur avec oldEmail, ou déjà un utilisateur avec newEmail
-    @Transactional
     public boolean changeUserEmail(String oldEmail, String newEmail){
         
         // On vérifie que l'adresse mail n'existe pas déjà dans la Bdd.
@@ -214,7 +213,21 @@ public class UserDao {
         return false;
     }
     
-    // TODO: toutes les autres fonctions de modification qu'on aura besoin.
-    //sur le modèle de changeUserEmail
+
+    // Cherche les pseudos contenant une chaine de caractères donnée
+    public List<String> searchUsersByName(String pseudo)
+    {      
+        // Recherche de users par pseudo
+        TypedQuery<String> query = em.createNamedQuery("Pseudo.search", String.class);
+        query.setParameter("name", "%" + pseudo + "%");
+        List<String> results = query.getResultList();
+        
+        if(results.isEmpty()){
+            return null;
+        }
+        else{
+            return results;
+        }
+    }
     
 }
