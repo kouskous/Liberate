@@ -50,7 +50,7 @@
 				<div class="nav-no-collapse header-nav">
                                     <ul class="nav pull-left menu-options">
                                         <li class="btn_action">
-                                            <a class="user-action" href="#" data-toggle="modal" data-target="#projet" data-url=""><i class="halflings-icon white plus-sign"></i>Projet </a>
+                                            <a class="user-action" href="#" data-toggle="modal" data-target="#projet" data-url="newProjet"><i class="halflings-icon white plus-sign"></i>Projet </a>
                                         </li>
                                         
                                         <li class="btn_action">

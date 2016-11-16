@@ -236,3 +236,15 @@ footer {
 .arbre{
     margin-top: 10px;
 }
+.modal {
+    left: 15% !important;
+    width: 70% !important;
+    margin-left: 0 !important;
+}
+.fade.in {
+    display:block !important;
+}
+#listuser {
+    left: 20% !important;
+    width: 60% !important;
+}

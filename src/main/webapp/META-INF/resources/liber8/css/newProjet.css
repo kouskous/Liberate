@@ -1,7 +1,5 @@
-/* 
-    Created on : 19 oct. 2016, 15:27:18
-    Author     : sofiaa faddi
-*/
+/*** Author : sofiaa faddi
+******/
 .borderprojet legend {
     position: relative;
 }
@@ -63,4 +61,25 @@ div.radio {
     font-size: 20px;
     margin: 0 auto;
     margin-bottom: 20px;
+    text-decoration: none !important;
+}
+.addbouton:hover {
+color: #fff;
+background: #646464;
+}
+#listuser .modal-body .alert-error {
+    margin:10px 0;
+}
+.icon-exclamation-sign {
+    margin-right: 10px;
+}
+#adduser p {
+    padding: 10px;
+    font-size: 16px;
+    text-align: center;
+    
+}
+.projetinput .bordure {
+        border-color: #f27b81 !important;
+	border-left-color: #f27b81 !important;
 }

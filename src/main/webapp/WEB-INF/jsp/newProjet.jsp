@@ -1,7 +1,7 @@
 <%-- 
     Document   : newProjet
     Created on : Oct 20, 2016, 3:20:10 PM
-    Author     : Luc Di Sanza faddi sofiaa
+    Author     : Faddi sofiaa
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -19,14 +19,14 @@
 	<!-- end: Mobile Specific -->
 	
 	<!-- start: CSS -->
-        <link id="bootstrap-style" href="/Liber8/resources/metro/css/bootstrap.min.css" rel="stylesheet">
+    <link id="bootstrap-style" href="/Liber8/resources/metro/css/bootstrap.min.css" rel="stylesheet">
 	<link href="/Liber8/resources/metro/css/bootstrap-responsive.min.css" rel="stylesheet">
 	<link id="base-style" href="/Liber8/resources/metro/css/style.css" rel="stylesheet">
+     <link href="/Liber8/resources/metro/css/jquery-ui-1.8.21.custom.css" rel="stylesheet">
 	<link id="base-style-responsive" href="/Liber8/resources/metro/css/style-responsive.css" rel="stylesheet">
-        <link id="base-style-responsive" href="/Liber8/resources/liber8/css/newProjet.css" rel="stylesheet">
+     <link id="base-style-responsive" href="/Liber8/resources/liber8/css/newProjet.css" rel="stylesheet">
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&subset=latin,cyrillic-ext,latin-ext' rel='stylesheet' type='text/css'>
 	<!-- end: CSS -->
-	
 
 	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
 	<!--[if lt IE 9]>
@@ -43,7 +43,7 @@
 	<!-- end: Favicon -->
 	
 </head>
-    <body>        
+    <body>    
         <div class="container-fluid">
             <div class="row-fluid">
                 <div class="box" span12>
@@ -66,7 +66,7 @@
                             <div class="control-group">
 								<label class="control-label userline span4" for="selectErrortype">Langage</label>
 								<div class="controls userline">
-								  <select id="selectErrortype" data-rel="chosen" name="langageProjet">
+								  <select id="selectErrortype" data-rel="chosen" name="langage">
 									<option>Java</option>
 									<option>C++</option>
 									<option>C</option>
@@ -75,56 +75,32 @@
 								</div>
 							  </div>
                             <div class="control-group">
-                                <label class="control-label"><h3>Sources</h3></label>
-                                    <div class="controls">
-                                	<label class="radio">
-				<div class="radio inputradio" id="uniform-optionsRadios1"><input type="radio" name="sourcesprojet" id="vide" value="vide"></div>
-                                        Vide
-			</label><br/>
-			<label class="radio">
-				<div class="radio inputradio" id="uniform-optionsRadios2"><input type="radio" name="sourcesprojet" id="existant" value="existant"></div>
-                                        A partir des fichiers existant
-			</label>
-		</div>
-</div>
+								<h4 class="control-label">Source</h4>
+								<div class="controls">
+								  <label class="radio">
+									<input type="radio" name="optionsRadios" id="optionsRadios1" value="vide" checked="">
+									vide
+								  </label>
+								  <div style="clear:both"></div>
+								  <label class="radio">
+									<input type="radio" name="optionsRadios" id="optionsRadios2" value="existant">
+									a partir d'un projet existant 
+								  </label>
+								</div>
+							  </div>
                            </div></div>
-                        <div class="box span6">
+                        <div class="box span6" id="adduser">
                             <div class="box-header" data-original-title="">
 						<h2><i class="icon-user"></i><span class="break"></span>Collaboration et partage</h2>
 					</div>
+                            <p> Cliquer sur le bouton plus pour ajouter des utilisateurs à votre projets </p>
                             <ul class='usernew'>
-                                <li><div class="control-group">
-								<label class="control-label userline" for="selectError1">@user1</label>
-								<div class="controls userline">
-								  <select id="selectError1" data-rel="chosen" name="userprojet1">
-									<option>Modification</option>
-									<option>Lecture</option>
-								  </select>
-								</div>
-							  </div></li>
-                                <li><div class="control-group">
-								<label class="control-label userline" for="selectError2">@user2</label>
-								<div class="controls userline">
-								  <select id="selectError2" data-rel="chosen" name="userprojet2">
-									<option>Modification</option>
-									<option>Lecture</option>
-								  </select>
-								</div>
-							  </div></li><li><div class="control-group">
-								<label class="control-label userline" for="selectError3">@user3</label>
-								<div class="controls userline">
-								  <select id="selectError3" data-rel="chosen" name="userprojet3">
-									<option>Modification</option>
-									<option>Lecture</option>
-								  </select>
-								</div>
-							  </div></li>
                             </ul>
-                            <a href="#" class="addbouton"><i class="icon-plus"></i></a>
+                            <a href="#"  data-toggle="modal" data-target="#listuser" class="addbouton"><i class="icon-plus"></i></a>
                            
                         </div>
                          <div class="form-actions">
-								<button type="submit" class="btn btn-primary">Terminer</button>
+								<button type="submit" class="btn btn-primary" id="submitaddusrer">Terminer</button>
 								<button class="btn">Annuler</button>
 							  </div>
                        
@@ -132,8 +108,29 @@
                 </div>
             </div>
         </div>
-                    <script src="/Liber8/resources/metro/js/jquery-1.9.1.min.js"></script>
-	<script src="/Liber8/resources/metro/js/jquery-migrate-1.0.0.min.js"></script>
+        <div class="modal fade" id="listuser" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Choisissez un utilisateur</h4>
+      </div>
+      <div class="modal-body">
+       <div class="ui-widget">
+            <input id="usersname" type="text">
+       </div>
+        <div class="alert alert-error role alert"><i class="icon-exclamation-sign" aria-hidden="true"></i><span></span></div>  
+      </div>
+      <div class="modal-footer">
+          
+        <button type="button" class="btn btn-primary" id="adduserbouton">Enregistrer</button>
+        <button type="button" class="btn closebtn">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>    
+                   <script src="/Liber8/resources/metro/js/jquery-1.9.1.min.js"></script>
+                    <script src="/Liber8/resources/metro/js/jquery-migrate-1.0.0.min.js"></script>
 	
 		<script src="/Liber8/resources/metro/js/jquery-ui-1.10.0.custom.min.js"></script>
 	
@@ -182,10 +179,87 @@
 		<script src="/Liber8/resources/metro/js/jquery.sparkline.min.js"></script>
 	
 		<script src="/Liber8/resources/metro/js/counter.js"></script>
-	
+
 		<script src="/Liber8/resources/metro/js/retina.js"></script>
 
-		<script src="/Liber8/resources/metro/js/custom.js"></script>
+		<script>
+  $( function() {
+    var availableTags = [
+      "ActionScript",
+      "AppleScript",
+      "Asp",
+      "BASIC",
+      "C",
+      "C++",
+      "Clojure",
+      "COBOL",
+      "ColdFusion",
+      "Erlang",
+      "Fortran",
+      "Groovy",
+      "Haskell",
+      "Java",
+      "JavaScript",
+      "Lisp",
+      "Perl",
+      "PHP",
+      "Python",
+      "Ruby",
+      "Scala",
+      "Scheme"
+    ];
+    $( "#usersname" ).autocomplete({
+      source: availableTags
+    });
+    
+    var max_input     = 20; //le nombre maximun des input
+    var adduser       = $("#adduser"); // div contenant tout les utilisateurs
+    var add_button      = $("#adduserbouton"); //Ajouter bouton id
+     $('#listuser .modal-body .alert-error').css('display','none');
+    
+    numberinput=1;
+    $(add_button).click(function(e){ //on add input button click
+        e.preventDefault();
+        $('#listuser').css("display","block");
+        if(numberinput < max_input){ //max input box allowed
+           numberinput++; //text box increment
+           var getname=$('#usersname').val();
+           		if (jQuery.inArray(getname,availableTags) === -1  || getname ==="") {
+                            $('#listuser .modal-body .alert-error').css('display','block');
+    				$('#listuser .modal-body .alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>Le nom est incorrect ! Réessayer </span>');
+  				}
+           		else {
+                            $('#listuser .modal-body .alert-error').css('display','none');
+                            $('#listuser').modal('hide');
+                            $('#usersname').val("");
+           			 $(".usernew").append('<li><div class="control-group">\n\
+					<label class="control-label userline" for="selectError'+numberinput+'">'+getname+'</label>\n\
+					<div class="controls userline"><select id="selectError'+numberinput+'" data-rel="chosen" name="userprojet[]"><option>Modification</option>\n\
+					<option>Lecture</option></select><a class="remove_field"><i class="icon-trash"></i></a></div></div>'); //add input box
+           		}
+           
+       		}
+           
+        });
+    $(adduser).on("click",".remove_field", function(e){ //user click on remove text
+        e.preventDefault(); $(this).parents('li').remove(); numberinput--;
+    });
+    });
+    $("#submitaddusrer").click(function(e){
+        if(!$('#nomProjet').val()){
+           
+            $('#nomProjet').addClass("bordure");
+             return false;
+        }
+        else {
+             $('#nomProjet').removeClass("bordure");
+        }
+        
+    });
+    $('#listuser .closebtn').click(function(e){
+         $('#listuser').modal('hide');
+    });
+  </script>
 	<!-- end: JavaScript-->
 	
     </body>
