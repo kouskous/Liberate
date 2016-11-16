@@ -127,6 +127,23 @@ $( document ).ready(function() {
                     }       
     });
     });
+    
+    /** Sauvegarder le fichier dont l'onglet est sélectionné **/
+    $("#saveAction").click(function(){
+       content = $("#editeur").val();
+       path = (App.currentOnglet).slice(4);
+       alert(content);
+    });
+    $.ajax({ 
+      url      : "/Liber8/saveFichier",
+      type     : 'POST',
+      dataType : "json",
+      data     :{
+                    pathFichier: path,
+                    contenuFichier: content
+                } 
+    });
+    
 });
 
 
