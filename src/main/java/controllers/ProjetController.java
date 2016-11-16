@@ -145,7 +145,7 @@ public class ProjetController {
                 return returnObject.toString();
             }
             else{
-                List<String> myList = userDao.searchUsersByName(name);                
+                List<String> myList = userDao.getAllPseudo(name);                
                 
                 JSONArray list = new JSONArray();
                 

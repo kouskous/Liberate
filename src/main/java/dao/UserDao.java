@@ -225,4 +225,14 @@ public class UserDao {
         return results;
     }
     
+    // Renvoi la liste de tous les pseudos d'utilisateurs
+    public List<String> getAllPseudo(String pseudo)
+    {      
+        // Recherche de users par pseudo
+        TypedQuery<String> query = em.createNamedQuery("Pseudo.getAll", String.class);
+        query.setParameter("name", "%" + pseudo + "%");
+        List<String> results = query.getResultList();
+        
+        return results;
+    }
 }
