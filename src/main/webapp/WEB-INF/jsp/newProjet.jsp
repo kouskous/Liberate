@@ -89,7 +89,7 @@
 								</div>
 							  </div>
                            </div></div>
-                        <div class="box span6" id="adduser">
+                        <div class="box span6" id="adduser" class="coll">
                             <div class="box-header" data-original-title="">
 						<h2><i class="icon-user"></i><span class="break"></span>Collaboration et partage</h2>
 					</div>
