@@ -74,7 +74,7 @@
                                         </li>
                                         
                                         <li class="btn_action">
-                                            <a href="#"><i class="icon-save"></i>Enregistrer</a>
+                                            <a href="#" id="saveAction"><i class="icon-save"></i>Enregistrer</a>
                                         </li>
                                         
                                         <li class="btn_action">
