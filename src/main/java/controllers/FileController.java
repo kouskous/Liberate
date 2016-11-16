@@ -115,7 +115,7 @@ public class FileController {
                                 String path = ctx.getRealPath("/");
                                 
                                 // TODO: change this path when deploying to server
-                                FileOutputStream out = new FileOutputStream(path + "/../" + fileName);
+                                FileOutputStream out = new FileOutputStream(path + "/../../files/" + fileName);
                             }
                             catch(Exception e){
                                 returnObject.put("response",e.getMessage());
@@ -276,7 +276,7 @@ public class FileController {
                             ServletContext ctx = request.getServletContext();
                             String path = ctx.getRealPath("/");
                             
-                            FileOutputStream out = new FileOutputStream(path + "/../" + fileName);
+                            FileOutputStream out = new FileOutputStream(path + "/../../files/" + fileName);
                             out.write(contenuFichier.getBytes());
                         }
                         catch(Exception e){
@@ -347,7 +347,7 @@ public class FileController {
             try{
                 ServletContext ctx = request.getServletContext();
                 String path = ctx.getRealPath("/");
-                InputStream flux=new FileInputStream(path+"/../" +pathPhysique); 
+                InputStream flux=new FileInputStream(path+"/../../files/" +pathPhysique); 
                 InputStreamReader lecture=new InputStreamReader(flux);
                 BufferedReader buff=new BufferedReader(lecture);
                 String ligne;
