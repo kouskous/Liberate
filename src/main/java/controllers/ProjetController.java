@@ -9,17 +9,21 @@ import dao.ProjetDao;
 import dao.UserDao;
 import dao.UserProjetDao;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import models.Projet;
 import models.User;
 import models.UserProjet;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  *
@@ -39,6 +43,7 @@ public class ProjetController {
     
     // Regex1 utilisée pour le nom du projet
     static String regex1 = "^([a-zA-Z]{3,50})";
+    static String regex2 = "^([a-zA-Z]{1,50})";
     
     public ProjetController(){
     }
@@ -119,5 +124,41 @@ public class ProjetController {
         return Pattern.compile(regex).matcher(aTester).matches();
     }
             
+    // Récupération des utilisateurs dont le nom contient une chaine de caractères
+    // - La requête doit contenir un champs "name"
+    @ResponseBody
+    @RequestMapping(value="/getUsers", method = RequestMethod.POST, produces = "application/json")
+    public String getUsers(HttpServletRequest request, ModelMap model){
+        
+        // On créé l'objet à retourner
+        JSONObject returnObject = new JSONObject();   
+        
+        try{
+            returnObject.put("response", "");
+            returnObject.put("errors", "");
+            
+            // Test de la chaine de caractère à chercher
+            String name = (String)request.getParameter("name");
+            
+            if(!testRegex(regex2, name)){
+                returnObject.put("errors", "Nom à chercher invalide");
+                return returnObject.toString();
+            }
+            else{
+                List<String> myList = userDao.searchUsersByName(name);                
+                
+                JSONArray list = new JSONArray();
+                
+                for (int i = 0; i < myList.size(); i++)
+                    list.put(myList.get(i));
+                
+                returnObject.put("response", list.toString());
+                return returnObject.toString();
+            }
+        }
+        catch(Exception e){
+            return null;
+        }
+    }
     
 }

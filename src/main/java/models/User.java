@@ -39,7 +39,8 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "User.findByNom", query = "SELECT u FROM User u WHERE u.nom = :nom"),
     @NamedQuery(name = "User.findByPrenom", query = "SELECT u FROM User u WHERE u.prenom = :prenom"),
     @NamedQuery(name = "User.findByDateCreation", query = "SELECT u FROM User u WHERE u.dateCreation = :dateCreation"),
-    @NamedQuery(name = "User.findByDateModification", query = "SELECT u FROM User u WHERE u.dateModification = :dateModification")})
+    @NamedQuery(name = "User.findByDateModification", query = "SELECT u FROM User u WHERE u.dateModification = :dateModification"),
+    @NamedQuery(name = "Pseudo.search", query = "SELECT pseudo FROM User u WHERE u.pseudo LIKE :name ")})
 public class User implements Serializable {
 
     @Id
