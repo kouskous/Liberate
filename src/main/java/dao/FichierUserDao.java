@@ -7,6 +7,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.util.*;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
+import org.springframework.stereotype.Repository;
 
 /**
  * Created by Florian on 20/10/2016.
@@ -14,21 +17,20 @@ import javax.persistence.Persistence;
  * @author Florian
  */
 public class FichierUserDao {
+    
     EntityManager em;
 
-    public FichierUserDao(){}
+    public FichierUserDao(){
     
-    public FichierUserDao(String persistenceUnitName){
-        em = Persistence.createEntityManagerFactory(persistenceUnitName).createEntityManager();
+    }
+    
+    public FichierUserDao(EntityManager em_){
+        em = em_;
     }
     
     public EntityManager getEntityManager(){
         return this.em;
     }
-
-    /*public FichierUserDao(EntityManager em){
-        this.em = em;
-    }*/
 
     // Cherche les fichiers d'un utilisateur dans la BDD
     // - renvoie null s'il n'y a pas de fichiers pour cet user.
@@ -174,7 +176,9 @@ public class FichierUserDao {
 
         // On essaye d'ajouter l'utilisateur à la persistence
         try{
+            em.getTransaction().begin();
             em.persist(newFichierUsers);
+            em.getTransaction().commit();
             return newFichierUsers;
         }
         catch(Exception e){
@@ -195,7 +199,9 @@ public class FichierUserDao {
 
             // Si on l'a trouvé, on le supprime
             if(fichiersUsersToDelete != null){
+                em.getTransaction().begin();
                 em.remove(fichiersUsersToDelete);
+                em.getTransaction().commit();
                 return true;
             }
             else{
@@ -218,10 +224,13 @@ public class FichierUserDao {
      * @param newPathLogique le nouveau chemin physique
      * @return Renvoie vrai si réussi, faux sinon
      */
+    @Transactional
     public boolean changePathLogique(FichiersUsers fichierToChange, String newPathLogique){
         if(fichierToChange != null){
             fichierToChange.setPathLogique(newPathLogique);
+            em.getTransaction().begin();
             em.persist(fichierToChange);
+            em.getTransaction().commit();
             return true;
         }
         else{

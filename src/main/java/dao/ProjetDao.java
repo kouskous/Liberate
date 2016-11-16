@@ -9,9 +9,12 @@ import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
 import models.Projet;
 import models.User;
+import org.springframework.stereotype.Repository;
 
 /**
  *
@@ -25,17 +28,13 @@ public class ProjetDao {
         
     }
     
-    public ProjetDao(String persistenceUnitName){
-        em = Persistence.createEntityManagerFactory(persistenceUnitName).createEntityManager();
-    }
-    
     public EntityManager getEntityManager(){
         return this.em;
     }
     
-    /*public ProjetDao(EntityManager em){
+    public ProjetDao(EntityManager em){
         this.em = em;
-    }*/
+    }
     
     // Cherche le projet dans la BDD
     // - renvoie null si il n'y est pas.
@@ -65,6 +64,7 @@ public class ProjetDao {
     // Création d'un nouveau projet
     // Renvoie le projet si réussite
     // Renvoie null sinon
+    @Transactional
     public Projet createNewProjet(String nom, Date dateCreation, Date dateModification, String langage){
         
         // Création nouveau projet
@@ -72,7 +72,9 @@ public class ProjetDao {
         
         // On essaye d'ajouter le projet à la persistence
         try{
+            em.getTransaction().begin();
             em.persist(newProjet);
+            em.getTransaction().commit();
             return newProjet;
         }
         catch(Exception e){
@@ -94,7 +96,9 @@ public class ProjetDao {
             
             // Si on l'a trouvé, on le supprime
             if(projetToDelete != null){
+                em.getTransaction().begin();
                 em.remove(projetToDelete);
+                em.getTransaction().commit();
                 return true;
             }
             else{

@@ -7,10 +7,7 @@ package controllers;
 import dao.UserDao;
 import java.util.Date;
 import java.util.regex.Pattern;
-import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import models.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,8 +50,6 @@ public class InscriptionController {
     // Nouvelle inscription
     @RequestMapping(value="/inscription", method = RequestMethod.POST)
     public String newUser(HttpServletRequest request, ModelMap model){
-       
-        EntityManager em = userDao.getEntityManager();
         
         // On vérifie qu'une session n'est pas déjà ouverte
         HttpSession session= request.getSession();
@@ -102,7 +97,6 @@ public class InscriptionController {
         // TODO: génération de la clé mot de passe ici
         
         // Création de l'utilisateur
-        em.getTransaction().begin();
         User newUser = userDao.createNewUser(request.getParameter("pseudo"),
                                             request.getParameter("mail"), 
                                             request.getParameter("nom"), 
@@ -114,7 +108,6 @@ public class InscriptionController {
         // Si l'utilisateur a bien été créé
         if(newUser != null){
             try{
-                em.getTransaction().commit();
                 // Réussite, redirection page principale
                 return "redirect:/login";
             }

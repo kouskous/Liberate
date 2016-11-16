@@ -15,6 +15,7 @@ import javax.persistence.Persistence;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.transaction.Transactional;
 import models.FichiersUsers;
 import models.User;
 import org.json.JSONObject;
@@ -66,8 +67,6 @@ public class FileController {
     @RequestMapping(value="/newFile", method = RequestMethod.POST, produces = "application/json")
     public String newFile(HttpServletRequest request, ModelMap model){           
         
-        EntityManager em = fichierUserDao.getEntityManager();
-        
         // On créé l'objet à retourner
         JSONObject returnObject = new JSONObject();   
         
@@ -91,7 +90,6 @@ public class FileController {
                     return returnObject.toString();
                 }
                 else{
-                    em.getTransaction().begin();
                     
                     String fileName = extractFileName((String)request.getParameter("pathFichier"));
                     
@@ -106,10 +104,7 @@ public class FileController {
                     }
                     else{
                         try{
-                            em.persist(newFile);
-                            em.getTransaction().commit();
-                            em.close();
-                            
+
                             try{                          
                                 ServletContext ctx = request.getServletContext();
                                 String path = ctx.getRealPath("/");
@@ -126,7 +121,6 @@ public class FileController {
                             return returnObject.toString();
                         }
                         catch(Exception e){
-                            em.close();
                             returnObject.put("errors","Erreur BDD");
                             return returnObject.toString();
                         }
@@ -230,8 +224,6 @@ public class FileController {
     @ResponseBody 
     @RequestMapping(value="/saveFile", method = RequestMethod.POST, produces = "application/json")
     public String saveFile(HttpServletRequest request, ModelMap model){
-                
-        EntityManager em = fichierUserDao.getEntityManager();
         
         // On créé l'objet à retourner
         JSONObject returnObject = new JSONObject();   
@@ -260,7 +252,6 @@ public class FileController {
                     return returnObject.toString();
                 }
                 else{
-                    em.getTransaction().begin();
                 
                     // On trouve le fichier à enregistrer dans la BDD
                     FichiersUsers fichier = fichierUserDao.getFichiersByUserAndPath(user, pathFichier);
@@ -272,6 +263,8 @@ public class FileController {
                     else{
                         // Mise à jour date
                         fichier.setDateCreation(new Date());
+                        
+                        // TODO: enregistrement bdd nouvelle date ici
                         
                         // Enregistrement du fichier sur le disque ici
                         try{
@@ -287,13 +280,10 @@ public class FileController {
                         }
 
                         try{
-                            em.persist(fichier);
-                            em.close();
                             returnObject.put("response",true);
                             return returnObject.toString();
                         }
                         catch(Exception e){
-                            em.close();
                             returnObject.put("errors","Erreur BDD");
                             return returnObject.toString();
                         }

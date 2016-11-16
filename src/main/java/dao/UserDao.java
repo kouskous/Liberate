@@ -9,8 +9,11 @@ import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
 import models.User;
+import org.springframework.stereotype.Repository;
 
 /**
  *
@@ -24,17 +27,13 @@ public class UserDao {
         
     }
     
-    public UserDao(String persistenceUnitName){
-        em = Persistence.createEntityManagerFactory(persistenceUnitName).createEntityManager();
-    }
-    
     public EntityManager getEntityManager(){
         return this.em;
     }
     
-    /*public UserDao(EntityManager em){
+    public UserDao(EntityManager em){
         this.em = em;
-    }*/
+    }
     
     // Cherche l'utilisateur dans la BDD
     // - renvoie null si il n'y est pas.
@@ -89,6 +88,7 @@ public class UserDao {
     // Création d'un nouvel utilisateur
     // Renvoie l'utilisateur si réussite
     // Renvoie null sinon
+    @Transactional
     public User createNewUser(String pseudo, String email, String nom, String prenom, 
             Date dateCreation, Date dateModification, String cleMotDePasse){
         
@@ -98,7 +98,9 @@ public class UserDao {
         
         // On essaye d'ajouter l'utilisateur à la persistence
         try{
+            em.getTransaction().begin();
             em.persist(newUser);
+            em.getTransaction().commit();
             return newUser;
         }
         catch(Exception e){
@@ -120,7 +122,9 @@ public class UserDao {
             
             // Si on l'a trouvé, on le supprime
             if(userToDelete != null){
+                em.getTransaction().begin();
                 em.remove(userToDelete);
+                em.getTransaction().commit();
                 return true;
             }
             else{
@@ -138,6 +142,7 @@ public class UserDao {
     // Modifie l'adresse email d'un utilisateur
     // Renvoie vrai si réussi
     // Renvoie faux sinon (pas d'utilisateur avec oldEmail, ou déjà un utilisateur avec newEmail
+    @Transactional
     public boolean changeUserEmail(String oldEmail, String newEmail){
         
         // On vérifie que l'adresse mail n'existe pas déjà dans la Bdd.
@@ -164,7 +169,9 @@ public class UserDao {
             // Si on l'a trouvé, on change son email
             if(userToChange != null){
                 userToChange.setEmail(newEmail);
+                em.getTransaction().begin();
                 em.persist(userToChange);
+                em.getTransaction().commit();
                 return true;
             }
             else{

@@ -8,11 +8,8 @@ package controllers;
 import dao.ProjetDao;
 import dao.UserDao;
 import dao.UserProjetDao;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.regex.Pattern;
-import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import models.Projet;
@@ -53,8 +50,6 @@ public class ProjetController {
     
     @RequestMapping(value="/newProjet", method = RequestMethod.POST)
     public String nouveauProjet(HttpServletRequest request, ModelMap model){
-
-        EntityManager em = userDao.getEntityManager();
         
         // Obtention de la session
         HttpSession session= request.getSession();
@@ -84,7 +79,6 @@ public class ProjetController {
             }
 
             // Création du projet
-            em.getTransaction().begin();
             Projet projet = projetDao.createNewProjet(nomProjet, new Date(), new Date(), langageProjet);
             
             // Si le projet a bien été créé
@@ -99,7 +93,7 @@ public class ProjetController {
                     // TODO: ajouter les autres users projet ici
                     // TODO: ajouter tous les fichiers de base du projet ici
                     try{
-                        em.getTransaction().commit();
+
                         // Réussite, redirection page principale
                         return "redirect:/";
                     }

@@ -6,8 +6,6 @@
 package controllers;
 
 import dao.UserDao;
-import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import models.User;
@@ -59,7 +57,7 @@ public class LoginController {
                 error = "mot de passe incorrect";
             }
         } catch (Exception e) {
-            error = "Erreur : plusieurs utilisateurs ont le même pseudo !";
+            error = "Erreur : plusieurs utilisateurs ont le même pseudo !"+e.getLocalizedMessage();
         }
         model.addAttribute("error", error);
 

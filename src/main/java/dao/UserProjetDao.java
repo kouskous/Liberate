@@ -9,10 +9,13 @@ import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
 import models.Projet;
 import models.User;
 import models.UserProjet;
+import org.springframework.stereotype.Repository;
 
 /**
  *
@@ -26,17 +29,13 @@ public class UserProjetDao {
         
     }
     
-    public UserProjetDao(String persistenceUnitName){
-        em = Persistence.createEntityManagerFactory(persistenceUnitName).createEntityManager();
-    }
-    
     public EntityManager getEntityManager(){
         return this.em;
     }
     
-    /*public UserProjetDao(EntityManager em){
+    public UserProjetDao(EntityManager em){
         this.em = em;
-    }*/
+    }
     
     // Cherche le UserProjet dans la BDD
     // - renvoie null si il n'y est pas.
@@ -67,6 +66,7 @@ public class UserProjetDao {
     // Création d'un nouveau UserProjet
     // Renvoie le UserProjet si réussite
     // Renvoie null sinon
+    @Transactional
     public UserProjet createNewUserProjet(String typeDroit, Date dateCreation, Date dateModification, 
             User user, Projet projet){
         
@@ -77,7 +77,9 @@ public class UserProjetDao {
             
             // On essaye d'ajouter le UserProjet à la persistence
             try{
+                em.getTransaction().begin();
                 em.persist(newUserProjet);
+                em.getTransaction().commit();
                 return newUserProjet;
             }
             catch(Exception e){
@@ -102,7 +104,9 @@ public class UserProjetDao {
             
             // Si on l'a trouvé, on le supprime
             if(userProjetToDelete != null){
+                em.getTransaction().begin();
                 em.remove(userProjetToDelete);
+                em.getTransaction().commit();
                 return true;
             }
             else{
@@ -150,6 +154,7 @@ public class UserProjetDao {
     // TypeDroit doit faire partie de {"Admin", "Dev", "Reporter"}
     // - Renvoie vrai si réussite
     // - Faux sinon
+    @Transactional
     public boolean changeDroitsUserProjet(String typeDroit, UserProjet userProjet){
         
         // Vérification que typeDroit est une chaine de caractère valide
@@ -157,7 +162,9 @@ public class UserProjetDao {
             userProjet.setTypeDroit(typeDroit);
       
             try{
+                em.getTransaction().begin();
                 em.persist(em);
+                em.getTransaction().commit();
                 return true;
             }
             catch (Exception e){

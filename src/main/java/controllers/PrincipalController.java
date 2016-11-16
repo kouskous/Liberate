@@ -54,6 +54,7 @@ public class PrincipalController {
          return "principal";
 
     }
+    
     @ResponseBody
     @RequestMapping(value="/getTree", method = RequestMethod.GET,produces = "application/json")
     public String currentTree(HttpServletRequest request, HttpServletResponse res){
@@ -135,11 +136,7 @@ public class PrincipalController {
                     return e.toString();
                 }
         }
-       
-    
-
     return  response.toString();
-
        
     }
 }
