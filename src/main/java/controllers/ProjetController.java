@@ -127,7 +127,7 @@ public class ProjetController {
     // Récupération des utilisateurs dont le nom contient une chaine de caractères
     // - La requête doit contenir un champs "name"
     @ResponseBody
-    @RequestMapping(value="/getUsers", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value="/getUsers", method = RequestMethod.GET, produces = "application/json")
     public String getUsers(HttpServletRequest request, ModelMap model){
         
         // On créé l'objet à retourner
@@ -137,24 +137,15 @@ public class ProjetController {
             returnObject.put("response", "");
             returnObject.put("errors", "");
             
-            // Test de la chaine de caractère à chercher
-            String name = (String)request.getParameter("name");
-            
-            if(!testRegex(regex2, name)){
-                returnObject.put("errors", "Nom à chercher invalide");
-                return returnObject.toString();
-            }
-            else{
-                List<String> myList = userDao.getAllPseudo(name);                
-                
-                JSONArray list = new JSONArray();
-                
-                for (int i = 0; i < myList.size(); i++)
-                    list.put(myList.get(i));
-                
-                returnObject.put("response", list.toString());
-                return returnObject.toString();
-            }
+            List<String> myList = userDao.getAllPseudo();                
+
+            JSONArray list = new JSONArray();
+
+            for (int i = 0; i < myList.size(); i++)
+                list.put(myList.get(i));
+
+            returnObject.put("response", list.toString());
+            return returnObject.toString();
         }
         catch(Exception e){
             return null;
