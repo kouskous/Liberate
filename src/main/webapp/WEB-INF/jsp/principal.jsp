@@ -163,7 +163,8 @@
                                     <ul id="onglets">
                                     </ul>
                                 </div>
-                            <pre id="editeur"><code  contenteditable="">var x = 5;</code></pre>
+                            <!--<pre id="editeur"><code  contenteditable="">var x = 5;</code></pre>-->
+                            <div id="editeur"></div>
                             <div id="lignes" displayLignes ></div>
                         </div>
                     </div>
