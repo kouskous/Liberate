@@ -59,83 +59,98 @@ public class ProjetController {
         return "newProjet";
     }
     
+    @ResponseBody 
     @RequestMapping(value="/newProjet", method = RequestMethod.POST)
     public String nouveauProjet(HttpServletRequest request, ModelMap model){
+        
+        // On créé l'objet à retourner
+        JSONObject returnObject = new JSONObject();   
         
         // Obtention de la session
         HttpSession session= request.getSession();
         User user = (User)session.getAttribute("user");
         
-        // Si pas de session ouverte
-        if(user == null){
-            model.addAttribute("Erreur", "Pas de session ouverte");
-            return "redirect:/";
-        }
-        else{
+        try{
+            returnObject.put("response", "");
+            returnObject.put("errors", "");
             
-            // Obtention des paramètres de la requête
-            String nomProjet = request.getParameter("nomProjet");
-            String langageProjet = request.getParameter("langageProjet");
-          
-            ArrayList<String> usersProjet = new ArrayList<String>();
-            ArrayList<String> droitsUsers = new ArrayList<String>();
-            for (int i = 1; i <= 10; i++){
-                if(request.getParameter("utilisateur"+ Integer.toString(i)) != null){
-                    usersProjet.add((String)request.getParameter("utilisateur"+ Integer.toString(i)));
-                }
-                
-                if(request.getParameter("droit"+ Integer.toString(i)) != null){
-                    droitsUsers.add((String)request.getParameter("droit"+ Integer.toString(i)));
-                }
+            // Si pas de session ouverte
+            if(user == null){
+                returnObject.put("errors", "No user");
+                return returnObject.toString();
             }
-         
-            // TODO: Gestion des fichiers importés
-            //ArrayList<String> fichiersImportés = request.getParameter("ListeFichiersImportés");
-
-            // Test du nom
-            if(nomProjet == null || !testRegex(regex1, nomProjet)){
-                model.addAttribute("Erreur", "Nom de projet invalide");
-                return "newProjet";
-            }
-
-            // Création du projet
-            Projet projet = projetDao.createNewProjet(nomProjet, new Date(), new Date(), langageProjet);
-            
-            // Si le projet a bien été créé
-            if(projet != null){
+            else{
+                // Obtention des paramètres de la requête
+                String nomProjet = request.getParameter("nomProjet");
+                String langageProjet = request.getParameter("langageProjet");
                 
-                // Le user qui l'a créé (celui dans la session) est admin
-                UserProjet userProjet = userProjetDao.createNewUserProjet("Admin", new Date(), new Date(), user, projet);
-                
-                // Si l'admin a bien été créé
-                if(userProjet != null){
-                    try{
-                        // On créé le dossier vide du projet pour l'admin
-                        FichiersUsers newFile = fichierUserDao.createNewFichierUser("/" + nomProjet, "none", nomProjet, new Date(), false, user);
-                        
-                        // Pour chaque autre utilisateur a ajouter, on le trouve dans la BDD et on l'ajoute avec ses droits
-                        for (int i = 0; i < usersProjet.size(); i++){
-                            User newUser = userDao.getUserByPseudo(usersProjet.get(i));
-                            userProjetDao.createNewUserProjet(droitsUsers.get(i), new Date(), new Date(), newUser, projet);
-                            if(userProjetDao == null)
-                                throw new Exception();
+                if(nomProjet == null || langageProjet == null){
+                    returnObject.put("errors", "No project name or language");
+                    return returnObject.toString();
+                }
+                else{
+                    // Test du nom de projet
+                    if(!testRegex(regex1, nomProjet)){
+                        returnObject.put("errors", "Nom de projet invalide");
+                        return returnObject.toString();
+                    }
+                    
+                    ArrayList<String> usersProjet = new ArrayList<String>();
+                    ArrayList<String> droitsUsers = new ArrayList<String>();
+                    for (int i = 1; i <= 10; i++){
+                        if(request.getParameter("utilisateur"+ Integer.toString(i)) != null){
+                            usersProjet.add((String)request.getParameter("utilisateur"+ Integer.toString(i)));
+                        }
+
+                        if(request.getParameter("droit"+ Integer.toString(i)) != null){
+                            droitsUsers.add((String)request.getParameter("droit"+ Integer.toString(i)));
                         }
                     }
-                    catch(Exception e){
-                        model.addAttribute("Erreur", "Erreur pendant l'ajout de membres utilisateurs" + e.getMessage());
-                        return "newProjet";
+                    
+                    // Création du projet
+                    Projet projet = projetDao.createNewProjet(nomProjet, new Date(), new Date(), langageProjet);
+
+                    // Si le projet a bien été créé
+                    if(projet != null){
+
+                        // Le user qui l'a créé (celui dans la session) est admin
+                        UserProjet userProjet = userProjetDao.createNewUserProjet("Admin", new Date(), new Date(), user, projet);
+
+                        // Si l'admin a bien été créé
+                        if(userProjet != null){
+                            try{
+                                // On créé le dossier vide du projet pour l'admin
+                                FichiersUsers newFile = fichierUserDao.createNewFichierUser("/" + nomProjet, nomProjet, nomProjet, new Date(), false, user);
+
+                                // Pour chaque autre utilisateur a ajouter, on le trouve dans la BDD et on l'ajoute avec ses droits
+                                for (int i = 0; i < usersProjet.size(); i++){
+                                    User newUser = userDao.getUserByPseudo(usersProjet.get(i));
+                                    userProjetDao.createNewUserProjet(droitsUsers.get(i), new Date(), new Date(), newUser, projet);
+                                    if(userProjetDao == null)
+                                        throw new Exception();
+                                }
+                            }
+                            catch(Exception e){
+                                returnObject.put("errors", "Erreur pendant l'ajout de membres utilisateurs");
+                                return returnObject.toString();
+                            }
+                            returnObject.put("response", "true");
+                            return returnObject.toString();
+                        }
+                        else{ // Le userProjet Admin n'a pas pu être créé
+                            returnObject.put("errors", "BDD - User admin n'a pas pu être assigné au projet");
+                            return returnObject.toString();
+                        }
                     }
-                    return "redirect:/";
-                }
-                else{ // Le userProjet Admin n'a pas pu être créé
-                    model.addAttribute("Erreur", "BDD - User admin n'a pas pu être assigné au projet");
-                    return "newProjet";
+                    else{ // Projet n'a pas pu être créé
+                        returnObject.put("errors", "BDD - Projet n'a pas pu être créé");
+                        return returnObject.toString();
+                    }
                 }
             }
-            else{ // Projet n'a pas pu être créé
-                model.addAttribute("Erreur", "BDD - Projet n'a pas pu être créé");
-                return "newProjet";
-            }
+        }
+        catch(Exception e){
+            return null;
         }
     }
     
@@ -156,13 +171,18 @@ public class ProjetController {
             returnObject.put("response", "");
             returnObject.put("errors", "");
             
+            // On récupère le pseudo de l'utilisateur courant
+            HttpSession session= request.getSession();
+            User user = (User)session.getAttribute("user");
+            String pseudoCurrent = user.getPseudo();
+            
             List<String> myList = userDao.getAllPseudo();                
 
             JSONArray list = new JSONArray();
 
             for (int i = 0; i < myList.size(); i++)
             {
-                if(myList.get(i) != ((User)(request.getSession().getAttribute("user"))).getPseudo()){
+                if(!myList.get(i).equals(pseudoCurrent)){
                     list.put(myList.get(i));
                 }
             }
