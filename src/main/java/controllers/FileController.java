@@ -172,7 +172,7 @@ public class FileController {
             else{                  
                     String fileName = extractFileName((String)request.getParameter("pathFichier"));
                     FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathFichier"), 
-                    null, 
+                    fileName, 
                     fileName, 
                     new Date(), 
                     false, 
