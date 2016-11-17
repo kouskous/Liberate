@@ -5,8 +5,17 @@
  */
 
 $( document ).ready(function() {
+    $('#newfile .alert-error').css('display','none');
    $("#btn_new_file").click(function(){
       filename = $("#input_name_file").val();
+        if(filename.length === 0){
+            $('#newfile .alert-error').css('display','block');
+            $('#newfile .alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>Le nom  du fichier est vide ! Veuillez le remplir </span>');
+            
+       }    
+        else {
+            $('#newfile .alert-error').css('display','none'); 
+            
       $.ajax({ 
         url      : "/Liber8/newFile",
         dataType : "json",
@@ -18,5 +27,12 @@ $( document ).ready(function() {
                         
                     }       
         });
+       $('#projet').modal('hide');
+              
+        
+          }
+          return false;
+         
+        
+    });
    });
-});
