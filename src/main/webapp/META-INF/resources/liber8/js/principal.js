@@ -69,6 +69,7 @@
         });
     }
     
+    
 
 $( document ).ready(function() {
     //inclusion de la coloration syntaxique
@@ -77,7 +78,8 @@ $( document ).ready(function() {
         hljs.highlightBlock(block);
       });
     });
-    
+
+        
     //volet gauche resizable
     $( "#sidebar-left" ).resizable();
     $( "#sidebar-left" ).resize(function(){
@@ -144,6 +146,25 @@ $( document ).ready(function() {
       success  : function(data) {  
                     }       
         });
+        
+    });
+    
+        
+    $("#btn_compile").click(function(){
+        if(App.currentVoletElement != ""){
+            appPath = App.currentVoletElement.slice(4);
+            $.ajax({ 
+                url      : "/Liber8/compile",
+                type     : 'POST',
+                dataType : "json",
+                data     :{
+                              projectPath: appPath,
+                          },
+                success  : function(data) {  
+                        }       
+            });
+        }
+        
     });
     
 });
