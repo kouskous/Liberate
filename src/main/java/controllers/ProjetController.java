@@ -5,6 +5,7 @@
  */
 package controllers;
 
+import dao.FichierUserDao;
 import dao.ProjetDao;
 import dao.UserDao;
 import dao.UserProjetDao;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import models.FichiersUsers;
 import models.Projet;
 import models.User;
 import models.UserProjet;
@@ -41,6 +43,9 @@ public class ProjetController {
     
     @Autowired
     UserProjetDao userProjetDao;
+    
+    @Autowired
+    FichierUserDao fichierUserDao;
     
     // Regex1 utilisée pour le nom du projet
     static String regex1 = "^([a-zA-Z]{3,50})";
@@ -105,6 +110,9 @@ public class ProjetController {
                 // Si l'admin a bien été créé
                 if(userProjet != null){
                     try{
+                        // On créé le dossier vide du projet pour l'admin
+                        FichiersUsers newFile = fichierUserDao.createNewFichierUser("/" + nomProjet, "none", nomProjet, new Date(), false, user);
+                        
                         // Pour chaque autre utilisateur a ajouter, on le trouve dans la BDD et on l'ajoute avec ses droits
                         for (int i = 0; i < usersProjet.size(); i++){
                             User newUser = userDao.getUserByPseudo(usersProjet.get(i));
@@ -114,7 +122,7 @@ public class ProjetController {
                         }
                     }
                     catch(Exception e){
-                        model.addAttribute("Erreur", "Erreur pendant l'ajout de membres utilisateurs");
+                        model.addAttribute("Erreur", "Erreur pendant l'ajout de membres utilisateurs" + e.getMessage());
                         return "newProjet";
                     }
                     return "redirect:/";
