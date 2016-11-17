@@ -1,5 +1,5 @@
 <div class="constainer">
-<form action = "newProjet" method="GET" id="newfile">
+<div  id="newfile">
         <div class="box">
             <div class="box-header" data-original-title="">
 		<h2><i class="halflings-icon edit"></i><span class="break"></span>Nouveau fichier</h2>
@@ -15,7 +15,7 @@
                 <div class="alert alert-error role alert"><i class="icon-exclamation-sign" aria-hidden="true"></i><span></span></div>  
                </div>
         </div>
-</form>
+</div>
 </div>
 
 <script src="/Liber8/resources/liber8/js/newFile.js"></script>
