@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.servlet.ServletContext;
@@ -327,7 +328,15 @@ public class FileController {
     
     JSONArray list = new JSONArray();
         
-    String pathPhysique = fichierUserDao.getPathByPathLogique(user,request.getParameter("pathLogique"));
+    FichiersUsers file = fichierUserDao.getPathByPathLogique(user,request.getParameter("pathLogique"));
+    String pathPhysique =file.getNomPhysique();
+    List<FichiersUsers> files =fichierUserDao.getPathsByPathLogique(user,request.getParameter("pathLogique"));
+    int verrou = file.getVerrou();
+    if(verrou==0){
+        boolean verrouillage = fichierUserDao.changeVerrou(file, 2);
+        boolean verrouillageAutre =fichierUserDao.changeVerrouAutre(files, 1);
+    }
+    
         JSONObject response = new JSONObject();
          try{
             response.put("pathLogique","");
