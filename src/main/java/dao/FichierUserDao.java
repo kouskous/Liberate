@@ -98,7 +98,7 @@ public class FichierUserDao {
         }
     }
     
-    public String getPathByPathLogique(User user,String pathLogique){
+    public FichiersUsers getPathByPathLogique(User user,String pathLogique){
         TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByUserAndPath", FichiersUsers.class);
         query.setParameter("user", user);
         query.setParameter("pathLogique", pathLogique);
@@ -106,9 +106,35 @@ public class FichierUserDao {
         
         if(results.size()==1){
             if(results.get(0).getType())
-             return results.get(0).getNomPhysique();
+             return results.get(0);
         }
         return null;
+    }
+    
+    public List<FichiersUsers> getPathsByPathLogique(User user,String pathLogique){
+        TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByNotUserAndPath", FichiersUsers.class);
+        query.setParameter("user", user);
+        query.setParameter("pathLogique", pathLogique);
+        List<FichiersUsers> results = query.getResultList();
+        
+        if(results.size()!=0){
+            if(results.get(0).getType())
+             return results;
+        }
+        return null;
+    }
+    
+    public int getVerrouByPathLogique(User user,String pathLogique){
+        TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByUserAndPath", FichiersUsers.class);
+        query.setParameter("user", user);
+        query.setParameter("pathLogique", pathLogique);
+        List<FichiersUsers> results = query.getResultList();
+        
+        if(results.size()==1){
+            if(results.get(0).getType())
+             return results.get(0).getVerrou();
+        }
+        return 5;
     }
 
     /**
@@ -224,7 +250,7 @@ public class FichierUserDao {
      * @param newPathLogique le nouveau chemin physique
      * @return Renvoie vrai si réussi, faux sinon
      */
-    @Transactional
+    
     public boolean changePathLogique(FichiersUsers fichierToChange, String newPathLogique){
         if(fichierToChange != null){
             fichierToChange.setPathLogique(newPathLogique);
@@ -237,7 +263,36 @@ public class FichierUserDao {
             return false;
         }
     }
+    
+     public boolean changeVerrou(FichiersUsers fichierToChange, int verrou){
+        if(fichierToChange != null){
+            fichierToChange.setVerrou(verrou);
+            em.getTransaction().begin();
+            em.persist(fichierToChange);
+            em.getTransaction().commit();
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 
-    // TODO: toutes les autres fonctions de modification qu'on aura besoin.
+     public boolean changeVerrouAutre(List<FichiersUsers> fichiersToChange, int verrou){
+        if(fichiersToChange.size() != 0){
+            em.getTransaction().begin();
+            for(int i=0;i<fichiersToChange.size();i++){
+                fichiersToChange.get(i).setVerrou(verrou);
+                em.persist(fichiersToChange.get(i));
+            }
+            em.getTransaction().commit();
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+     
+      
+    
 
 }
