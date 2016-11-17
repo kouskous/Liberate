@@ -16,17 +16,11 @@ import org.springframework.stereotype.Repository;
  *
  * @author Florian
  */
+@Transactional
 public class FichierUserDao {
-    
-    EntityManager em;
 
-    public FichierUserDao(){
-    
-    }
-    
-    public FichierUserDao(EntityManager em_){
-        em = em_;
-    }
+    @PersistenceContext
+    EntityManager em;
     
     public EntityManager getEntityManager(){
         return this.em;
@@ -175,9 +169,7 @@ public class FichierUserDao {
 
         // On essaye d'ajouter l'utilisateur à la persistence
         try{
-            em.getTransaction().begin();
             em.persist(newFichierUsers);
-            em.getTransaction().commit();
             return newFichierUsers;
         }
         catch(Exception e){

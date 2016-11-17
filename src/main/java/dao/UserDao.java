@@ -20,21 +20,11 @@ import org.springframework.stereotype.Repository;
  *
  * @author Luc Di Sanza
  */
+@Transactional
 public class UserDao {
-    
+
+    @PersistenceContext
     EntityManager em;
-    
-    public UserDao(){
-        
-    }
-    
-    public EntityManager getEntityManager(){
-        return this.em;
-    }
-    
-    public UserDao(EntityManager em){
-        this.em = em;
-    }
     
     // Cherche l'utilisateur dans la BDD
     // - renvoie null si il n'y est pas.
@@ -98,9 +88,7 @@ public class UserDao {
         
         // On essaye d'ajouter l'utilisateur à la persistence
         try{
-            em.getTransaction().begin();
             em.persist(newUser);
-            em.getTransaction().commit();
             return newUser;
         }
         catch(Exception e){

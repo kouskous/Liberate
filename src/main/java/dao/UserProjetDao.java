@@ -21,17 +21,11 @@ import org.springframework.stereotype.Repository;
  *
  * @author Luc Di Sanza
  */
+@Transactional
 public class UserProjetDao {
-    
+
+    @PersistenceContext
     EntityManager em;
-    
-    public UserProjetDao(){
-        
-    }
-    
-    public EntityManager getEntityManager(){
-        return this.em;
-    }
     
     public UserProjetDao(EntityManager em){
         this.em = em;
