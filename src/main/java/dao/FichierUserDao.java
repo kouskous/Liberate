@@ -35,17 +35,13 @@ public class FichierUserDao {
     // Cherche les fichiers d'un utilisateur dans la BDD
     // - renvoie null s'il n'y a pas de fichiers pour cet user.
     // - renvoie la liste des fichiers de l'user si il y est
-    public Collection<FichiersUsers> getFichiersByUser(User user) {
+    public List<FichiersUsers> getFichiersByUser(User user) {
 
         // Recherche des fichiers
         TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByUser", FichiersUsers.class);
         query.setParameter("user", user);
-        Collection<FichiersUsers> results = query.getResultList();
+        List<FichiersUsers> results = query.getResultList();
 
-        // Si aucun fichier n'est trouvé avec cet user
-        if(results.isEmpty()){
-            return null;
-        }
         // Des fichiers ont été trouvés
         return results;
     }

@@ -9,7 +9,7 @@
 
             <property name="javax.persistence.jdbc.user" value="root" />
 
-        <property name="javax.persistence.jdbc.password" value="root" />
+        <property name="javax.persistence.jdbc.password" value="liber8" />
 
             <!-- specifie le dialecte SQL utilise pour communiquer avec la BDD-->
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />
