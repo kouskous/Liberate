@@ -107,44 +107,50 @@ public class ProjetController {
                         }
                     }
                     
-                    // Création du projet
-                    Projet projet = projetDao.createNewProjet(nomProjet, new Date(), new Date(), langageProjet);
+                    if(projetDao.projetNameAlreadyUsed(nomProjet)){
+                        returnObject.put("errors", "Nom de projet déjà utilisé");
+                        return returnObject.toString();
+                    }
+                    else{
+                        // Création du projet
+                        Projet projet = projetDao.createNewProjet(nomProjet, new Date(), new Date(), langageProjet);
 
-                    // Si le projet a bien été créé
-                    if(projet != null){
+                        // Si le projet a bien été créé
+                        if(projet != null){
 
-                        // Le user qui l'a créé (celui dans la session) est admin
-                        UserProjet userProjet = userProjetDao.createNewUserProjet("Admin", new Date(), new Date(), user, projet);
+                            // Le user qui l'a créé (celui dans la session) est admin
+                            UserProjet userProjet = userProjetDao.createNewUserProjet("Admin", new Date(), new Date(), user, projet);
 
-                        // Si l'admin a bien été créé
-                        if(userProjet != null){
-                            try{
-                                // On créé le dossier vide du projet pour l'admin
-                                FichiersUsers newFile = fichierUserDao.createNewFichierUser("/" + nomProjet, nomProjet, nomProjet, new Date(), false, user);
+                            // Si l'admin a bien été créé
+                            if(userProjet != null){
+                                try{
+                                    // On créé le dossier vide du projet pour l'admin
+                                    FichiersUsers newFile = fichierUserDao.createNewFichierUser("/" + nomProjet, nomProjet, nomProjet, new Date(), false, user);
 
-                                // Pour chaque autre utilisateur a ajouter, on le trouve dans la BDD et on l'ajoute avec ses droits
-                                for (int i = 0; i < usersProjet.size(); i++){
-                                    User newUser = userDao.getUserByPseudo(usersProjet.get(i));
-                                    userProjetDao.createNewUserProjet(droitsUsers.get(i), new Date(), new Date(), newUser, projet);
-                                    if(userProjetDao == null)
-                                        throw new Exception();
+                                    // Pour chaque autre utilisateur a ajouter, on le trouve dans la BDD et on l'ajoute avec ses droits
+                                    for (int i = 0; i < usersProjet.size(); i++){
+                                        User newUser = userDao.getUserByPseudo(usersProjet.get(i));
+                                        userProjetDao.createNewUserProjet(droitsUsers.get(i), new Date(), new Date(), newUser, projet);
+                                        if(userProjetDao == null)
+                                            throw new Exception();
+                                    }
                                 }
-                            }
-                            catch(Exception e){
-                                returnObject.put("errors", "Erreur pendant l'ajout de membres utilisateurs");
+                                catch(Exception e){
+                                    returnObject.put("errors", "Erreur pendant l'ajout de membres utilisateurs");
+                                    return returnObject.toString();
+                                }
+                                returnObject.put("response", "true");
                                 return returnObject.toString();
                             }
-                            returnObject.put("response", "true");
+                            else{ // Le userProjet Admin n'a pas pu être créé
+                                returnObject.put("errors", "BDD - User admin n'a pas pu être assigné au projet");
+                                return returnObject.toString();
+                            }
+                        }
+                        else{ // Projet n'a pas pu être créé
+                            returnObject.put("errors", "BDD - Projet n'a pas pu être créé");
                             return returnObject.toString();
                         }
-                        else{ // Le userProjet Admin n'a pas pu être créé
-                            returnObject.put("errors", "BDD - User admin n'a pas pu être assigné au projet");
-                            return returnObject.toString();
-                        }
-                    }
-                    else{ // Projet n'a pas pu être créé
-                        returnObject.put("errors", "BDD - Projet n'a pas pu être créé");
-                        return returnObject.toString();
                     }
                 }
             }
