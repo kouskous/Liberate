@@ -40,10 +40,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "FichiersUsers.findByUser", query = "SELECT f FROM FichiersUsers f WHERE f.user = :user"),
     @NamedQuery(name = "FichiersUsers.findDescendantsDossier", query = "SELECT f FROM FichiersUsers f WHERE f.pathLogique LIKE :pathLogiqueDossier"),
     @NamedQuery(name = "FichiersUsers.findByUserAndPath", query = "SELECT f FROM FichiersUsers f WHERE f.user = :user AND f.pathLogique = :pathLogique"),
-    @NamedQuery(name = "FichiersUsers.updateVerrouillageByUserAndPath", query = "UPDATE FichiersUsers f SET f.verrou=2 where f.user = :user and f.pathLogique = :pathLogique"),
-    @NamedQuery(name = "FichiersUsers.updateDeverrouillageByUserAndPath", query = "UPDATE FichiersUsers f SET f.verrou=0 where f.user = :user and f.pathLogique = :pathLogique"),
-    @NamedQuery(name = "FichiersUsers.updateEstVerrouilleByUserAndPath", query = "UPDATE FichiersUsers f SET f.verrou=1 where f.user != :user and f.pathLogique = :pathLogique"),
-    @NamedQuery(name = "FichiersUsers.updateEstDeverrouilleByUserAndPath", query = "UPDATE FichiersUsers f SET f.verrou=0 where f.user != :user and f.pathLogique = :pathLogique"),})
+    @NamedQuery(name = "FichiersUsers.findByNotUserAndPath", query = "SELECT f FROM FichiersUsers f WHERE f.user != :user AND f.pathLogique = :pathLogique")})
 public class FichiersUsers implements Serializable {
 
     @Id
