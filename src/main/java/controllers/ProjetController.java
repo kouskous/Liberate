@@ -8,6 +8,7 @@ package controllers;
 import dao.ProjetDao;
 import dao.UserDao;
 import dao.UserProjetDao;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -67,18 +68,27 @@ public class ProjetController {
         }
         else{
             
+            // Obtention des paramètres de la requête
             String nomProjet = request.getParameter("nomProjet");
             String langageProjet = request.getParameter("langageProjet");
           
+            ArrayList<String> usersProjet = new ArrayList<String>();
+            ArrayList<String> droitsUsers = new ArrayList<String>();
+            for (int i = 1; i <= 10; i++){
+                if(request.getParameter("utilisateur"+ Integer.toString(i)) != null){
+                    usersProjet.add((String)request.getParameter("utilisateur"+ Integer.toString(i)));
+                }
+                
+                if(request.getParameter("droit"+ Integer.toString(i)) != null){
+                    droitsUsers.add((String)request.getParameter("droit"+ Integer.toString(i)));
+                }
+            }
+         
             // TODO: Gestion des fichiers importés
             //ArrayList<String> fichiersImportés = request.getParameter("ListeFichiersImportés");
-            
-            // TODO: Gestion des utilisateurs du projet et de leurs droits
-            //ArrayList<String> usersProjet = request.getParameter("ListeNomsUsers");
-            //ArrayList<String> droitsUsers = request.getParameter("ListeDroitsUsers");
-            
+
             // Test du nom
-            if(!testRegex(regex1, nomProjet)){
+            if(nomProjet == null || !testRegex(regex1, nomProjet)){
                 model.addAttribute("Erreur", "Nom de projet invalide");
                 return "newProjet";
             }
@@ -92,21 +102,22 @@ public class ProjetController {
                 // Le user qui l'a créé (celui dans la session) est admin
                 UserProjet userProjet = userProjetDao.createNewUserProjet("Admin", new Date(), new Date(), user, projet);
                 
-                // Si le userProjet a bien été créé
+                // Si l'admin a bien été créé
                 if(userProjet != null){
-                    
-                    // TODO: ajouter les autres users projet ici
-                    // TODO: ajouter tous les fichiers de base du projet ici
                     try{
-
-                        // Réussite, redirection page principale
-                        return "redirect:/";
+                        // Pour chaque autre utilisateur a ajouter, on le trouve dans la BDD et on l'ajoute avec ses droits
+                        for (int i = 0; i < usersProjet.size(); i++){
+                            User newUser = userDao.getUserByPseudo(usersProjet.get(i));
+                            userProjetDao.createNewUserProjet(droitsUsers.get(i), new Date(), new Date(), newUser, projet);
+                            if(userProjetDao == null)
+                                throw new Exception();
+                        }
                     }
                     catch(Exception e){
-                        // Erreur pendant le commit
-                        model.addAttribute("Erreur", "Communication BDD");
+                        model.addAttribute("Erreur", "Erreur pendant l'ajout de membres utilisateurs");
                         return "newProjet";
                     }
+                    return "redirect:/";
                 }
                 else{ // Le userProjet Admin n'a pas pu être créé
                     model.addAttribute("Erreur", "BDD - User admin n'a pas pu être assigné au projet");
@@ -142,8 +153,11 @@ public class ProjetController {
             JSONArray list = new JSONArray();
 
             for (int i = 0; i < myList.size(); i++)
-                list.put(myList.get(i));
-
+            {
+                if(myList.get(i) != ((User)(request.getSession().getAttribute("user"))).getPseudo()){
+                    list.put(myList.get(i));
+                }
+            }
             returnObject.put("response", list.toString());
             return returnObject.toString();
         }

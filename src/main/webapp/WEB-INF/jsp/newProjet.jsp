@@ -52,7 +52,7 @@
 						
 					</div>
                 <h2>${Erreur}</h2>
-                    <form action = "newProjet" method="GET" id="newprojet">
+                    <form action = "newProjet" method="POST" id="newprojet">
                         <div class="box span6">
                             <div class="box-header" data-original-title="">
 						<h2><i class="halflings-icon edit"></i><span class="break"></span>Général</h2>
@@ -61,7 +61,7 @@
                             <div class="projetinput">
                                
                                <label class="span4">Nom du Projet</label>
-                                <input name="name" id="nomProjet" type="text" placeholder=" Nom du Projet"/>
+                                <input name="nomProjet" id="nomProjet" type="text" placeholder=" Nom du Projet"/>
                             </div>
                             <div class="control-group">
 								<label class="control-label userline span4" for="selectErrortype">Langage</label>
