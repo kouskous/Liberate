@@ -105,7 +105,7 @@ public class FichierUserDao {
         List<FichiersUsers> results = query.getResultList();
         
         if(results.size()==1){
-            if(results.get(0).getType())
+            if(results.get(0).getType() == FichiersUsers.Type.DOSSIER)
              return results.get(0).getNomPhysique();
         }
         return null;
@@ -118,7 +118,7 @@ public class FichierUserDao {
      * @param user l'utilisateur dont on veux l'arborescence
      * @return Renvoie l'arborescence complete depuis la racine de l'utilisateur
      */
-    public Map<String, Boolean> getArborescence(User user){
+    public Map<String, FichiersUsers.Type> getArborescence(User user){
         return getArborescence(user, null);
     }
 
@@ -131,10 +131,9 @@ public class FichierUserDao {
      *                si null depuis la racine de l'utilisateur
      * @return Renvoie l'arborescence depuis le dossier en question, ou null si le dossier est un fichier
      */
-    public Map<String, Boolean> getArborescence(User user, FichiersUsers dossier){
-        //TODO changer le Type de fichier en enumeration
+    public Map<String, FichiersUsers.Type> getArborescence(User user, FichiersUsers dossier){
         try {
-            Map<String, Boolean> arborescence = new Hashtable<>();
+            Map<String, FichiersUsers.Type> arborescence = new Hashtable<>();
             Collection<FichiersUsers> fichiers;
 
             if(dossier == null) {
@@ -142,7 +141,7 @@ public class FichierUserDao {
             }
 
             //si le fichier n'est pas un dossier
-            else if (dossier.getType() == true) {
+            else if (dossier.getType() != FichiersUsers.Type.DOSSIER) {
                 throw new IllegalArgumentException();
             }
             else {
@@ -169,7 +168,7 @@ public class FichierUserDao {
     // Renvoie le fichier si réussite
     // Renvoie null sinon
     public FichiersUsers createNewFichierUser(String pathLogique, String nomPhysique, String nomReel, Date dateCreation,
-                                     boolean type, User user){
+                                              FichiersUsers.Type type, User user){
 
         // Création nouvel utilisateur
         FichiersUsers newFichierUsers = new FichiersUsers(pathLogique, nomPhysique, nomReel, dateCreation, type, user);
