@@ -2,12 +2,17 @@
     var App = new Object();
     App.currentOnglet = "";
     App.currentVoletElement = "";
-    App.onglets = new Array() ; 
+    App.onglets = new Array() ;
+    App.editeur = "";
     /********************************************/
 
 
 $( document ).ready(function() {
     //inclusion de la coloration syntaxique
+    var editeur = ace.edit("editeur");
+    editeur.setTheme("ace/theme/twilight");
+    editeur.session.setMode("ace/mode/javascript");
+    
     $("#editeur code").keyup(function() {
          $('pre code').each(function(i, block) {
         hljs.highlightBlock(block);
@@ -133,7 +138,6 @@ $( document ).ready(function() {
         /* TODO */
        content = "toto";
        path = (App.currentOnglet).slice(4);
-       
        $.ajax({ 
       url      : "/Liber8/saveFile",
       type     : 'POST',
