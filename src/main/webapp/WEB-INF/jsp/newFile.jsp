@@ -2,7 +2,7 @@
 <form action = "newProjet" method="GET" id="newfile">
         <div class="box">
             <div class="box-header" data-original-title="">
-		<h2><i class="halflings-icon edit"></i><span class="break"></span>Nouveau fichier</h2>
+		<h2><i class="halflings-icon edit"></i><span class="break nouveau"></span>Nouveau fichier</h2>
             </div>
             <div class="contain_modal">
                 <label>
