@@ -4,6 +4,7 @@
     App.currentVoletElement = "";
     App.onglets = new Array() ;
     App.tree = "";
+    App.editeur = "";
     /********************************************/
 //definition des evenements sur l'arbre:
     function defineArbreEvents(){
@@ -27,7 +28,7 @@
                         fileName = fileName[fileName.length - 1];
                         $("#onglets").append('<li class="onglet" data-id="'+ id +'" ><a href="#">'+fileName+' <i data-id="'+ id +'" class="icon-remove close-onglet"></i></a></li>');
                         App.onglets[id] = content;
-                        $("#editeur code").html(App.onglets[id]);
+                        App.editeur.setValue(App.onglets[id]);
                     }
                 }
             });
@@ -46,7 +47,7 @@
     function defineOngletsEvents(){
         $("#onglets").on("click", ".onglet", function(){
             id = $(this).data("id");
-            $("#editeur code").html(App.onglets[id]);
+            App.editeur.setValue(App.onglets[id]);
             App.currentOnglet = id;
         });
         
@@ -59,10 +60,13 @@
                 App.currentOnglet = key;
                 break;
             }
+            /** TODO **/
+            //console.log(App.currentOnglet);
+            //console.log(App.onglets[App.currentOnglet]);
             if (App.currentOnglet !== ""){
-                $("#editeur code").html(App.onglets[App.currentOnglet]);
+                App.editeur.setValue(App.onglets[App.currentOnglet]);
             } else {
-                $("#editeur code").html("");
+                App.editeur.setValue("");
             }
             
             
@@ -70,15 +74,11 @@
     }
     
     
-
 $( document ).ready(function() {
-    //inclusion de la coloration syntaxique
-    $("#editeur code").keyup(function() {
-         $('pre code').each(function(i, block) {
-        hljs.highlightBlock(block);
-      });
-    });
-
+   //inclusion de la coloration syntaxique
+    App.editeur = ace.edit("editeur");
+    App.editeur.setTheme("ace/theme/twilight");
+    App.editeur.session.setMode("ace/mode/javascript");
         
     //volet gauche resizable
     $( "#sidebar-left" ).resizable();
@@ -131,8 +131,7 @@ $( document ).ready(function() {
     
     /** Sauvegarder le fichier dont l'onglet est sélectionné **/
     $("#saveAction").click(function(){
-        /* TODO */
-       content = "toto";
+       content = App.editeur.getValue();
        path = (App.currentOnglet).slice(4);
        
        $.ajax({ 
@@ -146,7 +145,10 @@ $( document ).ready(function() {
       success  : function(data) {  
                     }       
         });
-        
+    });
+    
+    $("#editeur").keyup(function(){
+       App.onglets[App.currentOnglet] = App.editeur.getValue(); 
     });
     
         
