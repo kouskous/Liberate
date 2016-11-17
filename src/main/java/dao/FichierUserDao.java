@@ -171,12 +171,14 @@ public class FichierUserDao {
     public FichiersUsers createNewFichierUser(String pathLogique, String nomPhysique, String nomReel, Date dateCreation,
                                      boolean type, User user){
 
+        em.getTransaction().begin();
+        
         // Création nouvel utilisateur
         FichiersUsers newFichierUsers = new FichiersUsers(pathLogique, nomPhysique, nomReel, dateCreation, type, user);
 
         // On essaye d'ajouter l'utilisateur à la persistence
         try{
-            em.getTransaction().begin();
+            
             em.persist(newFichierUsers);
             em.getTransaction().commit();
             return newFichierUsers;

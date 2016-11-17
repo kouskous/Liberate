@@ -66,9 +66,10 @@ public class UserProjetDao {
     // Création d'un nouveau UserProjet
     // Renvoie le UserProjet si réussite
     // Renvoie null sinon
-    @Transactional
     public UserProjet createNewUserProjet(String typeDroit, Date dateCreation, Date dateModification, 
             User user, Projet projet){
+        
+        em.getTransaction().begin();
         
         if (user != null && projet != null){
             
@@ -77,7 +78,7 @@ public class UserProjetDao {
             
             // On essaye d'ajouter le UserProjet à la persistence
             try{
-                em.getTransaction().begin();
+               
                 em.persist(newUserProjet);
                 em.getTransaction().commit();
                 return newUserProjet;

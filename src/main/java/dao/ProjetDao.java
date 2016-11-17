@@ -64,15 +64,14 @@ public class ProjetDao {
     // Création d'un nouveau projet
     // Renvoie le projet si réussite
     // Renvoie null sinon
-    @Transactional
     public Projet createNewProjet(String nom, Date dateCreation, Date dateModification, String langage){
-        
-        // Création nouveau projet
-        Projet newProjet = new Projet(nom, dateCreation, dateModification, langage);
         
         // On essaye d'ajouter le projet à la persistence
         try{
             em.getTransaction().begin();
+            
+            // Création nouveau projet
+            Projet newProjet = new Projet(nom, dateCreation, dateModification, langage);
             em.persist(newProjet);
             em.getTransaction().commit();
             return newProjet;
