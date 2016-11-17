@@ -278,7 +278,7 @@ public class FichierUserDao {
     }
 
      public boolean changeVerrouAutre(List<FichiersUsers> fichiersToChange, int verrou){
-        if(fichiersToChange.size() != 0){
+        if(fichiersToChange != null){
             em.getTransaction().begin();
             for(int i=0;i<fichiersToChange.size();i++){
                 fichiersToChange.get(i).setVerrou(verrou);

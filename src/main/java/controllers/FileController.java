@@ -334,7 +334,7 @@ public class FileController {
     int verrou = file.getVerrou();
     if(verrou==0){
         boolean verrouillage = fichierUserDao.changeVerrou(file, 2);
-        boolean verrouillageAutre =fichierUserDao.changeVerrouAutre(files, 1);
+        boolean verrouillageAutre =fichierUserDao.changeVerrouAutre(files, 1);   
     }
     
         JSONObject response = new JSONObject();
