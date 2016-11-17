@@ -156,7 +156,13 @@ public class ProjetController {
             }
         }
         catch(Exception e){
-            return null;
+            try{
+                returnObject.put("errors", e.getMessage());
+                return returnObject.toString();
+            }
+            catch(Exception e2){
+                return null;
+            }
         }
     }
     
