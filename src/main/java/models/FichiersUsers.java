@@ -74,17 +74,22 @@ public class FichiersUsers implements Serializable {
     @ManyToOne(optional = false)
     private User user;
 
+    @Basic(optional = false)
+    @Column(name = "verrou")
+    private int verrou;
+    
     public FichiersUsers() {
     }
 
     public FichiersUsers(String pathLogique, String nomPhysique, String nomReel, Date dateCreation,
-            boolean type, User user) {
+            boolean type, User user,int verrou) {
         this.pathLogique = pathLogique;
         this.nomPhysique = nomPhysique;
         this.nomReel = nomReel;
         this.dateCreation = dateCreation;
         this.type = type;
         this.user = user;
+        this.verrou=verrou;
     }
 
     public String getPathLogique() {
@@ -133,6 +138,14 @@ public class FichiersUsers implements Serializable {
 
     public void setUser(User user) {
         this.user = user;
+    }
+    
+    public int getVerrou() {
+        return verrou;
+    }
+
+    public void setVerrou(int verrou) {
+        this.verrou = verrou;
     }
 
     @Override
