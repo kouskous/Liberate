@@ -73,13 +73,8 @@ public class FichiersVersion implements Serializable {
     public FichiersVersion() {
     }
 
-    public FichiersVersion(Integer idF) {
-        this.idFichierVersion = idF;
-    }
-
-    public FichiersVersion(Integer idF, String pathLogique, String nomPhysique, String nomReel, Date dateCreation,
+    public FichiersVersion( String pathLogique, String nomPhysique, String nomReel, Date dateCreation,
             boolean type, Version version) {
-        this.idFichierVersion = idF;
         this.pathLogique = pathLogique;
         this.nomPhysique = nomPhysique;
         this.nomReel = nomReel;
