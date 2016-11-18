@@ -368,9 +368,13 @@ public class FileController {
                 buff.close();
                 
                 response.put("content",contenuPage);
+                
                 }		
                 catch (Exception e){
-                    return e.toString();
+                    
+                        
+                        return e.toString();
+                    
                 }
         }
     return  response.toString();

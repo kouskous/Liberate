@@ -25,7 +25,8 @@ $( document ).ready(function() {
                  data     :{
                              pathFichier: Logicpath
                            },
-                 success  : function(data) {  
+                 success  : function(data) { 
+                                  
                                   $(".close").trigger("click");
                                   var nodes = App.tree.getAllNodes();
                                   var sourceNode = {};
@@ -37,6 +38,7 @@ $( document ).ready(function() {
                                   $("#"+sourceNode.id).addClass("isFile");
                                   $("#"+sourceNode.id).addClass("branche-arbre");
                                   defineArbreEvents();
+                              
                              }       
                  });
             }

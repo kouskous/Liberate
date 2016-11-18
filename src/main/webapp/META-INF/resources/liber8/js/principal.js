@@ -20,6 +20,7 @@
                 type     : "POST",
                 data     : "pathLogique="+id2,
                 success  : function(data) {
+                    
                     content=data["content"];
                     App.currentOnglet = id;
                     App.currentVoletElement = id;
@@ -29,6 +30,7 @@
                         $("#onglets").append('<li class="onglet" data-id="'+ id +'" ><a href="#">'+fileName+' <i data-id="'+ id +'" class="icon-remove close-onglet"></i></a></li>');
                         App.onglets[id] = content;
                         App.editeur.setValue(App.onglets[id]);
+                    
                     }
                 }
             });
