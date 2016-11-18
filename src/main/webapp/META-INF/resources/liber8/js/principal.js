@@ -58,7 +58,6 @@
             }
             if (App.currentOnglet !== ""){
                 App.editeur.setValue(App.onglets[App.currentOnglet]);
-                //App.onglets[id] = App.currentOnglet;
             } else {
                 App.editeur.setValue("");
             }
