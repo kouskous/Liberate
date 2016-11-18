@@ -78,7 +78,7 @@
                                         </li>
                                         
                                         <li class="btn_action">
-                                            <a href="#"><i class="icon-play"></i>Compiler</a>
+                                            <a id="btn_compile" href="#"><i class="icon-play"></i>Compiler</a>
                                         </li>
 
                                         <li class="dropdown hidden-phone">
@@ -159,12 +159,17 @@
                         
                         <!-- start: Content -->	
                         <div id="content" >
-                                <div id="menu">
-                                    <ul id="onglets">
-                                    </ul>
-                                </div>
-                            <pre id="editeur"><code  contenteditable="">var x = 5;</code></pre>
-                            <div id="lignes" displayLignes ></div>
+                            <div id="menu">
+                                <ul id="onglets">
+                                </ul>
+                            </div>
+
+                            <div id="editeur">function foo(items) {
+    var i;
+    for (i = 0; i &lt; items.length; i++) {
+        alert("Ace Rocks " + items[i]);
+    }
+}                           </div>
                         </div>
                     </div>
 		</div>
@@ -245,6 +250,8 @@
                 <script src="/Liber8/resources/EasyTree/jquery.easytree.js"></script>  
                 
                 <script src="/Liber8/resources/liber8/js/principal.js"></script>
+                
+                <script src="/Liber8/resources/Ace/src/ace.js" type="text/javascript" charset="utf-8"></script>
                  
                 
 	<!-- end: JavaScript-->

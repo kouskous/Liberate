@@ -2,18 +2,84 @@
     var App = new Object();
     App.currentOnglet = "";
     App.currentVoletElement = "";
-    App.onglets = new Array() ; 
+    App.onglets = new Array() ;
+    App.tree = "";
+    App.editeur = "";
     /********************************************/
-
-
-$( document ).ready(function() {
-    //inclusion de la coloration syntaxique
-    $("#editeur code").keyup(function() {
-         $('pre code').each(function(i, block) {
-        hljs.highlightBlock(block);
-      });
-    });
+//definition des evenements sur l'arbre:
+    function defineArbreEvents(){
+        //double click sur un fichier
+        $(".isFile").on("dblclick",function(){
+            id = $(this).attr("id");
+            id = id.replace(/-/g,'/');
+            id = id.replace('__','.'); 
+            id2 = id.replace("Root",'');
+            $.ajax({ 
+                url      : "/Liber8/getFile",
+                dataType : "json",
+                type     : "POST",
+                data     : "pathLogique="+id2,
+                success  : function(data) {
+                    content=data["content"];
+                    App.currentOnglet = id;
+                    App.currentVoletElement = id;
+                    if(typeof App.onglets[id] === 'undefined'){
+                        fileName = id.split('/');
+                        fileName = fileName[fileName.length - 1];
+                        $("#onglets").append('<li class="onglet" data-id="'+ id +'" ><a href="#">'+fileName+' <i data-id="'+ id +'" class="icon-remove close-onglet"></i></a></li>');
+                        App.onglets[id] = content;
+                        App.editeur.setValue(App.onglets[id]);
+                    }
+                }
+            });
+            
+        });
+        
+        //selection d'un fichier
+        $(".branche-arbre").on("click", function(){
+            id = $(this).attr("id");
+            id = id.replace(/-/g,'/');
+            id = id.replace('__','.');
+            App.currentVoletElement = id;
+        });
+    }
     
+    function defineOngletsEvents(){
+        $("#onglets").on("click", ".onglet", function(){
+            id = $(this).data("id");
+            App.editeur.setValue(App.onglets[id]);
+            App.currentOnglet = id;
+        });
+        
+        $("#onglets").on("click", ".close-onglet", function(){
+            id = $(this).data("id");
+            delete App.onglets[id];
+            $(".onglet[data-id='"+ id +"']").remove();
+            App.currentOnglet = "";
+            for (var key in App.onglets) {
+                App.currentOnglet = key;
+                break;
+            }
+            /** TODO **/
+            //console.log(App.currentOnglet);
+            //console.log(App.onglets[App.currentOnglet]);
+            if (App.currentOnglet !== ""){
+                App.editeur.setValue(App.onglets[App.currentOnglet]);
+            } else {
+                App.editeur.setValue("");
+            }
+            
+            
+        });
+    }
+    
+    
+$( document ).ready(function() {
+   //inclusion de la coloration syntaxique
+    App.editeur = ace.edit("editeur");
+    App.editeur.setTheme("ace/theme/twilight");
+    App.editeur.session.setMode("ace/mode/javascript");
+        
     //volet gauche resizable
     $( "#sidebar-left" ).resizable();
     $( "#sidebar-left" ).resize(function(){
@@ -42,81 +108,16 @@ $( document ).ready(function() {
                                 } 
                                 if(element1==null) {
                                     id = parent_id.replace(/\//g,'-');
-                                    $(element).append('<li id="'+id+'" class="branche-arbre '+type+' noeud"><ul id='+parent_id+'><a>'+slug[j]+'</a></ul></li>');
+                                    id = id.replace('.','__');
+                                    $(element).append('<li id="'+id+'" data-url="'+id+'" class="branche-arbre '+type+' noeud"><ul id='+parent_id+'><a>'+slug[j]+'</a></ul></li>');
                                 }
                             }
                         });
-                        $('#arbre').easytree();
+                        App.tree = $('#arbre').easytree();
                         defineArbreEvents();
                     }       
     });
-    
-    //definition des evenements sur l'arbre:
-    function defineArbreEvents(){
-        //double click sur un fichier
-        $(".isFile").dblclick(function(){
-            id = $(this).attr("id");
-            id = id.replace(/-/g,'/');
-            id2 = id.replace("Root",'');
-            $.ajax({ 
-                url      : "/Liber8/getFile",
-                dataType : "json",
-                type     : "POST",
-                data     : "pathLogique="+id2,
-                success  : function(data) {
-                    content=data["content"];
-                    App.currentOnglet = id;
-                    App.currentVoletElement = id;
-                    if(typeof App.onglets[id] === 'undefined'){
-                        fileName = id.split('/');
-                        fileName = fileName[fileName.length - 1];
-                        $("#onglets").append('<li class="onglet" data-id="'+ id +'" ><a href="#">'+fileName+' <i data-id="'+ id +'" class="icon-remove close-onglet"></i></a></li>');
-                        App.onglets[id] = content;
-                        $("#editeur code").html(App.onglets[id]);
-                    }
-                }
-            });
-            
-        });
-        
-        //selection d'un fichier
-        $(".branche-arbre").bind("click");
-        $(".branche-arbre").on("click", function(){
-            id = $(this).attr("id");
-            id = id.replace(/-/g,'/');
-            App.currentVoletElement = id;
-        });
-        
-
-        
-    }
-    
-    function defineOngletsEvents(){
-        $("#onglets").on("click", ".onglet", function(){
-            id = $(this).data("id");
-            $("#editeur code").html(App.onglets[id]);
-            App.currentOnglet = id;
-        });
-        
-        $("#onglets").on("click", ".close-onglet", function(){
-            id = $(this).data("id");
-            delete App.onglets[id];
-            $(".onglet[data-id='"+ id +"']").remove();
-            App.currentOnglet = "";
-            for (var key in App.onglets) {
-                App.currentOnglet = key;
-                break;
-            }
-            if (App.currentOnglet !== ""){
-                $("#editeur code").html(App.onglets[App.currentOnglet]);
-            } else {
-                $("#editeur code").html("");
-            }
-            
-            
-        });
-    }
-   
+       
     $(".user-action").click(function(){
         url = $(this).data("url");
         $.ajax({ 
@@ -130,8 +131,7 @@ $( document ).ready(function() {
     
     /** Sauvegarder le fichier dont l'onglet est sélectionné **/
     $("#saveAction").click(function(){
-        /* TODO */
-       content = "toto";
+       content = App.editeur.getValue();
        path = (App.currentOnglet).slice(4);
        
        $.ajax({ 
@@ -145,6 +145,28 @@ $( document ).ready(function() {
       success  : function(data) {  
                     }       
         });
+    });
+    
+    $("#editeur").keyup(function(){
+       App.onglets[App.currentOnglet] = App.editeur.getValue(); 
+    });
+    
+        
+    $("#btn_compile").click(function(){
+        if(App.currentVoletElement != ""){
+            appPath = App.currentVoletElement.slice(4);
+            $.ajax({ 
+                url      : "/Liber8/compile",
+                type     : 'POST',
+                dataType : "json",
+                data     :{
+                              projectPath: appPath,
+                          },
+                success  : function(data) {  
+                        }       
+            });
+        }
+        
     });
     
 });
