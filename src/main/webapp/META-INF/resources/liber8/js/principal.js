@@ -42,16 +42,12 @@
             id = id.replace('__','.');
             App.currentVoletElement = id;
         });
-    }
+    } 
     
     function defineOngletsEvents(){
-        $("#onglets").on("click", ".onglet", function(){
-            id = $(this).data("id");
-            App.editeur.setValue(App.onglets[id]);
-            App.currentOnglet = id;
-        });
-        
+        var close = false;
         $("#onglets").on("click", ".close-onglet", function(){
+            close = true;
             id = $(this).data("id");
             delete App.onglets[id];
             $(".onglet[data-id='"+ id +"']").remove();
@@ -60,26 +56,31 @@
                 App.currentOnglet = key;
                 break;
             }
-            /** TODO **/
-            //console.log(App.currentOnglet);
-            //console.log(App.onglets[App.currentOnglet]);
             if (App.currentOnglet !== ""){
                 App.editeur.setValue(App.onglets[App.currentOnglet]);
             } else {
                 App.editeur.setValue("");
             }
-            
-            
+        });
+        
+        
+        $("#onglets").on("click", ".onglet", function(){
+            id = $(this).data("id");
+            if (!close) {
+                App.editeur.setValue(App.onglets[id]);
+                App.currentOnglet = id;
+            }
+            close = false;
         });
     }
     
-    
+
 $( document ).ready(function() {
    //inclusion de la coloration syntaxique
     App.editeur = ace.edit("editeur");
     App.editeur.setTheme("ace/theme/twilight");
-    App.editeur.session.setMode("ace/mode/javascript");
-        
+    App.editeur.session.setMode("ace/mode/javascript");   
+
     //volet gauche resizable
     $( "#sidebar-left" ).resizable();
     $( "#sidebar-left" ).resize(function(){
@@ -127,7 +128,7 @@ $( document ).ready(function() {
                         $("#modal_content").html(data);
                     }       
     });
-    });
+    });    
     
     /** Sauvegarder le fichier dont l'onglet est sélectionné **/
     $("#saveAction").click(function(){
