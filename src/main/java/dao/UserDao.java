@@ -154,9 +154,7 @@ public class UserDao {
             // Si on l'a trouvé, on change son email
             if(userToChange != null){
                 userToChange.setEmail(newEmail);
-                em.getTransaction().begin();
                 em.persist(userToChange);
-                em.getTransaction().commit();
                 return true;
             }
             else{
@@ -208,12 +206,16 @@ public class UserDao {
         query.setParameter("name", "%" + pseudo + "%");
         List<String> results = query.getResultList();
         
-        if(results.isEmpty()){
-            return null;
-        }
-        else{
-            return results;
-        }
+        return results;
     }
     
+    // Renvoi la liste de tous les pseudos d'utilisateurs
+    public List<String> getAllPseudo()
+    {      
+        // Recherche de users par pseudo
+        TypedQuery<String> query = em.createNamedQuery("Pseudo.getAll", String.class);
+        List<String> results = query.getResultList();
+        
+        return results;
+    }
 }

@@ -27,10 +27,6 @@ public class UserProjetDao {
     @PersistenceContext
     EntityManager em;
     
-    public UserProjetDao(EntityManager em){
-        this.em = em;
-    }
-    
     // Cherche le UserProjet dans la BDD
     // - renvoie null si il n'y est pas.
     // - renvoie le UserProjet si il y est
@@ -60,7 +56,6 @@ public class UserProjetDao {
     // Création d'un nouveau UserProjet
     // Renvoie le UserProjet si réussite
     // Renvoie null sinon
-    @Transactional
     public UserProjet createNewUserProjet(String typeDroit, Date dateCreation, Date dateModification, 
             User user, Projet projet){
         
@@ -71,6 +66,7 @@ public class UserProjetDao {
             
             // On essaye d'ajouter le UserProjet à la persistence
             try{
+
                 em.persist(newUserProjet);
                 return newUserProjet;
             }
@@ -144,7 +140,6 @@ public class UserProjetDao {
     // TypeDroit doit faire partie de {"Admin", "Dev", "Reporter"}
     // - Renvoie vrai si réussite
     // - Faux sinon
-    @Transactional
     public boolean changeDroitsUserProjet(String typeDroit, UserProjet userProjet){
         
         // Vérification que typeDroit est une chaine de caractère valide

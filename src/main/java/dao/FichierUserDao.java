@@ -21,9 +21,9 @@ public class FichierUserDao {
 
     @PersistenceContext
     EntityManager em;
-    
-    public EntityManager getEntityManager(){
-        return this.em;
+
+    public EntityManager getEntityManager() {
+        return em;
     }
 
     // Cherche les fichiers d'un utilisateur dans la BDD
@@ -91,22 +91,8 @@ public class FichierUserDao {
             throw new Exception("Erreur BDD: plusieurs fichiers d'utilisateur ont le même nom physique");
         }
     }
+    
 
-    // Cherche un fichier dans la BDD par son nom
-    // - renvoie null si il n'y est pas.
-    // - renvoie le fichier si il y est
-    public String getPathByPathLogique(User user,String pathLogique){
-        TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByUserAndPath", FichiersUsers.class);
-        query.setParameter("user", user);
-        query.setParameter("pathLogique", pathLogique);
-        List<FichiersUsers> results = query.getResultList();
-        
-        if(results.size()==1){
-            if(results.get(0).getType() == FichiersUsers.Type.DOSSIER)
-             return results.get(0).getNomPhysique();
-        }
-        return null;
-    }
 
     /**
      * @author Florian
@@ -172,6 +158,7 @@ public class FichierUserDao {
 
         // On essaye d'ajouter l'utilisateur à la persistence
         try{
+
             em.persist(newFichierUsers);
             return newFichierUsers;
         }
@@ -208,6 +195,45 @@ public class FichierUserDao {
         }
     }
 
+    public FichiersUsers getPathByPathLogique(User user,String pathLogique){
+        TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByUserAndPath", FichiersUsers.class);
+        query.setParameter("user", user);
+        query.setParameter("pathLogique", pathLogique);
+        List<FichiersUsers> results = query.getResultList();
+
+        if(results.size()==1){
+            if(results.get(0).getType() == FichiersUsers.Type.FICHIER)
+             return results.get(0);
+        }
+        return null;
+    }
+
+    public List<FichiersUsers> getPathsByPathLogique(User user,String pathLogique){
+        TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByNotUserAndPath", FichiersUsers.class);
+        query.setParameter("user", user);
+        query.setParameter("pathLogique", pathLogique);
+        List<FichiersUsers> results = query.getResultList();
+
+        if(results.size()!=0){
+            if(results.get(0).getType() == FichiersUsers.Type.FICHIER)
+             return results;
+        }
+        return null;
+    }
+
+    public int getVerrouByPathLogique(User user,String pathLogique){
+        TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByUserAndPath", FichiersUsers.class);
+        query.setParameter("user", user);
+        query.setParameter("pathLogique", pathLogique);
+        List<FichiersUsers> results = query.getResultList();
+
+        if(results.size()==1){
+            if(results.get(0).getType() == FichiersUsers.Type.FICHIER)
+             return results.get(0).getVerrou();
+        }
+        return 5;
+    }
+
     /**
      * @author Florian
      *
@@ -216,7 +242,6 @@ public class FichierUserDao {
      * @param newPathLogique le nouveau chemin physique
      * @return Renvoie vrai si réussi, faux sinon
      */
-    @Transactional
     public boolean changePathLogique(FichiersUsers fichierToChange, String newPathLogique){
         if(fichierToChange != null){
             fichierToChange.setPathLogique(newPathLogique);
@@ -229,5 +254,29 @@ public class FichierUserDao {
     }
 
     // TODO: toutes les autres fonctions de modification qu'on aura besoin.
+
+    public boolean changeVerrou(FichiersUsers fichierToChange, int verrou){
+        if(fichierToChange != null){
+            fichierToChange.setVerrou(verrou);
+            em.persist(fichierToChange);
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public boolean changeVerrouAutre(List<FichiersUsers> fichiersToChange, int verrou){
+        if(fichiersToChange != null){
+            for(int i=0;i<fichiersToChange.size();i++){
+            fichiersToChange.get(i).setVerrou(verrou);
+            em.persist(fichiersToChange.get(i));
+            }
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 
 }
