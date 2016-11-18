@@ -83,7 +83,7 @@
                       
                          <div class="form-actions">
 								<button type="submit" class="btn btn-primary" id="submitaddusrer">Terminer</button>
-								<button class="btn">Annuler</button>
+								<button type="button" class="btn" data-dismiss="modal">Annuler</button>
 							  </div>
                        
                     </form>
@@ -132,10 +132,68 @@
 		
 
     <script>
-       
-             
-$( function() {
-      $.ajax({ 
+        $( function() {
+          
+    $("#submitaddusrer").click(function(e){
+                 e.preventDefault(); 
+                 if(!$('#nomProjet').val()){
+           
+                      $('#nomProjet').addClass("bordure");
+                       return false;
+              }
+        else {
+           $('#nomProjet').removeClass("bordure");
+            var nomprojet = $('#nomProjet').val();
+            var lang = $('#selectErrortype').val();
+            var utilisateur = {};
+            var droit = {};
+            var i =0;
+            var j =0;
+            $('input:hidden').each(function(){
+            utilisateur[i++] = this.value;
+            
+});
+            $('.droit').each(function(){
+            droit[j++] = this.value;
+            
+});
+             $.ajax({ 
+                url      : "/Liber8/newProjet",
+                dataType : "json",
+                type     : "POST",
+                data     : {
+                       nomProjet : nomprojet,
+                       langageProjet: lang,
+                       utilisateurs: JSON.stringify(utilisateur),
+                       droits: JSON.stringify(droit)
+                   },
+                           
+                success  : function(data) {
+                    console.log(data);
+                   
+                   if(data.errors!==""){
+                    
+                         $('#projet .modal-content .alert-error').css('display','block');
+                          $('#listuser .modal-body .alert-error').css('display','none');
+                         $('#projet .modal-content .alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>'+data.errors+ '</span>');
+        }
+                    
+                    else if(data.response==="true"){
+                         $('#projet .modal-content .alert-error').css('display','none');
+                          $('#projet').removeClass("in");
+                          $(".modal-backdrop").removeClass("in");
+                          $(".modal-backdrop").css("display","none");
+                    }
+                }
+            });
+                
+                }
+                
+    });
+         $('#listuser .closebtn').click(function(e){
+         $('#listuser').modal('hide');
+    });
+        $.ajax({ 
       url      : "/Liber8/getUsers",
           dataType : "json",
           success  : function(data) { 
@@ -201,71 +259,11 @@ $( function() {
         availableTags.push(valeursupprimer );
         numberinput--;
     });
-    
-    $("#submitaddusrer").click(function(e){
-
-e.preventDefault(); 
-        if(!$('#nomProjet').val()){
-           
-            $('#nomProjet').addClass("bordure");
-             return false;
-        }
-        else {
-           
-            var nomprojet = $('#nomProjet').val();
-            var lang = $('#selectErrortype').val();
-            var utilisateur = {};
-            var droit = {};
-            var i =0;
-            var j =0;
-            $('input:hidden').each(function(){
-            utilisateur[i++] = this.value;
-            
-});
-            $('.droit').each(function(){
-            droit[j++] = this.value;
-});
-             $.ajax({ 
-                url      : "/Liber8/newProjet",
-                dataType : "json",
-                type     : "POST",
-                data     : {
-                       nomProjet : nomprojet,
-                       langageProjet: lang,
-                       utilisateurs: JSON.stringify(utilisateur),
-                       droits: JSON.stringify(droit)
-                   },
-                           
-                success  : function(data) {
-                    
-                    if(data.errors!==""){
-                    
-                        $('#projet .modal-content .alert-error').css('display','block');
-                            $('#listuser .modal-body .alert-error').css('display','none');
-                         $('#projet .modal-content .alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>'+data.errors+ '</span>');
-                    
-        }
-                    
-                    else{
-                        $('#projet .modal-content .alert-error').css('display','none');
-                         $('#projet').css("display","none");
-                        
-                    }
-                }
-            });
-             $('#nomProjet').removeClass("bordure");
-        }
-        
-    });
-    $('#listuser .closebtn').click(function(e){
-         $('#listuser').modal('hide');
-    });
-    
-    
-    }
-        });
+          }
       });
-    
+        });
+             
+
        
   </script>
 	<!-- end: JavaScript-->
