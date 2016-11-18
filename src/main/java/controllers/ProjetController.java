@@ -208,5 +208,9 @@ public class ProjetController {
             return null;
         }
     }
+    @RequestMapping(value="/gestionsUsers", method = RequestMethod.GET)
+    public String getUsersP(HttpServletRequest request, ModelMap model){
+        return "gestionsUsers";
+    }
     
 }

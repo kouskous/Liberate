@@ -86,3 +86,10 @@ background: #646464;
 #projet .modal-content .alert-error {
     display:none;
 }
+.gestionsuser {
+    width: 70%;
+    margin: 0 auto;
+}
+.gestionsuser h3 , .gestionsuser p {
+    padding:0 10px;
+}
