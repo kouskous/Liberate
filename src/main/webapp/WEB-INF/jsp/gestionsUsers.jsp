@@ -12,7 +12,7 @@
        <body>    
         <div class="container-fluid">
             <div class="row-fluid">
-                <div class="box gestionsuser">
+                <div class="box gestionsuser" span12>
                     <div class="box-header" data-original-title>
 						<h2><i class="icon-folder-close"></i></i><span class="break"></span>Gestion des utilisateurs</h2>
 						
