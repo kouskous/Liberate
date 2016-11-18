@@ -130,8 +130,7 @@ $( document ).ready(function() {
                         $("#modal_content").html(data);
                     }       
     });
-    });
-    
+    });    
     /** Sauvegarder le fichier dont l'onglet est sélectionné **/
     $("#saveAction").click(function(){
        content = App.editeur.getValue();
