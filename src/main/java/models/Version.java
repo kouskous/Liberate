@@ -38,7 +38,9 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Version.findAll", query = "SELECT v FROM Version v"),
     @NamedQuery(name = "Version.findByIdV", query = "SELECT v FROM Version v WHERE v.idVersion = :idV"),
     @NamedQuery(name = "Version.findByNumVersion", query = "SELECT v FROM Version v WHERE v.numVersion = :numVersion"),
-    @NamedQuery(name = "Version.findByDateCreation", query = "SELECT v FROM Version v WHERE v.dateCreation = :dateCreation")})
+    @NamedQuery(name = "Version.findByDateCreation", query = "SELECT v FROM Version v WHERE v.dateCreation = :dateCreation"),
+    @NamedQuery(name = "Version.findByProjet", query = "SELECT v FROM Version v WHERE v.projet = :projet"),
+    @NamedQuery(name = "Version.findLastByProjet", query = "SELECT v FROM Version v WHERE v.projet = :projet and v.numVersion=(SELECT MAX(numVersion) FROM Version)")})
 public class Version implements Serializable {
 
     @Id
