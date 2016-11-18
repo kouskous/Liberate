@@ -19,28 +19,8 @@
 	<!-- end: Mobile Specific -->
 	
 	<!-- start: CSS -->
-    <link id="bootstrap-style" href="/Liber8/resources/metro/css/bootstrap.min.css" rel="stylesheet">
-	<link href="/Liber8/resources/metro/css/bootstrap-responsive.min.css" rel="stylesheet">
-	<link id="base-style" href="/Liber8/resources/metro/css/style.css" rel="stylesheet">
-     <link href="/Liber8/resources/metro/css/jquery-ui-1.8.21.custom.css" rel="stylesheet">
-	<link id="base-style-responsive" href="/Liber8/resources/metro/css/style-responsive.css" rel="stylesheet">
+  
      <link id="base-style-responsive" href="/Liber8/resources/liber8/css/newProjet.css" rel="stylesheet">
-	<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&subset=latin,cyrillic-ext,latin-ext' rel='stylesheet' type='text/css'>
-	<!-- end: CSS -->
-
-	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
-	<!--[if lt IE 9]>
-	  	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-		<link id="ie-style" href="resources/metro/css/ie.css" rel="stylesheet">
-	<![endif]-->
-	
-	<!--[if IE 9]>
-		<link id="ie9style" href="resources/metro/css/ie9.css" rel="stylesheet">
-	<![endif]-->
-		
-	<!-- start: Favicon -->
-	<link rel="shortcut icon" href="/Liber8/resources/metro/img/favicon.ico">
-	<!-- end: Favicon -->
 	
 </head>
     <body>    
@@ -51,8 +31,9 @@
 						<h2><i class="icon-folder-close"></i></i><span class="break"></span>Nouveau projet</h2>
 						
 					</div>
-                <h2>${Erreur}</h2>
+               
                     <form action = "newProjet" method="POST" id="newprojet">
+                        
                         <div class="box span6">
                             <div class="box-header" data-original-title="">
 						<h2><i class="halflings-icon edit"></i><span class="break"></span>Général</h2>
@@ -81,7 +62,7 @@
 									<input type="radio" name="optionsRadios" id="optionsRadios1" value="vide" checked="">
 									vide
 								  </label>
-								  <div style="clear:both"></div>
+								  <div  class="rad" style="clear:both"></div>
 								  <label class="radio">
 									<input type="radio" name="optionsRadios" id="optionsRadios2" value="existant">
 									a partir d'un projet existant 
@@ -99,12 +80,15 @@
                             <a href="#"  data-toggle="modal" data-target="#listuser" class="addbouton"><i class="icon-plus"></i></a>
                            
                         </div>
+                      
                          <div class="form-actions">
 								<button type="submit" class="btn btn-primary" id="submitaddusrer">Terminer</button>
 								<button class="btn">Annuler</button>
 							  </div>
                        
                     </form>
+                      <div class="alert alert-error role alert"><i class="icon-exclamation-sign" aria-hidden="true"></i><span></span></div>  
+      
                 </div>
             </div>
         </div>
@@ -116,71 +100,36 @@
         <h4 class="modal-title" id="myModalLabel">Choisissez un utilisateur</h4>
       </div>
       <div class="modal-body">
+            <div class="alert alert-error role alert span12"><i class="icon-exclamation-sign" aria-hidden="true"></i><span></span></div>  
+ 
        <div class="ui-widget">
             <input id="usersname" type="text">
+            
        </div>
-        <div class="alert alert-error role alert"><i class="icon-exclamation-sign" aria-hidden="true"></i><span></span></div>  
       </div>
       <div class="modal-footer">
+              
           
         <button type="button" class="btn btn-primary" id="adduserbouton">Enregistrer</button>
         <button type="button" class="btn closebtn">Fermer</button>
       </div>
+         
+
     </div>
-  </div>
+     </div>
 </div>    
                    <script src="/Liber8/resources/metro/js/jquery-1.9.1.min.js"></script>
                     <script src="/Liber8/resources/metro/js/jquery-migrate-1.0.0.min.js"></script>
-	
-		<script src="/Liber8/resources/metro/js/jquery-ui-1.10.0.custom.min.js"></script>
-	
-		<script src="/Liber8/resources/metro/js/jquery.ui.touch-punch.js"></script>
-	
-		<script src="/Liber8/resources/metro/js/modernizr.js"></script>
-	
+                    <script src="/Liber8/resources/metro/js/jquery-ui-1.10.0.custom.min.js"></script>
 		<script src="/Liber8/resources/metro/js/bootstrap.min.js"></script>
-	
-		<script src="/Liber8/resources/metro/js/jquery.cookie.js"></script>
-	
-		<script src='/Liber8/resources/metro/js/fullcalendar.min.js'></script>
-	
-		<script src='/Liber8/resources/metro/js/jquery.dataTables.min.js'></script>
 
-		<script src="/Liber8/resources/metro/js/excanvas.js"></script>
-	<script src="/Liber8/resources/metro/js/jquery.flot.js"></script>
-	<script src="/Liber8/resources/metro/js/jquery.flot.pie.js"></script>
-	<script src="/Liber8/resources/metro/js/jquery.flot.stack.js"></script>
-	<script src="/Liber8/resources/metro/js/jquery.flot.resize.min.js"></script>
 	
-		<script src="/Liber8/resources/metro/js/jquery.chosen.min.js"></script>
 	
-		<script src="/Liber8/resources/metro/js/jquery.uniform.min.js"></script>
 		
-		<script src="/Liber8/resources/metro/js/jquery.cleditor.min.js"></script>
+		
+		
 	
-		<script src="/Liber8/resources/metro/js/jquery.noty.js"></script>
-	
-		<script src="/Liber8/resources/metro/js/jquery.elfinder.min.js"></script>
-	
-		<script src="/Liber8/resources/metro/js/jquery.raty.min.js"></script>
-	
-		<script src="/Liber8/resources/metro/js/jquery.iphone.toggle.js"></script>
-	
-		<script src="/Liber8/resources/metro/js/jquery.uploadify-3.1.min.js"></script>
-	
-		<script src="/Liber8/resources/metro/js/jquery.gritter.min.js"></script>
-	
-		<script src="/Liber8/resources/metro/js/jquery.imagesloaded.js"></script>
-	
-		<script src="/Liber8/resources/metro/js/jquery.masonry.min.js"></script>
-	
-		<script src="/Liber8/resources/metro/js/jquery.knob.modified.js"></script>
-	
-		<script src="/Liber8/resources/metro/js/jquery.sparkline.min.js"></script>
-	
-		<script src="/Liber8/resources/metro/js/counter.js"></script>
-
-		<script src="/Liber8/resources/metro/js/retina.js"></script>
+		
 
 		<script>
 $( function() {
@@ -197,7 +146,7 @@ $( function() {
             var max_input     = 10; //le nombre maximun des input
             var adduser       = $("#adduser"); // div contenant tout les utilisateurs
             var add_button      = $("#adduserbouton"); //Ajouter bouton id
-            $('#listuser .modal-body .alert-error').css('display','none');
+         
             var arrname = new Array();
             
             $('.addbouton').click(function(e) {
@@ -225,8 +174,8 @@ $( function() {
                             $('#usersname').val("");
            			             $(".usernew").append('<li><div class="control-group">\n\
 				                  	<label class="control-label userline" for="selectError'+numberinput+'">'+getname+'</label>\n\
-					                   <div class="controls userline"><select id="selectError'+numberinput+'" data-rel="chosen" name="droit'+numberinput+'"><option value="admin">admin</option>\n\
-					                   <option value="reporteur">reporteur</option><option class="developpeur">developpeur</option></select><a class="remove_field"><input type="hidden" value="'+getname+'" name="utilisateur'+numberinput+'"><i class="icon-trash"></i></a></div></div>'); //add input box
+					                   <div class="controls userline"><select id="selectError'+numberinput+'" data-rel="chosen" name="droit'+numberinput+'" class="droit"><option value="admin">admin</option>\n\
+					                   <option value="reporteur">reporteur</option><option class="developpeur">developpeur</option></select><a class="remove_field"><input type="hidden" value="'+getname+'" class="utilisateur'+numberinput+'" name="utilisateur'+numberinput+'"><i class="icon-trash"></i></a></div></div>'); //add input box
                         		for(var i = availableTags.length - 1; i >= 0; i--) {
     if(availableTags[i] === getname) {
        availableTags.splice(i, 1);
@@ -250,12 +199,58 @@ $( function() {
         numberinput--;
     });
     $("#submitaddusrer").click(function(e){
+  
         if(!$('#nomProjet').val()){
            
             $('#nomProjet').addClass("bordure");
              return false;
         }
         else {
+           
+            var nomprojet = $('#nomProjet').val();
+            var lang = $('#selectErrortype').val();
+            var utilisateur = {};
+            var droit = {}
+            var i =0;
+             var j =0;
+            $('input:hidden').each(function(){
+            utilisateur[i++] = this.value;
+            
+});
+            $('.droit').each(function(){
+            droit[j++] = this.value;
+});
+             $.ajax({ 
+                url      : "/Liber8/newProjet",
+                dataType : "json",
+                type     : "POST",
+                data     : {
+                       nomProjet : nomprojet,
+                       langageProjet: lang,
+                       utilisateur,
+                       droit
+                   },
+                           
+                       
+                
+                    
+                success  : function(data) {
+                    
+                    if(data.errors!==""){
+                    
+                        $('#projet .modal-content .alert-error').css('display','block');
+                            $('#listuser .modal-body .alert-error').css('display','none');
+                         $('#projet .modal-content .alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>'+data.errors+ '</span>');
+                    
+        }
+                    
+                    else{
+                        $('#projet .modal-content .alert-error').css('display','none');
+                         $('#projet').css("display","none");
+                        
+                    }
+                }
+            });
              $('#nomProjet').removeClass("bordure");
         }
         
