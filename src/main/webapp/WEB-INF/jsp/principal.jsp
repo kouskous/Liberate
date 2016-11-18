@@ -18,9 +18,6 @@
         <link id="base-style-responsive" href="/Liber8/resources/liber8/css/principal.css" rel="stylesheet">
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&subset=latin,cyrillic-ext,latin-ext' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="/Liber8/resources/EasyTree/skin-win8/ui.easytree.css">
-        <link rel="stylesheet" href="/Liber8/resources/highlight/styles/darcula.css">
-        <script src="/Liber8/resources/highlight/highlight.pack.js"></script>
-        <script>hljs.initHighlightingOnLoad();</script>
         <!-- end: CSS -->
 	
 
