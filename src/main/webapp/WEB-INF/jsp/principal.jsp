@@ -78,7 +78,7 @@
                                         </li>
                                         
                                         <li class="btn_action">
-                                            <a href="#"><i class="icon-play"></i>Compiler</a>
+                                            <a id="btn_compile" href="#"><i class="icon-play"></i>Compiler</a>
                                         </li>
 
                                         <li class="dropdown hidden-phone">
