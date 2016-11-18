@@ -95,15 +95,18 @@ public class ProjetController {
                         return returnObject.toString();
                     }
                     
+                    JSONObject jsonUsersProjet = new JSONObject(request.getParameter("utilisateurs"));
+                    JSONObject jsonDroitsProjet = new JSONObject(request.getParameter("droits"));
                     ArrayList<String> usersProjet = new ArrayList<String>();
                     ArrayList<String> droitsUsers = new ArrayList<String>();
-                    for (int i = 1; i <= 10; i++){
-                        if(request.getParameter("utilisateur"+ Integer.toString(i)) != null){
-                            usersProjet.add((String)request.getParameter("utilisateur"+ Integer.toString(i)));
+                    
+                    for (int i = 0; i <= 9; i++){
+                        if(jsonUsersProjet.has(Integer.toString(i)) && !jsonUsersProjet.get(Integer.toString(i)).equals("")){
+                            usersProjet.add((String)jsonUsersProjet.get(Integer.toString(i)));
                         }
-
-                        if(request.getParameter("droit"+ Integer.toString(i)) != null){
-                            droitsUsers.add((String)request.getParameter("droit"+ Integer.toString(i)));
+                        
+                        if(jsonDroitsProjet.has(Integer.toString(i)) && !jsonDroitsProjet.get(Integer.toString(i)).equals("")){
+                            droitsUsers.add((String)jsonDroitsProjet.get(Integer.toString(i)));
                         }
                     }
                     
@@ -136,6 +139,7 @@ public class ProjetController {
                                     }
                                 }
                                 catch(Exception e){
+                                    returnObject.put("response", Integer.toString(usersProjet.size()));
                                     returnObject.put("errors", "Erreur pendant l'ajout de membres utilisateurs");
                                     return returnObject.toString();
                                 }
@@ -157,7 +161,6 @@ public class ProjetController {
         }
         catch(Exception e){
             try{
-                returnObject.put("errors", e.getMessage());
                 return returnObject.toString();
             }
             catch(Exception e2){

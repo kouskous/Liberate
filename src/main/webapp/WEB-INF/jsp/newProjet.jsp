@@ -131,13 +131,16 @@
 	
 		
 
-		<script>
+    <script>
+       
+             
 $( function() {
       $.ajax({ 
       url      : "/Liber8/getUsers",
           dataType : "json",
           success  : function(data) { 
           var nameusers = data.response;
+          console.log(nameusers);
           availableTags = JSON.parse(nameusers);
             $( "#usersname" ).autocomplete({
                source: availableTags
@@ -198,8 +201,10 @@ $( function() {
         availableTags.push(valeursupprimer );
         numberinput--;
     });
+    
     $("#submitaddusrer").click(function(e){
-  
+
+e.preventDefault(); 
         if(!$('#nomProjet').val()){
            
             $('#nomProjet').addClass("bordure");
@@ -210,9 +215,9 @@ $( function() {
             var nomprojet = $('#nomProjet').val();
             var lang = $('#selectErrortype').val();
             var utilisateur = {};
-            var droit = {}
+            var droit = {};
             var i =0;
-             var j =0;
+            var j =0;
             $('input:hidden').each(function(){
             utilisateur[i++] = this.value;
             
@@ -227,13 +232,10 @@ $( function() {
                 data     : {
                        nomProjet : nomprojet,
                        langageProjet: lang,
-                       utilisateur,
-                       droit
+                       utilisateurs: JSON.stringify(utilisateur),
+                       droits: JSON.stringify(droit)
                    },
                            
-                       
-                
-                    
                 success  : function(data) {
                     
                     if(data.errors!==""){
@@ -258,10 +260,13 @@ $( function() {
     $('#listuser .closebtn').click(function(e){
          $('#listuser').modal('hide');
     });
+    
+    
     }
         });
       });
     
+       
   </script>
 	<!-- end: JavaScript-->
 	
