@@ -91,7 +91,10 @@ public class FichierUserDao {
             throw new Exception("Erreur BDD: plusieurs fichiers d'utilisateur ont le même nom physique");
         }
     }
-    
+
+    // Cherche un fichier dans la BDD par son nom
+    // - renvoie null si il n'y est pas.
+    // - renvoie le fichier si il y est
     public String getPathByPathLogique(User user,String pathLogique){
         TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByUserAndPath", FichiersUsers.class);
         query.setParameter("user", user);
@@ -190,9 +193,7 @@ public class FichierUserDao {
 
             // Si on l'a trouvé, on le supprime
             if(fichiersUsersToDelete != null){
-                em.getTransaction().begin();
                 em.remove(fichiersUsersToDelete);
-                em.getTransaction().commit();
                 return true;
             }
             else{
@@ -219,9 +220,7 @@ public class FichierUserDao {
     public boolean changePathLogique(FichiersUsers fichierToChange, String newPathLogique){
         if(fichierToChange != null){
             fichierToChange.setPathLogique(newPathLogique);
-            em.getTransaction().begin();
             em.persist(fichierToChange);
-            em.getTransaction().commit();
             return true;
         }
         else{

@@ -110,9 +110,7 @@ public class UserDao {
             
             // Si on l'a trouvé, on le supprime
             if(userToDelete != null){
-                em.getTransaction().begin();
                 em.remove(userToDelete);
-                em.getTransaction().commit();
                 return true;
             }
             else{

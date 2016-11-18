@@ -66,9 +66,7 @@ public class ProjetDao {
         
         // On essaye d'ajouter le projet à la persistence
         try{
-            em.getTransaction().begin();
             em.persist(newProjet);
-            em.getTransaction().commit();
             return newProjet;
         }
         catch(Exception e){
@@ -90,9 +88,7 @@ public class ProjetDao {
             
             // Si on l'a trouvé, on le supprime
             if(projetToDelete != null){
-                em.getTransaction().begin();
                 em.remove(projetToDelete);
-                em.getTransaction().commit();
                 return true;
             }
             else{

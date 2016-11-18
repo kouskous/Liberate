@@ -12,9 +12,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by SlowFlow on 14/11/2016.
@@ -23,24 +21,6 @@ import java.util.List;
 @ContextConfiguration(locations = "file:src/main/webapp/WEB-INF/dispatcher-servlet.xml")
 @RunWith(SpringJUnit4ClassRunner.class)
 public class FichierUserDaoTest {
-
-    /*
-    private static EntityManager em;
-
-    private static EntityManagerFactory emf;
-
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        emf = Persistence.createEntityManagerFactory("persistenceUnitLiber8");
-        em = emf.createEntityManager();
-    }
-
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-        em.close();
-        emf.close();
-    }
-    */
 
     @Autowired
     private FichierUserDao fichierUserDAO;
@@ -52,50 +32,146 @@ public class FichierUserDaoTest {
     @Transactional
     @Rollback
     public void getFichiersByUser() throws Exception {
+        User florian = userDAO.createNewUser("fbautry", "florian@test.test", "Bautry", "Florian", Date.from(Instant.now()), Date.from(Instant.now()), "mdp");
 
+        User remiSansFichier = userDAO.createNewUser("remi69","remi@test.test", "Sansfichiers", "Rémi", Date.from(Instant.now()), Date.from(Instant.now()),"unmotdepasse");
+
+        fichierUserDAO.createNewFichierUser("/dossier1/fichierTest", "nomPhysiqueTest", "nomReelTest", Date.from(Instant.now()), FichiersUsers.Type.FICHIER, florian);
+        fichierUserDAO.createNewFichierUser("/dossier1/dossierTest", "dossierTest", "dossierTest", Date.from(Instant.now()), FichiersUsers.Type.DOSSIER, florian);
+
+        List<FichiersUsers> fichiersFlorian = new ArrayList<>(fichierUserDAO.getFichiersByUser(florian));
+
+        Collection<FichiersUsers> fichiersRemiSansFichier = fichierUserDAO.getFichiersByUser(remiSansFichier);
+
+        Assert.assertEquals("/dossier1/fichierTest", fichiersFlorian.get(0).getPathLogique());
+        Assert.assertEquals("/dossier1/dossierTest", fichiersFlorian.get(1).getPathLogique());
+        Assert.assertNotEquals("/dossier1/fichierInexistant", fichiersFlorian.get(0).getPathLogique());
+
+        Assert.assertEquals("nomPhysiqueTest" ,fichiersFlorian.get(0).getNomPhysique());
+        Assert.assertEquals("nomReelTest" ,fichiersFlorian.get(0).getNomReel());
+        Assert.assertEquals(FichiersUsers.Type.FICHIER ,fichiersFlorian.get(0).getType());
+        Assert.assertEquals(florian ,fichiersFlorian.get(0).getUser());
+
+        Assert.assertEquals(null, fichiersRemiSansFichier);
     }
 
     @Test
     @Transactional
     @Rollback
     public void getFichiersByUserAndPath() throws Exception {
+        User florian = userDAO.createNewUser("fbautry", "florian@test.test", "Bautry", "Florian", Date.from(Instant.now()), Date.from(Instant.now()), "mdp");
 
+        User remiSansFichier = userDAO.createNewUser("remi69","remi@test.test", "Sansfichiers", "Rémi", Date.from(Instant.now()), Date.from(Instant.now()),"unmotdepasse");
+
+        fichierUserDAO.createNewFichierUser("/dossier1/fichierTest", "nomPhysiqueTest", "nomReelTest", Date.from(Instant.now()), FichiersUsers.Type.FICHIER, florian);
+        fichierUserDAO.createNewFichierUser("/dossier1/dossierTest", "dossierTest", "dossierTest", Date.from(Instant.now()), FichiersUsers.Type.DOSSIER, florian);
+
+        FichiersUsers fichierFlorian = fichierUserDAO.getFichiersByUserAndPath(florian, "/dossier1/fichierTest");
+        FichiersUsers dossierFlorian = fichierUserDAO.getFichiersByUserAndPath(florian, "/dossier1/dossierTest");
+
+        FichiersUsers fichierRemiSansFichier = fichierUserDAO.getFichiersByUserAndPath(remiSansFichier, "/fichierInexistant");
+
+        Assert.assertEquals("/dossier1/fichierTest", fichierFlorian.getPathLogique());
+        Assert.assertEquals("/dossier1/dossierTest", dossierFlorian.getPathLogique());
+        Assert.assertNotEquals("/dossier1/fichierInexistant", fichierFlorian.getPathLogique());
+
+        Assert.assertEquals("nomPhysiqueTest" ,fichierFlorian.getNomPhysique());
+        Assert.assertEquals("nomReelTest" ,fichierFlorian.getNomReel());
+        Assert.assertEquals(FichiersUsers.Type.FICHIER ,fichierFlorian.getType());
+        Assert.assertEquals(florian ,fichierFlorian.getUser());
+        Assert.assertEquals(FichiersUsers.Type.DOSSIER ,dossierFlorian.getType());
+
+        Assert.assertEquals(null, fichierRemiSansFichier);
     }
 
     @Test
     @Transactional
     @Rollback
     public void getFichierUserByNomPhysique() throws Exception {
+        User florian = userDAO.createNewUser("fbautry", "florian@test.test", "Bautry", "Florian", Date.from(Instant.now()), Date.from(Instant.now()), "mdp");
 
+        fichierUserDAO.createNewFichierUser("/dossier1/fichierTest", "nomPhysiqueTest", "nomReelTest", Date.from(Instant.now()), FichiersUsers.Type.FICHIER, florian);
+        fichierUserDAO.createNewFichierUser("/dossier1/dossierTest", "dossierTest", "dossierTest", Date.from(Instant.now()), FichiersUsers.Type.DOSSIER, florian);
+
+        FichiersUsers fichierFlorian = fichierUserDAO.getFichierUserByNomPhysique("nomPhysiqueTest");
+        FichiersUsers dossierFlorian = fichierUserDAO.getFichierUserByNomPhysique("dossierTest");
+
+        FichiersUsers fichierInexistant = fichierUserDAO.getFichierUserByNomPhysique("fichierInexistant");
+
+        Assert.assertEquals("/dossier1/fichierTest", fichierFlorian.getPathLogique());
+        Assert.assertEquals("/dossier1/dossierTest", dossierFlorian.getPathLogique());
+        Assert.assertNotEquals("/dossier1/fichierInexistant", fichierFlorian.getPathLogique());
+
+        Assert.assertEquals("nomPhysiqueTest" ,fichierFlorian.getNomPhysique());
+        Assert.assertEquals("nomReelTest" ,fichierFlorian.getNomReel());
+        Assert.assertEquals(FichiersUsers.Type.FICHIER ,fichierFlorian.getType());
+        Assert.assertEquals(florian ,fichierFlorian.getUser());
+        Assert.assertEquals(FichiersUsers.Type.DOSSIER ,dossierFlorian.getType());
+        Assert.assertEquals("dossierTest" ,dossierFlorian.getNomPhysique());
+
+        Assert.assertEquals(null, fichierInexistant);
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void getPathByPathLogique() throws Exception {
+       /* User florian = userDAO.createNewUser("fbautry", "florian@test.test", "Bautry", "Florian", Date.from(Instant.now()), Date.from(Instant.now()), "mdp");
+
+        fichierUserDAO.createNewFichierUser("/dossier1/fichierTest", "nomPhysiqueTest", "nomReelTest", Date.from(Instant.now()), FichiersUsers.Type.FICHIER, florian);
+        fichierUserDAO.createNewFichierUser("/dossier1/dossierTest", "dossierTest", "dossierTest", Date.from(Instant.now()), FichiersUsers.Type.DOSSIER, florian);
+
+        String fichierFlorian = fichierUserDAO.getPathByPathLogique("nomPhysiqueTest");
+        String dossierFlorian = fichierUserDAO.getPathByPathLogique("dossierTest");
+
+        String fichierInexistant = fichierUserDAO.getPathByPathLogique("fichierInexistant");
+
+        Assert.assertEquals("/dossier1/fichierTest", fichierFlorian.getPathLogique());
+        Assert.assertEquals("/dossier1/dossierTest", dossierFlorian.getPathLogique());
+        Assert.assertNotEquals("/dossier1/fichierInexistant", fichierFlorian.getPathLogique());
+
+        Assert.assertEquals("nomPhysiqueTest" ,fichierFlorian.getNomPhysique());
+        Assert.assertEquals("nomReelTest" ,fichierFlorian.getNomReel());
+        Assert.assertEquals(FichiersUsers.Type.FICHIER ,fichierFlorian.getType());
+        Assert.assertEquals(florian ,fichierFlorian.getUser());
+        Assert.assertEquals(FichiersUsers.Type.DOSSIER ,dossierFlorian.getType());
+        Assert.assertEquals("dossierTest" ,dossierFlorian.getNomPhysique());
+
+        Assert.assertEquals(null, fichierInexistant);*/
     }
 
     @Test
     @Transactional
     @Rollback
     public void getArborescence() throws Exception {
+        //TODO : debug
+        /*
+        User florian = userDAO.createNewUser("fbautry", "florian@test.test", "Bautry", "Florian", Date.from(Instant.now()), Date.from(Instant.now()), "mdp");
 
-    }
+        fichierUserDAO.createNewFichierUser("/dossier1/fichierTest", "fichierTest", "fichierTest", Date.from(Instant.now()), FichiersUsers.Type.FICHIER, florian);
+        fichierUserDAO.createNewFichierUser("/dossier1/dossierTest/fichierTest2", "fichierTest2", "fichierTest2", Date.from(Instant.now()), FichiersUsers.Type.FICHIER, florian);
 
-    @Test
-    @Transactional
-    @Rollback
-    public void getArborescence1() throws Exception {
+        Map<String, FichiersUsers.Type> arborescence = fichierUserDAO.getArborescence(florian);
 
+        Assert.assertEquals(FichiersUsers.Type.FICHIER ,arborescence.get("/dossier1/fichierTest"));
+        Assert.assertEquals(FichiersUsers.Type.DOSSIER ,arborescence.get("/dossier1/dossierTest"));
+        */
     }
 
     @Test
     @Transactional
     @Rollback
     public void createNewFichierUser() throws Exception {
-        User medini = userDAO.createNewUser("lmedini", "lmedini@test.test", "Medini", "Lionel", Date.from(Instant.now()), Date.from(Instant.now()), "mdp");
+        User florian = userDAO.createNewUser("fbautry", "florian@test.test", "Bautry", "Florian", Date.from(Instant.now()), Date.from(Instant.now()), "mdp");
 
-        fichierUserDAO.createNewFichierUser("/dossier1/fichierTest", "fichierTest", "fichierTest", Date.from(Instant.now()), FichiersUsers.Type.FICHIER, medini);
-        fichierUserDAO.createNewFichierUser("/dossier1/dossierTest", "dossierTest", "dossierTest", Date.from(Instant.now()), FichiersUsers.Type.DOSSIER, medini);
+        fichierUserDAO.createNewFichierUser("/dossier1/fichierTest", "fichierTest", "fichierTest", Date.from(Instant.now()), FichiersUsers.Type.FICHIER, florian);
+        fichierUserDAO.createNewFichierUser("/dossier1/dossierTest", "dossierTest", "dossierTest", Date.from(Instant.now()), FichiersUsers.Type.DOSSIER, florian);
 
-        List<FichiersUsers> fichiersMedini = new ArrayList<>(fichierUserDAO.getFichiersByUser(medini));
+        List<FichiersUsers> fichiersFlorian = new ArrayList<>(fichierUserDAO.getFichiersByUser(florian));
 
-        Assert.assertEquals("/dossier1/fichierTest", fichiersMedini.get(0).getPathLogique());
-        Assert.assertEquals("/dossier1/dossierTest", fichiersMedini.get(1).getPathLogique());
+        Assert.assertEquals("/dossier1/fichierTest", fichiersFlorian.get(0).getPathLogique());
+        Assert.assertEquals("/dossier1/dossierTest", fichiersFlorian.get(1).getPathLogique());
+        Assert.assertNotEquals("/dossier1/fichierInexistant", fichiersFlorian.get(0).getPathLogique());
     }
 
     @Test

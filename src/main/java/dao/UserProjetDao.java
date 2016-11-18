@@ -71,9 +71,7 @@ public class UserProjetDao {
             
             // On essaye d'ajouter le UserProjet à la persistence
             try{
-                em.getTransaction().begin();
                 em.persist(newUserProjet);
-                em.getTransaction().commit();
                 return newUserProjet;
             }
             catch(Exception e){
@@ -98,9 +96,7 @@ public class UserProjetDao {
             
             // Si on l'a trouvé, on le supprime
             if(userProjetToDelete != null){
-                em.getTransaction().begin();
                 em.remove(userProjetToDelete);
-                em.getTransaction().commit();
                 return true;
             }
             else{
@@ -156,9 +152,7 @@ public class UserProjetDao {
             userProjet.setTypeDroit(typeDroit);
       
             try{
-                em.getTransaction().begin();
                 em.persist(em);
-                em.getTransaction().commit();
                 return true;
             }
             catch (Exception e){
