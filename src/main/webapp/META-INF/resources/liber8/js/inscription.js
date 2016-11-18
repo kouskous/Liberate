@@ -114,14 +114,14 @@ function checkStrength(password)
 		{
 			$('#result').removeClass();
 			$('#result').addClass('offset3 span6 alert alert-warning');
-                        validpassword = false;
+                        validpassword = true;
 			return 'Votre mot de passe est moyen';			
 		}
 		else if (strength === 2 )
 		{
 			$('#result').removeClass();
 			$('#result').addClass('offset3 span6 alert alert-info');
-                        validpassword = false;
+                        validpassword = true;
 			return 'Votre mot de passe est bien';		
 		}
 		else
