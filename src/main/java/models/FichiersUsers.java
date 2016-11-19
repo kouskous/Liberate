@@ -39,7 +39,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "FichiersUsers.findByType", query = "SELECT f FROM FichiersUsers f WHERE f.type = :type"),
     @NamedQuery(name = "FichiersUsers.findByUser", query = "SELECT f FROM FichiersUsers f WHERE f.user = :user"),
     @NamedQuery(name = "FichiersUsers.findDescendantsDossier", query = "SELECT f FROM FichiersUsers f WHERE f.pathLogique LIKE :pathLogiqueDossier"),
-    @NamedQuery(name = "FichiersUsers.findByUserAndPath", query = "SELECT f FROM FichiersUsers f WHERE f.user = :user AND f.pathLogique = :pathLogique")})
+    @NamedQuery(name = "FichiersUsers.findByUserAndPath", query = "SELECT f FROM FichiersUsers f WHERE f.user = :user AND f.pathLogique = :pathLogique"),
+    @NamedQuery(name = "FichiersUsers.findByNotUserAndPath", query = "SELECT f FROM FichiersUsers f WHERE f.user != :user AND f.pathLogique = :pathLogique")})
+
 
 public class FichiersUsers implements Serializable {
 
@@ -73,6 +75,10 @@ public class FichiersUsers implements Serializable {
     @JoinColumn(name = "idU", referencedColumnName = "idU")
     @ManyToOne(optional = false)
     private User user;
+    
+    @Basic(optional = false)
+    @Column(name = "verrou")
+    private int verrou;
 
     public FichiersUsers() {
     }
@@ -133,6 +139,14 @@ public class FichiersUsers implements Serializable {
 
     public void setUser(User user) {
         this.user = user;
+    }
+    
+    public int getVerrou() {
+        return verrou;
+    }
+
+    public void setVerrou(int verrou) {
+        this.verrou = verrou;
     }
 
     @Override

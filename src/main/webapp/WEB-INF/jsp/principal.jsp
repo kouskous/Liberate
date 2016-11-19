@@ -18,9 +18,6 @@
         <link id="base-style-responsive" href="/Liber8/resources/liber8/css/principal.css" rel="stylesheet">
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&subset=latin,cyrillic-ext,latin-ext' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="/Liber8/resources/EasyTree/skin-win8/ui.easytree.css">
-        <link rel="stylesheet" href="/Liber8/resources/highlight/styles/darcula.css">
-        <script src="/Liber8/resources/highlight/highlight.pack.js"></script>
-        <script>hljs.initHighlightingOnLoad();</script>
         <!-- end: CSS -->
 	
 
@@ -78,7 +75,7 @@
                                         </li>
                                         
                                         <li class="btn_action">
-                                            <a href="#"><i class="icon-play"></i>Compiler</a>
+                                            <a id="btn_compile" href="#"><i class="icon-play"></i>Compiler</a>
                                         </li>
 
                                         <li class="dropdown hidden-phone">
@@ -159,12 +156,17 @@
                         
                         <!-- start: Content -->	
                         <div id="content" >
-                                <div id="menu">
-                                    <ul id="onglets">
-                                    </ul>
-                                </div>
-                            <pre id="editeur"><code  contenteditable="">var x = 5;</code></pre>
-                            <div id="lignes" displayLignes ></div>
+                            <div id="menu">
+                                <ul id="onglets">
+                                </ul>
+                            </div>
+
+                            <div id="editeur">function foo(items) {
+    var i;
+    for (i = 0; i &lt; items.length; i++) {
+        alert("Ace Rocks " + items[i]);
+    }
+}                           </div>
                         </div>
                     </div>
 		</div>
@@ -245,6 +247,8 @@
                 <script src="/Liber8/resources/EasyTree/jquery.easytree.js"></script>  
                 
                 <script src="/Liber8/resources/liber8/js/principal.js"></script>
+                
+                <script src="/Liber8/resources/Ace/src/ace.js" type="text/javascript" charset="utf-8"></script>
                  
                 
 	<!-- end: JavaScript-->

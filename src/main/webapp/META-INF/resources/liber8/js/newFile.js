@@ -37,6 +37,9 @@ $( document ).ready(function() {
                                   $("#"+sourceNode.id).addClass("isFile");
                                   $("#"+sourceNode.id).addClass("branche-arbre");
                                   defineArbreEvents();
+                                  $("#"+sourceNode.id).trigger("dblclick");
+                                  $("#"+path).next().css("display","block");
+                                  App.tree.activateNode(sourceNode.id);
                              }       
                  });
             }

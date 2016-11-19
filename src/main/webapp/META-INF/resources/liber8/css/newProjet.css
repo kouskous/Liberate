@@ -83,3 +83,6 @@ background: #646464;
         border-color: #f27b81 !important;
 	border-left-color: #f27b81 !important;
 }
+#projet .modal-content .alert-error {
+    display:none;
+}
