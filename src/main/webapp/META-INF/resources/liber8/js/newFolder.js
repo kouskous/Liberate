@@ -10,7 +10,6 @@ $( document ).ready(function() {
    $("#btn_new_folder").click(function(){
       foldername = $("#input_name_folder").val();
             path = App.currentVoletElement.replace(/\//g,'-');
-            console.log(path);
             path = path.replace('.','__');
             element = $("#"+path);
         if(foldername.length === 0){

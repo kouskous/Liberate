@@ -5,6 +5,9 @@
  */
 
 $( document ).ready(function() {
+        path = App.currentVoletElement.replace(/\//g,'-');
+            path = path.replace('.','__');
+            element = $("#"+path);
     $('#newfile .alert-error').css('display','none');
    $("#btn_new_file").click(function(){
       filename = $("#input_name_file").val();
@@ -15,8 +18,8 @@ $( document ).ready(function() {
         } else {
             if(path==="") {
                  
-                $('#newFolder .alert.alert-error').css('display','block');
-                 $('#newFolder .alert.alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>Veuillez selectionner un projet </span>');
+                $('#newfile .alert.alert-error').css('display','block');
+                 $('#newfile .alert.alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>Veuillez selectionner un projet </span>');
             
              }
               
