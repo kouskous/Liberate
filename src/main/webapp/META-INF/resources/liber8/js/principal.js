@@ -76,7 +76,7 @@
     
 
 $( document ).ready(function() {
-   //inclusion de la coloration syntaxique
+    //inclusion de la coloration syntaxique
     App.editeur = ace.edit("editeur");
     App.editeur.setTheme("ace/theme/twilight");
     App.editeur.session.setMode("ace/mode/javascript");   
@@ -118,16 +118,23 @@ $( document ).ready(function() {
                         defineArbreEvents();
                     }       
     });
-       
+
     $(".user-action").click(function(){
         url = $(this).data("url");
+        path = App.currentVoletElement.replace(/\//g,'-');
+        path = path.replace('.','__');
+        element = $("#"+path);
+        if (((path == "")||($(element).hasClass("isFile")))&&(url=="newFile")){
+            url = null;
+            toastr.warning('Veuillez sélectionner un dossier dans l\'arborescence');
+        }
         $.ajax({ 
         url      : "/Liber8/"+ url,
         dataType : "html",
         success  : function(data) {  
                         $("#modal_content").html(data);
-                    }       
-    });
+                    }
+        });
     });    
     
     /** Sauvegarder le fichier dont l'onglet est sélectionné **/
