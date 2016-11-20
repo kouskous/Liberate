@@ -13,9 +13,16 @@ $( document ).ready(function() {
             $('#newfile .alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>Le nom  du fichier est vide ! Veuillez le remplir </span>');
             
         } else {
-            path = App.currentVoletElement.replace(/\//g,'-');
-            path = path.replace('.','__');
-            element = $("#"+path);
+            if(path==="") {
+                 
+                $('#newFolder .alert.alert-error').css('display','block');
+                 $('#newFolder .alert.alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>Veuillez selectionner un projet </span>');
+            
+             }
+              
+             
+             else {
+            
             if ((path != "")&&(!$(element).hasClass("isFile"))){
               Logicpath = (App.currentVoletElement+"/"+filename).slice(4);
               $.ajax({ 
@@ -45,7 +52,7 @@ $( document ).ready(function() {
             }
         
         }
-         
+    }
          
         
     });
