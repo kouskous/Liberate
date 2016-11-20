@@ -214,7 +214,7 @@ public class ProjetController {
         return "gestionsUsers";
     }
     
-    // Récupération des utilisateurs qui font partie d'un projet en particulier
+    // Récupération des utilisateurs qui font partie d'un projet en particulier, avec leurs droits.
     // - La requête doit contenir un champs "nomProjet"
     @ResponseBody
     @RequestMapping(value="/getUsersInProject", method = RequestMethod.GET, produces = "application/json")
@@ -266,6 +266,8 @@ public class ProjetController {
         // On récupère tous les utilisateurs du projet
         List<User> myList = new ArrayList();
         List<String> pseudoUsers = new ArrayList();
+        List<String> droitsUsers = new ArrayList();
+        JSONObject jsonPseudoDroits = new JSONObject();
         try{
             myList = userProjetDao.getAllUsersByProjet(projet);
             if(myList == null){
@@ -280,7 +282,15 @@ public class ProjetController {
             }
             else{
                 for (int i = 0; i < myList.size(); i++){
-                    pseudoUsers.add(myList.get(i).getPseudo());
+                    //pseudoUsers.add(myList.get(i).getPseudo());
+                    jsonPseudoDroits.put("utilisateur" + Integer.toString(i), myList.get(i).getPseudo());
+                    String droitsUtilisateur = userProjetDao.getDroits(myList.get(i), projet);
+                    if(droitsUtilisateur != null){
+                        jsonPseudoDroits.put("droit" + Integer.toString(i), droitsUtilisateur);
+                    }
+                    else{
+                        throw new Exception("Erreur pendant la récupération des utilisateurs du projet");
+                    }
                 }
             }
         }
@@ -298,7 +308,7 @@ public class ProjetController {
         // Réussite
         try{
             returnObject.put("response", "true");
-            returnObject.put("content", pseudoUsers.toString());
+            returnObject.put("content", jsonPseudoDroits.toString());
             returnObject.put("errors", "");
             return returnObject.toString();
         }

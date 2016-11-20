@@ -215,4 +215,21 @@ public class UserProjetDao {
         return allUsers;
     }
     
+    // Renvoi les droits de l'utilisateurs donné associé au projet donné
+    public String getDroits(User user, Projet projet)
+    {
+        try{
+            UserProjet userProjet = getUserProjetByUIdPId(user.getIdUser(), projet.getIdProjet());
+            if(userProjet == null){
+                return null;
+            }
+            else{
+                return userProjet.getTypeDroit();
+            }
+        }
+        catch(Exception e){
+            return null;
+        }
+    }
+    
 }
