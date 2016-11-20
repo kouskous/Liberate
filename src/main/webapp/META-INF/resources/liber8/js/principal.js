@@ -134,7 +134,7 @@ $( document ).ready(function() {
     $("#saveAction").click(function(){
        content = App.editeur.getValue();
        path = (App.currentOnglet).slice(4);
-       
+       $.blockUI({ message: '<h2><img src="/Liber8/resources/blockUi/busy.gif" /> Enregistrement...</h2>' });
        $.ajax({ 
       url      : "/Liber8/saveFile",
       type     : 'POST',
@@ -144,6 +144,7 @@ $( document ).ready(function() {
                     contenuFichier: content
                 },
       success  : function(data) {  
+                    $.unblockUI();
                     }       
         });
     });
