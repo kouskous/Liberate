@@ -80,8 +80,9 @@ public class CompilationController {
         }
         
         // Vérification de l'existence en base
+        Projet projet;
         try{
-            Projet projet = projetDao.getProjetByName(nomProjet);
+            projet = projetDao.getProjetByName(nomProjet);
             if(projet == null) {throw new Exception("Erreur pendant la récupération du projet");}
         }
         catch(Exception e){
@@ -110,7 +111,16 @@ public class CompilationController {
         }
         
         // Compilation TIME
-        
+        if(!buildAndCreateExec(path, projet.getLangage(), user, nomProjet)){
+            try{
+                returnObject.put("response", "false");
+                returnObject.put("content", "");
+                returnObject.put("errors", "Erreur lors de la compilation");
+                return returnObject.toString();
+            }
+            // Json fail
+            catch(Exception e2){return null;}
+        }
         
         // Reussite
         try{
@@ -177,4 +187,63 @@ public class CompilationController {
         String filename = path.substring(path.lastIndexOf("/")+1); 
         return filename;
     }
+    
+    private boolean buildAndCreateExec(String directoryPath, String language, User user, String nomProjet)
+    {
+        if(language.equals("c") || (language).equals("c++")){
+            
+            // Recopier le makefile dans le dossier de compilation
+            // Getting file content
+            String content;
+            try{
+                if(language.equals("c")){
+                    content = new String(Files.readAllBytes(Paths.get(directoryPath + "/../../scripts/makefile_c")));
+                }
+                else{
+                    content = new String(Files.readAllBytes(Paths.get(directoryPath + "/../../scripts/makefile_c++")));
+                }
+                if(content == null)
+                    throw new Exception("Erreur pendant la récupération du contenu du makefile");
+            }
+            catch(Exception e){
+                System.out.println("Erreur pendant la récupération du contenu du makefile");
+                return false;
+            }
+            
+            // Creating makefile and writing content to it
+            try{
+                File file = new File(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "makefile");
+                FileWriter writer = new FileWriter(file);
+                writer.write(content);
+                writer.close();
+            }
+            catch(Exception e){
+                System.out.println("Erreur pendant l'ecriture du makefile");
+                return false;
+            }
+            
+            // Executing make command
+            try{
+                String pathToMakeFile = directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet;
+                System.out.println(pathToMakeFile);
+                Runtime rt = Runtime.getRuntime();
+                Process pr = rt.exec("make", null, new File(pathToMakeFile));
+                
+                //String[] cmd = { "make", "cd " + pathToMakeFile};
+                //Process p = Runtime.getRuntime().exec(cmd);
+            }
+            catch(Exception e){
+                System.out.println("Erreur pendant l'execution du makefile");
+                return false;
+            }
+            
+            return true;
+            
+        }
+        
+        
+        return false;
+    }
+        
+    
 }
