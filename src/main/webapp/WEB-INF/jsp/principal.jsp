@@ -184,6 +184,7 @@
 	
 	<!-- start: JavaScript-->
 
+                
 		<script src="/Liber8/resources/metro/js/jquery-1.9.1.min.js"></script>
                 
                 <script src="/Liber8/resources/metro/js/jquery-migrate-1.0.0.min.js"></script>
@@ -246,7 +247,10 @@
                 
                 <script src="/Liber8/resources/EasyTree/jquery.easytree.js"></script>  
                 
+                <script src="/Liber8/resources/blockUi/jquery.blockUI.js"></script>
+                
                 <script src="/Liber8/resources/liber8/js/principal.js"></script>
+                
                 
                 <script src="/Liber8/resources/Ace/src/ace.js" type="text/javascript" charset="utf-8"></script>
                  
