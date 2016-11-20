@@ -155,70 +155,70 @@ public class FileController {
     @RequestMapping(value="/newDossier", method = RequestMethod.POST, produces = "application/json")
     public String newDossier(HttpServletRequest request, ModelMap model){           
         
-        EntityManager em = fichierUserDao.getEntityManager();
-        
         // On créé l'objet à retourner
         JSONObject returnObject = new JSONObject();   
         
-        try{
-            returnObject.put("response", "");
-            returnObject.put("errors", "");
-            
-            // On vérifie qu'une session est bien ouverte
-            HttpSession session= request.getSession();
-            User user = (User)session.getAttribute("user");
-
-            if(user == null){
+        // On vérifie qu'une session est bien ouverte
+        HttpSession session= request.getSession();
+        User user = (User)session.getAttribute("user");
+        
+        if(user == null){
+            try{
+                returnObject.put("response", "false");
+                returnObject.put("content", "");
                 returnObject.put("errors", "No user");
                 return returnObject.toString();
             }
-            else{
-                    em.getTransaction().begin();
-                    
-                    String fileName = extractFileName((String)request.getParameter("pathDossier"));
-                    System.out.print(fileName);
-                    FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathDossier"), 
-                    null, 
-                    fileName, 
-                    new Date(), false, user);
-                    
-                    if(newFile == null){
-                        returnObject.put("errors", "Failed to create file");
-                        return returnObject.toString();
-                    }
-                    else{
-                        try{
-                            em.persist(newFile);
-                            em.getTransaction().commit();
-                            em.close();
-                            
-                            returnObject.put("response",true);
-                            return returnObject.toString();
-                        }
-                        catch(Exception e){
-                            em.close();
-                            returnObject.put("errors","Erreur BDD");
-                            return returnObject.toString();
-                        }
-                    }
+            // JSon fail
+            catch(Exception e){return null;}
+        }
+        
+        // Extraction du nom de dossier
+        String fileName = extractFileName((String)request.getParameter("pathDossier"));
+        if(fileName == null){
+            try{
+                returnObject.put("response", "false");
+                returnObject.put("content", "");
+                returnObject.put("errors", "Erreur pendant la récupération du nom de dossier");
+                return returnObject.toString();
+            }
+            // JSon fail
+            catch(Exception e){return null;}
+        }
+        
+        // Création du dossier
+        try{
+            FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathDossier"), 
+            fileName, 
+            fileName, 
+            new Date(), 
+            false, 
+            user);
+            
+            if(newFile == null){
+                throw new Exception("Erreur pendant la création du dossier");
             }
         }
         catch(Exception e){
-            System.out.println("Erreur JSON");
-            System.out.println(e.getMessage());
-            em.close();
-            //TODO: ce try-catch ne sert qu'à afficher les erreurs
             try{
-                JSONObject obj = new JSONObject();
-                obj.put("errors",e.getMessage());
-                em.close();
-                return obj.toString();
+                returnObject.put("response", "false");
+                returnObject.put("content", "");
+                returnObject.put("errors", "Erreur pendant la création du dossier");
+                return returnObject.toString();
             }
-            catch(Exception er){
-                em.close();
-            }
-            return null;
+            // JSon fail
+            catch(Exception e2){return null;}
         }
+        
+        // Réussite
+        try{
+            returnObject.put("response", "true");
+            returnObject.put("content", "");
+            returnObject.put("errors", "");
+            return returnObject.toString();
+        }
+        // Json fail
+        catch(Exception e){return null;}
     }
         
     // Enregistre un fichier
