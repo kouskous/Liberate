@@ -101,6 +101,7 @@ public class FichierUserDao {
      * @param user l'utilisateur dont on veux l'arborescence
      * @return Renvoie l'arborescence complete depuis la racine de l'utilisateur
      */
+    @Transactional
     public Map<String, FichiersUsers.Type> getArborescence(User user){
         return getArborescence(user, null);
     }
@@ -114,6 +115,7 @@ public class FichierUserDao {
      *                si null depuis la racine de l'utilisateur
      * @return Renvoie l'arborescence depuis le dossier en question, ou null si le dossier est un fichier
      */
+    @Transactional
     public Map<String, FichiersUsers.Type> getArborescence(User user, FichiersUsers dossier){
         try {
             Map<String, FichiersUsers.Type> arborescence = new Hashtable<>();
@@ -121,6 +123,9 @@ public class FichierUserDao {
 
             if(dossier == null) {
                 fichiers = user.getFichiersUsersCollection();
+                if(fichiers == null) {
+                    return arborescence;
+                }
             }
 
             //si le fichier n'est pas un dossier

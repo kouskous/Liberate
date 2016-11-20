@@ -145,7 +145,7 @@ public class FichierUserDaoTest {
     @Rollback
     public void getArborescence() throws Exception {
         //TODO : debug
-        /*
+
         User florian = userDAO.createNewUser("fbautry", "florian@test.test", "Bautry", "Florian", Date.from(Instant.now()), Date.from(Instant.now()), "mdp");
 
         fichierUserDAO.createNewFichierUser("/dossier1/fichierTest", "fichierTest", "fichierTest", Date.from(Instant.now()), FichiersUsers.Type.FICHIER, florian);
@@ -155,7 +155,7 @@ public class FichierUserDaoTest {
 
         Assert.assertEquals(FichiersUsers.Type.FICHIER ,arborescence.get("/dossier1/fichierTest"));
         Assert.assertEquals(FichiersUsers.Type.DOSSIER ,arborescence.get("/dossier1/dossierTest"));
-        */
+
     }
 
     @Test
