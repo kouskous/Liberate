@@ -51,7 +51,7 @@
                                         </li>
                                         
                                         <li class="btn_action">
-                                            <a class="user-action" href="#" data-toggle="modal" data-target="#projet" data-url=""><i class="halflings-icon white plus-sign"></i>Dossier </a>
+                                            <a class="user-action" href="#" data-toggle="modal" data-target="#projet" data-url="newDossier"><i class="halflings-icon white plus-sign"></i>Dossier </a>
                                         </li>
                                         
                                         <li class="btn_action">

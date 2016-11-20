@@ -12,15 +12,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.transaction.Transactional;
 import models.FichiersUsers;
 import models.User;
 import org.json.JSONArray;
@@ -55,7 +52,10 @@ public class FileController {
     public String index(HttpServletRequest request, ModelMap model){
         return "newFile";
     }
-    
+    @RequestMapping(value="/newDossier", method = RequestMethod.GET)
+    public String indexD(HttpServletRequest request, ModelMap model){
+        return "newDossier";
+    }
     @RequestMapping(value="/saveFile", method = RequestMethod.GET)
     public String indexSave(HttpServletRequest request, ModelMap model){
         return "saveFile";
@@ -175,9 +175,9 @@ public class FileController {
             else{
                     em.getTransaction().begin();
                     
-                    String fileName = extractFileName((String)request.getParameter("pathFichier"));
+                    String fileName = extractFileName((String)request.getParameter("pathDossier"));
                     System.out.print(fileName);
-                    FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathFichier"), 
+                    FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathDossier"), 
                     null, 
                     fileName, 
                     new Date(), false, user);
@@ -206,15 +206,16 @@ public class FileController {
         catch(Exception e){
             System.out.println("Erreur JSON");
             System.out.println(e.getMessage());
-            
+            em.close();
             //TODO: ce try-catch ne sert qu'à afficher les erreurs
             try{
                 JSONObject obj = new JSONObject();
                 obj.put("errors",e.getMessage());
+                em.close();
                 return obj.toString();
             }
             catch(Exception er){
-                
+                em.close();
             }
             return null;
         }
@@ -329,8 +330,9 @@ public class FileController {
     JSONArray list = new JSONArray();
         
     FichiersUsers file = fichierUserDao.getPathByPathLogique(user,request.getParameter("pathLogique"));
+    System.out.println("REQUEST"+request.getParameter("pathLogique"));
     String pathPhysique =file.getNomPhysique();
-    List<FichiersUsers> files =fichierUserDao.getPathsByPathLogique(user,request.getParameter("pathLogique"));
+    List<FichiersUsers> files =fichierUserDao.getPathsByPathLogique(user,request.getParameter("pathFichier"));
     int verrou = file.getVerrou();
     if(verrou==0){
         boolean verrouillage = fichierUserDao.changeVerrou(file, 2);
