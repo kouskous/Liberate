@@ -26,7 +26,7 @@ $( document ).ready(function() {
                              pathFichier: Logicpath
                            },
                  success  : function(data) {  
-                                  $(".close").trigger("click");
+                                  $("#close_modal_btn").trigger("click");
                                   var nodes = App.tree.getAllNodes();
                                   var sourceNode = {};
                                   sourceNode.text = filename;
