@@ -97,7 +97,7 @@
          availableusers.push(data.content[i].pseudo);
           
      }
-     console.log(availableusers);
+    
          
          
             $( "#usersname" ).autocomplete({
