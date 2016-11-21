@@ -1,5 +1,4 @@
-   
-        <div class="container-fluid">
+<div class="container-fluid">
             <div class="row-fluid">
                 <div class="box" span12>
                 <div class="box-header" data-original-title>
@@ -40,7 +39,7 @@
 								  <div  class="rad" style="clear:both"></div>
 								  <label class="radio">
 									<input type="radio" name="optionsRadios" id="optionsRadios2" value="existant">
-									a partir d'un projet existant 
+									à partir d'un projet existant 
 								  </label>
 								</div>
 							  </div>
@@ -92,6 +91,6 @@
 
     </div>
      </div>
-</div>    
+</div>
 <script src="/Liber8/resources/liber8/js/newProjet.js"></script>       
 
