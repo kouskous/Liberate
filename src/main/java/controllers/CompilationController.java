@@ -44,7 +44,7 @@ public class CompilationController {
     
     // Compilation d'un projet. La requête doit contenir un champs "nomProjet"
     @ResponseBody 
-    @RequestMapping(value="/compile", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value="/compile", method = RequestMethod.POST, produces = "application/json")
     public String compile(HttpServletRequest request, ModelMap model){  
         
         // On créé l'objet à retourner

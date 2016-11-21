@@ -154,19 +154,19 @@ $( document ).ready(function() {
     
         
     $("#btn_compile").click(function(){
-        if(App.currentVoletElement != ""){
-            appPath = App.currentVoletElement.slice(4);
+        /**if(App.currentVoletElement != ""){**/
+            appPath = App.currentVoletElement.slice(5);
             $.ajax({ 
                 url      : "/Liber8/compile",
                 type     : 'POST',
                 dataType : "json",
                 data     :{
-                              projectPath: appPath,
+                              nomProjet: appPath
                           },
                 success  : function(data) {  
                         }       
             });
-        }
+        
         
     });
     
