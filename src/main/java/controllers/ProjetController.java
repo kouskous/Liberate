@@ -409,12 +409,20 @@ public class ProjetController {
         }
         
         // Réussite
-        try{
-            returnObject.put("response", "true");
-            returnObject.put("content", pseudoUsers.toString());
-            returnObject.put("errors", "");
-            return returnObject.toString();
-        }
+       try{
+       	int i=0;
+           returnObject.put("response", "true");
+           JSONObject Inter1 = new JSONObject();
+           for(String s :  pseudoUsers){
+           	JSONObject Inter = new JSONObject();
+           	Inter.put("pseudo",s);
+            Inter1.put(Integer.toString(i), Inter);
+           	i++;
+           }
+           returnObject.put("content", Inter1);
+           returnObject.put("errors", "");
+           return returnObject.toString();
+       }
         // Json Fail
         catch(Exception e2){return null;}  
     }

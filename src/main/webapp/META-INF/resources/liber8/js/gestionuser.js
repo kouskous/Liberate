@@ -6,7 +6,7 @@
  */
 
  $( function() {
-    var elementsprojects = App.currentVoletElement.split('/')[1];
+     elementsprojects = App.currentVoletElement.split('/')[1];
     if (typeof elementsprojects  === "undefined") {
         $('.gestionsuser .alert-error').css("display","block");
         $('.gestionsuser .alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>Veuillez selectionner un projet</span>');
@@ -25,16 +25,18 @@
                       if(data.response ==="true") {
                          
                           var contenu = JSON.parse(data.content);
+                          
                          
                           
    
                               
                       for (i =0;i<Object.keys(contenu).length-1; i++) 
                       {
-                        
+                        console.log(Object.keys(contenu).length-1);
                           if(contenu[0].droit==='admin')
                           {
-                             
+                           
+                                 console.log("hh");
                           if(contenu[i+1].droit==='admin')
                           {
                               option1 ='reporteur';
@@ -59,7 +61,7 @@
                         		
                      
                   } else {
-                      console.log("no admin")
+                      
                        $('.gestionsuser .alert-error').css("display","block");
         $('.gestionsuser .alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>Vous n\'etes pas  un administrateur , nous ne pouvez pas changer les droits </span>');
     
@@ -81,6 +83,32 @@
      }
       
          });
+      console.log(elementsprojects);
+     
+      $.ajax({ 
+           url      : "/Liber8/getUsersNotInProject?nomProjet="+elementsprojects,
+          dataType : "json",
+          success  : function(data) { 
+             
+              var availableusers = new Array();
+              for(i=0;i<Object.keys(data.content).length;i++) {
+                  
+              
+         availableusers.push(data.content[i].pseudo);
+          
      }
+     console.log(availableusers);
+         
+         
+            $( "#usersname" ).autocomplete({
+               source: availableTags
+             });
+     
+     
+     
+          }
+      });
+  }
  });
+ 
  
