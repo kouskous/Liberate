@@ -1,30 +1,4 @@
-<%-- 
-    Document   : newProjet
-    Created on : Oct 20, 2016, 3:20:10 PM
-    Author     : Faddi sofiaa
---%>
-
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<!DOCTYPE html>
-<html>
-        <head>
-	
-	<!-- start: Meta -->
-	<meta charset="utf-8">
-	<title># L!BER8</title>
-
-	
-	<!-- start: Mobile Specific -->
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<!-- end: Mobile Specific -->
-	
-	<!-- start: CSS -->
-  
-     <link id="base-style-responsive" href="/Liber8/resources/liber8/css/newProjet.css" rel="stylesheet">
-	
-</head>
-    <body>    
-        <div class="container-fluid">
+<div class="container-fluid">
             <div class="row-fluid">
                 <div class="box" span12>
                 <div class="box-header" data-original-title>
@@ -118,12 +92,4 @@
     </div>
      </div>
 </div>    
-                <script src="/Liber8/resources/metro/js/jquery-1.9.1.min.js"></script>
-                <script src="/Liber8/resources/metro/js/jquery-migrate-1.0.0.min.js"></script>
-                <script src="/Liber8/resources/metro/js/jquery-ui-1.10.0.custom.min.js"></script>
-		<script src="/Liber8/resources/metro/js/bootstrap.min.js"></script>
                 <script src="/Liber8/resources/liber8/js/newProjet.js"></script>       
-
-	
-    </body>
-</html>
