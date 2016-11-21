@@ -124,10 +124,6 @@ $( document ).ready(function() {
         path = App.currentVoletElement.replace(/\//g,'-');
         path = path.replace('.','__');
         element = $("#"+path);
-        if (((path == "")||($(element).hasClass("isFile")))&&(url=="newFile")){
-            url = null;
-            toastr.warning('Veuillez sélectionner un dossier dans l\'arborescence');
-        }
         $.ajax({ 
         url      : "/Liber8/"+ url,
         dataType : "html",

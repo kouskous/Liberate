@@ -10,7 +10,7 @@
                         
                         <div class="box span6">
                             <div class="box-header" data-original-title="">
-						<h2><i class="halflings-icon edit"></i><span class="break"></span>GÃ©nÃ©ral</h2>
+						<h2><i class="halflings-icon edit"></i><span class="break"></span>Général</h2>
 					</div>
                            <div class="newproject">
                             <div class="projetinput">
@@ -39,7 +39,7 @@
 								  <div  class="rad" style="clear:both"></div>
 								  <label class="radio">
 									<input type="radio" name="optionsRadios" id="optionsRadios2" value="existant">
-									a partir d'un projet existant 
+									à partir d'un projet existant 
 								  </label>
 								</div>
 							  </div>
@@ -48,7 +48,7 @@
                             <div class="box-header" data-original-title="">
 						<h2><i class="icon-user"></i><span class="break"></span>Collaboration et partage</h2>
 					</div>
-                            <p> Cliquer sur le bouton plus pour ajouter des utilisateurs Ã  votre projets </p>
+                            <p> Cliquer sur le bouton plus pour ajouter des utilisateurs à votre projets </p>
                             <ul class='usernew'>
                             </ul>
                             <a href="#"  data-toggle="modal" data-target="#listuser" class="addbouton"><i class="icon-plus"></i></a>
