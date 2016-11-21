@@ -231,6 +231,19 @@ public class FichierUserDao {
         return null;
     }
     
+    public List<FichiersUsers> getLockedByUserAndProjet(User user,String projet){
+        TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findLockedByUserAndProjet", FichiersUsers.class);
+        query.setParameter("user", user);
+        query.setParameter("projet", projet);
+        List<FichiersUsers> results = query.getResultList();
+        
+        if(results.size()!=0){
+            if(results.get(0).getType())
+             return results;
+        }
+        return null;
+    }
+    
     public int getVerrouByPathLogique(User user,String pathLogique){
         TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByUserAndPath", FichiersUsers.class);
         query.setParameter("user", user);
@@ -242,6 +255,18 @@ public class FichierUserDao {
              return results.get(0).getVerrou();
         }
         return 5;
+    }
+    
+    public List<FichiersUsers> getLockedByUser(User user){
+        TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findLockedByUser", FichiersUsers.class);
+        query.setParameter("user", user);
+        List<FichiersUsers> results = query.getResultList();
+        
+        if(results.size()!=0){
+            if(results.get(0).getType())
+             return results;
+        }
+        return null;
     }
 
     /**
