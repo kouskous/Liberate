@@ -8,6 +8,7 @@ package controllers;
 import dao.FichierUserDao;
 import dao.ProjetDao;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -223,27 +224,51 @@ public class CompilationController {
             }
             
             // Executing make command
+            String pathToMakeFile = directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet;
             try{
-                String pathToMakeFile = directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet;
-                System.out.println(pathToMakeFile);
                 Runtime rt = Runtime.getRuntime();
                 Process pr = rt.exec("make", null, new File(pathToMakeFile));
-                
-                //String[] cmd = { "make", "cd " + pathToMakeFile};
-                //Process p = Runtime.getRuntime().exec(cmd);
+                pr.waitFor();
             }
             catch(Exception e){
                 System.out.println("Erreur pendant l'execution du makefile");
                 return false;
             }
             
-            return true;
+            // Moving exe to right folder
+            try{                
+                File file = new File(directoryPath + "/../../execs_" + user.getPseudo() + "/" + "exe");
+                file.getParentFile().mkdirs();
+                FileOutputStream fos = new FileOutputStream(file);
+                fos.write(Files.readAllBytes(
+                        Paths.get(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "exe")));
+                fos.close();
+            }
+            catch(Exception e){
+                System.out.println("Erreur pendant le déplacement de l'executable");
+                return false;
+            }
+           
+            // Deleting compile folder
+            try{
+                deleteFile(new File(pathToMakeFile + "/../../compile_" + user.getPseudo()));
+            }
+            catch(Exception e){
+                System.out.println("Erreur pendant la suppression du dossier de compile");
+                return false;
+            }
             
+            return true;
         }
-        
-        
         return false;
     }
         
-    
+    private void deleteFile(File element) {
+        if (element.isDirectory()) {
+            for (File sub : element.listFiles()) {
+                deleteFile(sub);
+            }
+        }
+        element.delete();
+    }
 }
