@@ -102,7 +102,7 @@ public class FileController {
                     FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathFichier"), 
                     fileName, 
                     fileName, 
-                    new Date(), FichiersUsers.Type.FICHIER, user);
+                    new Date(), FichiersUsers.Type.FICHIER, user, 0);
                     
                     if(newFile == null){
                         returnObject.put("errors", "Failed to create file");
@@ -193,7 +193,7 @@ public class FileController {
             fileName, 
             new Date(), 
             FichiersUsers.Type.DOSSIER, 
-            user);
+            user, 4);
             
             if(newFile == null){
                 throw new Exception("Erreur pendant la création du dossier");

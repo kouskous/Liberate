@@ -94,16 +94,6 @@ public class User implements Serializable {
     private Collection<Commentaire> commentaireCollection;
 
     public User() {
-        this.dateCreation = new Date();
-        this.dateModification = new Date();
-        this.userProjetCollection = new ArrayList<>();
-        this.demandeCollection = new ArrayList<>();
-        this.demandeCollection1 = new ArrayList<>();
-        this.fichiersUsersCollection = new ArrayList<>();
-        this.messageCollection = new ArrayList<>();
-        this.versionCollection = new ArrayList<>();
-        this.articleCollection = new ArrayList<>();
-        this.commentaireCollection = new ArrayList<>();
     }
 
     public User(String pseudo, String email, String nom, String prenom, Date dateCreation,
@@ -114,14 +104,6 @@ public class User implements Serializable {
         this.prenom = prenom;
         this.dateCreation = dateCreation;
         this.dateModification = dateModification;
-        this.userProjetCollection = new ArrayList<>();
-        this.demandeCollection = new ArrayList<>();
-        this.demandeCollection1 = new ArrayList<>();
-        this.fichiersUsersCollection = new ArrayList<>();
-        this.messageCollection = new ArrayList<>();
-        this.versionCollection = new ArrayList<>();
-        this.articleCollection = new ArrayList<>();
-        this.commentaireCollection = new ArrayList<>();
     }
     
     // Getters and setters

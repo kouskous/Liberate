@@ -75,13 +75,14 @@ public class FichiersUsers implements Serializable {
     }
 
     public FichiersUsers(String pathLogique, String nomPhysique, String nomReel, Date dateCreation,
-                         Type type, User user) {
+                         Type type, User user, int verrou) {
         this.pathLogique = pathLogique;
         this.nomPhysique = nomPhysique;
         this.nomReel = nomReel;
         this.dateCreation = dateCreation;
         this.type = type;
         this.user = user;
+        this.verrou = verrou;
     }
 
     public String getPathLogique() {
