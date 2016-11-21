@@ -121,9 +121,6 @@ public class FichierUserDao {
 
             if(dossier == null) {
                 fichiers = user.getFichiersUsersCollection();
-                //if(fichiers == null) {
-                  //  return arborescence;
-                //}
             }
 
             //si le fichier n'est pas un dossier
