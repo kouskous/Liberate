@@ -120,10 +120,7 @@ public class FichierUserDao {
             Collection<FichiersUsers> fichiers;
 
             if(dossier == null) {
-                fichiers = user.getFichiersUsersCollection();
-                //if(fichiers == null) {
-                  //  return arborescence;
-                //}
+                fichiers = getFichiersByUser(user);
             }
 
             //si le fichier n'est pas un dossier
@@ -161,7 +158,6 @@ public class FichierUserDao {
 
         // On essaye d'ajouter l'utilisateur à la persistence
         try{
-
             em.persist(newFichierUsers);
             return newFichierUsers;
         }
