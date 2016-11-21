@@ -7,7 +7,8 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
-    <head><link id="base-style-responsive" href="/Liber8/resources/liber8/css/newProjet.css" rel="stylesheet">
+    <head>
+        <link id="base-style-responsive" href="/Liber8/resources/liber8/css/newProjet.css" rel="stylesheet">
     </head>
        <body>    
         <div class="container-fluid">
@@ -21,13 +22,19 @@
                     
                
                  <p> Cliquer sur le bouton plus pour ajouter des utilisateurs à votre projet </p>
-                            <ul class='usernew'>
+                            <ul class='userproject'>
+                                
+                                
+                                
                             </ul>
                             <a href="#"  data-toggle="modal" data-target="#gestionuser" class="addbouton"><i class="icon-plus"></i></a>
-                      </div>      
+                 <div class="alert alert-error role alert"><i class="icon-exclamation-sign" aria-hidden="true"></i><span></span></div>  
+            
+                </div>      
                 <div class="form-actions">
 			<button type="submit" class="btn btn-primary" id="submitaddusrer">Appliquer</button>
 		</div>
+               
             </div>
         </div>
              <div class="modal fade" id="gestionuser" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -57,6 +64,7 @@
      </div>
 </div>    
       
-               
+     <script src="/Liber8/resources/liber8/js/gestionuser.js"></script> 
+     
     </body>
 </html>

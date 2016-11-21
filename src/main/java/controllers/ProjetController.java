@@ -219,7 +219,8 @@ public class ProjetController {
     @ResponseBody
     @RequestMapping(value="/getUsersInProject", method = RequestMethod.GET, produces = "application/json")
     public String getUsersInProject(HttpServletRequest request, ModelMap model){
-        
+        HttpSession session= request.getSession();
+       User user = (User)session.getAttribute("user");
         // On créé l'objet à retourner
         JSONObject returnObject = new JSONObject();
 
@@ -281,17 +282,27 @@ public class ProjetController {
                 catch(Exception e2){return null;} 
             }
             else{
-                for (int i = 0; i < myList.size(); i++){
-                    //pseudoUsers.add(myList.get(i).getPseudo());
-                    jsonPseudoDroits.put("utilisateur" + Integer.toString(i), myList.get(i).getPseudo());
-                    String droitsUtilisateur = userProjetDao.getDroits(myList.get(i), projet);
-                    if(droitsUtilisateur != null){
-                        jsonPseudoDroits.put("droit" + Integer.toString(i), droitsUtilisateur);
-                    }
-                    else{
-                        throw new Exception("Erreur pendant la récupération des utilisateurs du projet");
-                    }
-                }
+         
+                int j =1;
+            for (int i = 0; i < myList.size(); i++){
+                  //pseudoUsers.add(myList.get(i).getPseudo());
+                        JSONObject jsonInter = new JSONObject();
+                  jsonInter.put("utilisateur", myList.get(i).getPseudo());
+                  String droitsUtilisateur = userProjetDao.getDroits(myList.get(i), projet);
+                  if(droitsUtilisateur != null){
+                      jsonInter.put("droit", droitsUtilisateur);
+                     if(myList.get(i).getPseudo().equals(user.getPseudo())){
+                        jsonPseudoDroits.put( "0",jsonInter);
+                        }else{
+                        jsonPseudoDroits.put( Integer.toString(j),jsonInter);
+                                j++;
+                        }
+
+                  }
+                  else{
+                      throw new Exception("Erreur pendant la récupération des utilisateurs du projet");
+                  }
+              }
             }
         }
         catch(Exception e){

@@ -93,3 +93,14 @@ background: #646464;
 .gestionsuser h3 , .gestionsuser p {
     padding:0 10px;
 }
+.userproject li {
+    list-style-type: none;
+}
+.gestionsuser .alert-error {
+    display:none;
+}
+#gestionuser {
+        width: 60% !important;
+    margin: 0 auto !important;
+    left: 20% !important;
+}
