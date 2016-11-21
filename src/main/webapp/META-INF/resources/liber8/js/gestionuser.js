@@ -22,6 +22,7 @@
                  dataType : "json",
                  type     : "GET",
                   success  : function(data) {  
+                      console.log(data);
                       if(data.response ==="true") {
                          
                           var contenu = JSON.parse(data.content);
@@ -32,7 +33,7 @@
                               
                       for (i =0;i<Object.keys(contenu).length-1; i++) 
                       {
-                        console.log(Object.keys(contenu).length-1);
+                        console.log(contenu[0].droit);
                           if(contenu[0].droit==='admin')
                           {
                            
@@ -61,10 +62,9 @@
                         		
                      
                   } else {
+                      console.log("no admin");
                       
-                       $('.gestionsuser .alert-error').css("display","block");
-        $('.gestionsuser .alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>Vous n\'etes pas  un administrateur , nous ne pouvez pas changer les droits </span>');
-    
+                      
                       
                   }
                       }
@@ -90,24 +90,67 @@
           dataType : "json",
           success  : function(data) { 
              
-              var availableusers = new Array();
+               availableusers = new Array();
               for(i=0;i<Object.keys(data.content).length;i++) {
                   
               
          availableusers.push(data.content[i].pseudo);
           
      }
-    
-         
+         console.log('adminjdjd');
+         console.log(availableusers);
          
             $( "#usersname" ).autocomplete({
-               source: availableTags
+               source: availableusers
              });
      
      
      
           }
       });
+      var max_input     = 10; //le nombre maximun des input
+    var adduser       = $("#adduser"); // div contenant tout les utilisateurs
+    var add_button      = $("#adduserbouton"); //Ajouter bouton id
+    
+     numberinput=0;
+            $(add_button).click(function(e){ //on add input button click
+                 e.preventDefault();
+                
+                if(numberinput < max_input){ //max input box allowed
+                    numberinput++; //text box increment
+                   
+                   var getname=$('#usersname').val();
+                     
+           	        	if (jQuery.inArray(getname,availableusers) === -1  || getname ==="") {
+                            $('#gestionsuser .modal-body .alert-error').css('display','block');
+    				                $('.gestionsuser .modal-body .alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>Le nom est incorrect ! Réessayer </span>');
+  			             	}
+                                        
+           	        	else {
+                                    console.log("fermer");
+                            $('#gestionsuser .modal-body .alert-error').css('display','none');
+                            $('#gestionuser').modal('hide');
+                            $('#usersname').val("");
+           			             $(".userproject").append('<li><div class="control-group">\n\
+				                  	<label class="control-label userline" for="selectError'+numberinput+'">'+getname+'</label>\n\
+					                   <div class="controls userline"><select id="selectError'+numberinput+'" data-rel="chosen" name="droit'+numberinput+'" class="droit"><option value="admin">admin</option>\n\
+					                   <option value="reporteur">reporteur</option><option class="developpeur">developpeur</option></select><a class="remove_field"><input type="hidden" value="'+getname+'" class="utilisateur'+numberinput+'" name="utilisateur'+numberinput+'"><i class="icon-trash"></i></a></div></div>'); //add input box
+                        		for(var i = availableusers.length - 1; i >= 0; i--) {
+    if(availableusers[i] === getname) {
+       availableusers.splice(i, 1);
+    }
+}
+
+            
+            }
+            
+                }
+                                        
+           
+        });
+      numberpofelement = $('ul.userproject li').size();
+      console.log( numberpofelement);
+       
   }
  });
  
