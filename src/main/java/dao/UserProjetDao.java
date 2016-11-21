@@ -21,21 +21,11 @@ import org.springframework.stereotype.Repository;
  *
  * @author Luc Di Sanza
  */
+@Transactional
 public class UserProjetDao {
-    
+
+    @PersistenceContext
     EntityManager em;
-    
-    public UserProjetDao(){
-        
-    }
-    
-    public EntityManager getEntityManager(){
-        return this.em;
-    }
-    
-    public UserProjetDao(EntityManager em){
-        this.em = em;
-    }
     
     // Cherche le UserProjet dans la BDD
     // - renvoie null si il n'y est pas.
@@ -69,8 +59,6 @@ public class UserProjetDao {
     public UserProjet createNewUserProjet(String typeDroit, Date dateCreation, Date dateModification, 
             User user, Projet projet){
         
-        em.getTransaction().begin();
-        
         if (user != null && projet != null){
             
             // Création nouveau UserProjet
@@ -78,9 +66,8 @@ public class UserProjetDao {
             
             // On essaye d'ajouter le UserProjet à la persistence
             try{
-               
+
                 em.persist(newUserProjet);
-                em.getTransaction().commit();
                 return newUserProjet;
             }
             catch(Exception e){
@@ -105,9 +92,7 @@ public class UserProjetDao {
             
             // Si on l'a trouvé, on le supprime
             if(userProjetToDelete != null){
-                em.getTransaction().begin();
                 em.remove(userProjetToDelete);
-                em.getTransaction().commit();
                 return true;
             }
             else{
@@ -155,7 +140,6 @@ public class UserProjetDao {
     // TypeDroit doit faire partie de {"Admin", "Dev", "Reporter"}
     // - Renvoie vrai si réussite
     // - Faux sinon
-    @Transactional
     public boolean changeDroitsUserProjet(String typeDroit, UserProjet userProjet){
         
         // Vérification que typeDroit est une chaine de caractère valide
@@ -163,9 +147,7 @@ public class UserProjetDao {
             userProjet.setTypeDroit(typeDroit);
       
             try{
-                em.getTransaction().begin();
                 em.persist(em);
-                em.getTransaction().commit();
                 return true;
             }
             catch (Exception e){

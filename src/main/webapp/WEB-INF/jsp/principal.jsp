@@ -18,6 +18,8 @@
         <link id="base-style-responsive" href="/Liber8/resources/liber8/css/principal.css" rel="stylesheet">
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&subset=latin,cyrillic-ext,latin-ext' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="/Liber8/resources/EasyTree/skin-win8/ui.easytree.css">
+        <link id="base-style-responsive" href="/Liber8/resources/liber8/css/newProjet.css" rel="stylesheet">
+        <link rel="stylesheet" href="/Liber8/resources/Toastr/build/toastr.css"/>
         <!-- end: CSS -->
 	
 
@@ -184,6 +186,7 @@
 	
 	<!-- start: JavaScript-->
 
+                
 		<script src="/Liber8/resources/metro/js/jquery-1.9.1.min.js"></script>
                 
                 <script src="/Liber8/resources/metro/js/jquery-migrate-1.0.0.min.js"></script>
@@ -246,8 +249,12 @@
                 
                 <script src="/Liber8/resources/EasyTree/jquery.easytree.js"></script>  
                 
-                <script src="/Liber8/resources/liber8/js/principal.js"></script>
+                <script src="/Liber8/resources/blockUi/jquery.blockUI.js"></script>
                 
+                <script src="/Liber8/resources/Toastr/toastr.js"></script>
+                
+                <script src="/Liber8/resources/liber8/js/principal.js"></script>
+
                 <script src="/Liber8/resources/Ace/src/ace.js" type="text/javascript" charset="utf-8"></script>
                  
                 
@@ -256,7 +263,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <button id="close_modal_btn" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>
       <div id="modal_content">
       </div>
