@@ -20,18 +20,12 @@ import org.springframework.stereotype.Repository;
  *
  * @author Luc Di Sanza
  */
+@Transactional
 public class ProjetDao {
-    
+
+    @PersistenceContext
     EntityManager em;
-    
-    public ProjetDao(){
-        
-    }
-    
-    public EntityManager getEntityManager(){
-        return this.em;
-    }
-    
+
     public ProjetDao(EntityManager em){
         this.em = em;
     }
@@ -65,15 +59,12 @@ public class ProjetDao {
     // Renvoie le projet si réussite
     // Renvoie null sinon
     public Projet createNewProjet(String nom, Date dateCreation, Date dateModification, String langage){
-        
+
         // On essaye d'ajouter le projet à la persistence
         try{
-            em.getTransaction().begin();
-            
             // Création nouveau projet
             Projet newProjet = new Projet(nom, dateCreation, dateModification, langage);
             em.persist(newProjet);
-            em.getTransaction().commit();
             return newProjet;
         }
         catch(Exception e){
@@ -95,9 +86,7 @@ public class ProjetDao {
             
             // Si on l'a trouvé, on le supprime
             if(projetToDelete != null){
-                em.getTransaction().begin();
                 em.remove(projetToDelete);
-                em.getTransaction().commit();
                 return true;
             }
             else{

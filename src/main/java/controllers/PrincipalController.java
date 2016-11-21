@@ -13,6 +13,8 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import models.FichiersUsers;
 import models.User;
 import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
@@ -69,10 +71,10 @@ public class PrincipalController {
     
     JSONArray list = new JSONArray();
         
-    Map<String, Boolean> arborescence = fichierUserDao.getArborescence(user);
-    for (Map.Entry<String, Boolean> fichier: arborescence.entrySet()) {
+    Map<String, FichiersUsers.Type> arborescence = fichierUserDao.getArborescence(user);
+    for (Map.Entry<String, FichiersUsers.Type> fichier: arborescence.entrySet()) {
         JSONObject response = new JSONObject();
-        if(fichier.getValue() == true){
+        if(fichier.getValue() == FichiersUsers.Type.FICHIER){
             try{
                 response.put("path","/Root"+fichier.getKey());
                 response.put("type","fichier");

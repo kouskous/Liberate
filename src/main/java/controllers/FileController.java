@@ -102,7 +102,7 @@ public class FileController {
                     FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathFichier"), 
                     fileName, 
                     fileName, 
-                    new Date(), true, user);
+                    new Date(), FichiersUsers.Type.FICHIER, user);
                     
                     if(newFile == null){
                         returnObject.put("errors", "Failed to create file");
@@ -180,7 +180,7 @@ public class FileController {
                     FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathFichier"), 
                     null, 
                     fileName, 
-                    new Date(), false, user);
+                    new Date(), FichiersUsers.Type.DOSSIER, user);
                     
                     if(newFile == null){
                         returnObject.put("errors", "Failed to create file");
