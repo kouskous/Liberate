@@ -6,7 +6,9 @@
 package dao;
 
 import java.util.Date;
+import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import models.FichiersVersion;
 import models.Version;
 
@@ -50,6 +52,18 @@ public class FichiersVersionDao{
             System.out.println(e.getMessage());
             return null;
         }
+    }
+    
+    public List<FichiersVersion> getFileByVersion(Version version){
+        TypedQuery<FichiersVersion> query = em.createNamedQuery("FichiersUsers.findByVersion", FichiersVersion.class);
+        query.setParameter("version", version);
+        List<FichiersVersion> results = query.getResultList();
+        
+        if(results.size()!=0){
+            if(results.get(0).getType())
+             return results;
+        }
+        return null;
     }
     
 }
