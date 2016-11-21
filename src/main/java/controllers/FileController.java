@@ -12,15 +12,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.transaction.Transactional;
 import models.FichiersUsers;
 import models.User;
 import org.json.JSONArray;
@@ -55,7 +52,10 @@ public class FileController {
     public String index(HttpServletRequest request, ModelMap model){
         return "newFile";
     }
-    
+    @RequestMapping(value="/newDossier", method = RequestMethod.GET)
+    public String indexD(HttpServletRequest request, ModelMap model){
+        return "newDossier";
+    }
     @RequestMapping(value="/saveFile", method = RequestMethod.GET)
     public String indexSave(HttpServletRequest request, ModelMap model){
         return "saveFile";
@@ -102,7 +102,7 @@ public class FileController {
                     FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathFichier"), 
                     fileName, 
                     fileName, 
-                    new Date(), true, user);
+                    new Date(), FichiersUsers.Type.FICHIER, user);
                     
                     if(newFile == null){
                         returnObject.put("errors", "Failed to create file");
@@ -155,69 +155,70 @@ public class FileController {
     @RequestMapping(value="/newDossier", method = RequestMethod.POST, produces = "application/json")
     public String newDossier(HttpServletRequest request, ModelMap model){           
         
-        EntityManager em = fichierUserDao.getEntityManager();
-        
         // On créé l'objet à retourner
         JSONObject returnObject = new JSONObject();   
         
-        try{
-            returnObject.put("response", "");
-            returnObject.put("errors", "");
-            
-            // On vérifie qu'une session est bien ouverte
-            HttpSession session= request.getSession();
-            User user = (User)session.getAttribute("user");
-
-            if(user == null){
+        // On vérifie qu'une session est bien ouverte
+        HttpSession session= request.getSession();
+        User user = (User)session.getAttribute("user");
+        
+        if(user == null){
+            try{
+                returnObject.put("response", "false");
+                returnObject.put("content", "");
                 returnObject.put("errors", "No user");
                 return returnObject.toString();
             }
-            else{
-                    em.getTransaction().begin();
-                    
-                    String fileName = extractFileName((String)request.getParameter("pathFichier"));
-                    System.out.print(fileName);
-                    FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathFichier"), 
-                    null, 
-                    fileName, 
-                    new Date(), false, user);
-                    
-                    if(newFile == null){
-                        returnObject.put("errors", "Failed to create file");
-                        return returnObject.toString();
-                    }
-                    else{
-                        try{
-                            em.persist(newFile);
-                            em.getTransaction().commit();
-                            em.close();
-                            
-                            returnObject.put("response",true);
-                            return returnObject.toString();
-                        }
-                        catch(Exception e){
-                            em.close();
-                            returnObject.put("errors","Erreur BDD");
-                            return returnObject.toString();
-                        }
-                    }
+            // JSon fail
+            catch(Exception e){return null;}
+        }
+        
+        // Extraction du nom de dossier
+        String fileName = extractFileName((String)request.getParameter("pathDossier"));
+        if(fileName == null){
+            try{
+                returnObject.put("response", "false");
+                returnObject.put("content", "");
+                returnObject.put("errors", "Erreur pendant la récupération du nom de dossier");
+                return returnObject.toString();
+            }
+            // JSon fail
+            catch(Exception e){return null;}
+        }
+        
+        // Création du dossier
+        try{
+            FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathDossier"), 
+            fileName, 
+            fileName, 
+            new Date(), 
+            FichiersUsers.Type.DOSSIER, 
+            user);
+            
+            if(newFile == null){
+                throw new Exception("Erreur pendant la création du dossier");
             }
         }
         catch(Exception e){
-            System.out.println("Erreur JSON");
-            System.out.println(e.getMessage());
-            
-            //TODO: ce try-catch ne sert qu'à afficher les erreurs
             try{
-                JSONObject obj = new JSONObject();
-                obj.put("errors",e.getMessage());
-                return obj.toString();
+                returnObject.put("response", "false");
+                returnObject.put("content", "");
+                returnObject.put("errors", "Erreur pendant la création du dossier");
+                return returnObject.toString();
             }
-            catch(Exception er){
-                
-            }
-            return null;
+            // JSon fail
+            catch(Exception e2){return null;}
         }
+        
+        // Réussite
+        try{
+            returnObject.put("response", "true");
+            returnObject.put("content", "");
+            returnObject.put("errors", "");
+            return returnObject.toString();
+        }
+        // Json fail
+        catch(Exception e){return null;}
     }
         
     // Enregistre un fichier
@@ -329,8 +330,9 @@ public class FileController {
     JSONArray list = new JSONArray();
         
     FichiersUsers file = fichierUserDao.getPathByPathLogique(user,request.getParameter("pathLogique"));
+    System.out.println("REQUEST"+request.getParameter("pathLogique"));
     String pathPhysique =file.getNomPhysique();
-    List<FichiersUsers> files =fichierUserDao.getPathsByPathLogique(user,request.getParameter("pathLogique"));
+    List<FichiersUsers> files =fichierUserDao.getPathsByPathLogique(user,request.getParameter("pathFichier"));
     int verrou = file.getVerrou();
     if(verrou==0){
         boolean verrouillage = fichierUserDao.changeVerrou(file, 2);

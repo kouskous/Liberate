@@ -7,20 +7,26 @@ package controllers;
 
 import dao.FichierUserDao;
 import dao.ProjetDao;
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import models.FichiersUsers;
 import models.Projet;
 import models.User;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -150,7 +156,7 @@ public class CompilationController {
         }
         
         // Récupération de l'arborescence du projet
-        Map<String, Boolean> arborescence = fichierUserDao.getArborescence(user, racineProjet);
+        Map<String, FichiersUsers.Type> arborescence = fichierUserDao.getArborescence(user, racineProjet);
         if(arborescence == null){
             System.out.println("Erreur pendant la récupération de l'arborescence");
             return false;
@@ -159,10 +165,10 @@ public class CompilationController {
   
         // Construction du dossier à partir des paths logiques
         // Pour chaque entrée de l'arborescence
-        for (Map.Entry<String, Boolean> entry : arborescence.entrySet())
+        for (Map.Entry<String, FichiersUsers.Type> entry : arborescence.entrySet())
         {
             // Si c'est un fichier
-            if(entry.getValue() == true){
+            if(entry.getValue() == FichiersUsers.Type.FICHIER){
                 try{              
                     // Getting file content
                     String fileName = extractFileName(entry.getKey());
@@ -271,4 +277,30 @@ public class CompilationController {
         }
         element.delete();
     }
+
+    // Téléchargement de l'executable
+    @ResponseBody
+    @RequestMapping(value="/downloadExec", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public FileSystemResource downloadExec(HttpServletRequest request, ModelMap model, HttpServletResponse response)
+    {
+        // Récupération de la session de l'utilisateur
+        HttpSession session= request.getSession();
+        User user = (User)session.getAttribute("user");
+        
+        // Si pas d'utilisateur connecté
+        if(user == null){
+            return null;
+        }
+        
+        try {
+            ServletContext ctx = request.getServletContext();
+            String path = ctx.getRealPath("/");
+            String pathToExec = path + "/../../execs_" + user.getPseudo() + "/" + "exe";
+            return new FileSystemResource(pathToExec); 
+        } 
+        catch (Exception e) {
+            return null;
+        }
+    }
+
 }

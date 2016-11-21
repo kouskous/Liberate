@@ -56,8 +56,10 @@ public class LoginController {
             } else {
                 error = "mot de passe incorrect";
             }
-        } catch (Exception e) {
-            error = "Erreur : plusieurs utilisateurs ont le même pseudo !"+e.getLocalizedMessage();
+        } catch (IllegalArgumentException e) {
+            error = "Erreur : illegal Argument ! "+e.getLocalizedMessage();
+        }catch (Exception e) {
+            error = "Erreur : plusieurs utilisateurs ont le même pseudo ! "+e.getLocalizedMessage();
         }
         model.addAttribute("error", error);
 
