@@ -154,10 +154,10 @@ public class FichierUserDao {
     // Renvoie le fichier si réussite
     // Renvoie null sinon
     public FichiersUsers createNewFichierUser(String pathLogique, String nomPhysique, String nomReel, Date dateCreation,
-                                              FichiersUsers.Type type, User user){
+                                              FichiersUsers.Type type, User user, int verrou){
 
         // Création nouvel utilisateur
-        FichiersUsers newFichierUsers = new FichiersUsers(pathLogique, nomPhysique, nomReel, dateCreation, type, user);
+        FichiersUsers newFichierUsers = new FichiersUsers(pathLogique, nomPhysique, nomReel, dateCreation, type, user, verrou);
 
         // On essaye d'ajouter l'utilisateur à la persistence
         try{

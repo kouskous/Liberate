@@ -128,7 +128,7 @@ public class ProjetController {
                             if(userProjet != null){
                                 try{
                                     // On créé le dossier vide du projet pour l'admin
-                                    FichiersUsers newFile = fichierUserDao.createNewFichierUser("/" + nomProjet, nomProjet, nomProjet, new Date(), FichiersUsers.Type.DOSSIER, user);
+                                    FichiersUsers newFile = fichierUserDao.createNewFichierUser("/" + nomProjet, nomProjet, nomProjet, new Date(), FichiersUsers.Type.DOSSIER, user, 4);
 
                                     // Pour chaque autre utilisateur a ajouter, on le trouve dans la BDD et on l'ajoute avec ses droits
                                     for (int i = 0; i < usersProjet.size(); i++){
