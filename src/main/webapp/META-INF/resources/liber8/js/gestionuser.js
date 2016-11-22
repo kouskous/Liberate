@@ -111,7 +111,9 @@
       var max_input     = 10; //le nombre maximun des input
     var adduser       = $("#adduser"); // div contenant tout les utilisateurs
     var add_button      = $("#adduserbouton"); //Ajouter bouton id
-    
+      $(".closebtn").click(function(e){ //on add input button click
+                $('#gestionuser').modal('hide');
+             });
      numberinput=0;
             $(add_button).click(function(e){ //on add input button click
                  e.preventDefault();
@@ -127,7 +129,7 @@
   			             	}
                                         
            	        	else {
-                                    console.log("fermer");
+                                   
                             $('#gestionsuser .modal-body .alert-error').css('display','none');
                             $('#gestionuser').modal('hide');
                             $('#usersname').val("");
@@ -152,6 +154,56 @@
       console.log( numberpofelement);
        
   }
+  
+  
+   $("#submitaddusrer").click(function(e){
+             
+           $('#nomProjet').removeClass("bordure");
+          
+            var utilisateur = {};
+            var droit = {};
+            var i =0;
+            var j =0;
+            $('input:hidden').each(function(){
+            utilisateur[i++] = this.value;
+            
+});
+            $('.droit').each(function(){
+            droit[j++] = this.value;
+            
+});
+             $.ajax({ 
+                url      : "/Liber8/newUserProject",
+                dataType : "json",
+                type     : "POST",
+                data     : {
+                       nomProjet :  elementsprojects,
+                       utilisateur: JSON.stringify(utilisateur),
+                       droit: JSON.stringify(droit)
+                   },
+                           
+                success  : function(data) {
+                    console.log(data);
+                   
+                   if(data.errors!==""){
+                    
+                         $('#projet .modal-content .alert-error').css('display','block');
+                          $('#listuser .modal-body .alert-error').css('display','none');
+                         $('#projet .modal-content .alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>'+data.errors+ '</span>');
+        }
+                    
+                    else if(data.response==="true"){
+                         $('#projet .modal-content .alert-error').css('display','none');
+                          $('#projet').removeClass("in");
+                          $(".modal-backdrop").removeClass("in");
+                          $(".modal-backdrop").css("display","none");
+                    }
+                }
+            });
+                
+                
+                
+    });
  });
  
  

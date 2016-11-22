@@ -20,6 +20,7 @@ import models.Projet;
 import models.User;
 import models.UserProjet;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -133,6 +134,9 @@ public class ProjetController {
                                     // Pour chaque autre utilisateur a ajouter, on le trouve dans la BDD et on l'ajoute avec ses droits
                                     for (int i = 0; i < usersProjet.size(); i++){
                                         User newUser = userDao.getUserByPseudo(usersProjet.get(i));
+                                           System.out.println(projet);
+            System.out.println(newUser);
+            System.out.print(droitsUsers.get(i));
                                         userProjetDao.createNewUserProjet(droitsUsers.get(i), new Date(), new Date(), newUser, projet);
                                         if(userProjetDao == null)
                                             throw new Exception();
@@ -431,15 +435,34 @@ public class ProjetController {
     // - La requête doit contenir les champs "nomProjet", "utilisateur" et "droit"
     @ResponseBody
     @RequestMapping(value="/newUserProject", method = RequestMethod.POST, produces = "application/json")
-    public String newUserProject(HttpServletRequest request, ModelMap model){
+    public String newUserProject(HttpServletRequest request, ModelMap model) throws JSONException, Exception{
         
         // On créé l'objet à retourner
         JSONObject returnObject = new JSONObject();
 
         // Récupération des paramètres
         String nomProjet = (String)request.getParameter("nomProjet");
+        System.out.println(nomProjet);
         String pseudo = (String)request.getParameter("utilisateur");
+        System.out.println(pseudo);
         String droit = (String)request.getParameter("droit");
+        System.out.println(droit);
+                     JSONObject jsonUsersProjet = new JSONObject(request.getParameter("utilisateur"));
+                    JSONObject jsonDroitsProjet = new JSONObject(request.getParameter("droit"));
+                    ArrayList<String> usersProjet = new ArrayList<String>();
+                    ArrayList<String> droitsUsers = new ArrayList<String>();
+                    
+                    for (int i = 0; i <= 9; i++){
+                        if(jsonUsersProjet.has(Integer.toString(i)) && !jsonUsersProjet.get(Integer.toString(i)).equals("")){
+                            usersProjet.add((String)jsonUsersProjet.get(Integer.toString(i)));
+                        }
+                        
+                        if(jsonDroitsProjet.has(Integer.toString(i)) && !jsonDroitsProjet.get(Integer.toString(i)).equals("")){
+                            droitsUsers.add((String)jsonDroitsProjet.get(Integer.toString(i)));
+                        }
+                        System.out.print(droitsUsers);
+                    }
+                    
         if(nomProjet == null || pseudo == null || droit == null){
             try{
                 returnObject.put("response", "false");
@@ -450,14 +473,19 @@ public class ProjetController {
             // JSon Fail
             catch(Exception e){return null;}
         }
+                    
         
          // On cherche le projet et l'utilisateur dans la bdd
-        Projet projet;
-        User user;
+       
+     
         try{
-            projet = projetDao.getProjetByName(nomProjet);
-            user = userDao.getUserByPseudo(pseudo);
-         
+             Projet projet = projetDao.getProjetByName(nomProjet);
+           for (int i = 0; i < usersProjet.size(); i++){
+          
+           User user = userDao.getUserByPseudo(usersProjet.get(i));
+            System.out.println(user);
+            
+          System.out.println(projet);
             if(projet == null || user == null){
                 try{
                     returnObject.put("response", "false");
@@ -467,6 +495,7 @@ public class ProjetController {
                 }
                 // Json Fail
                 catch(Exception e2){return null;} 
+            }
             }
         }
         catch(Exception e){
@@ -482,9 +511,16 @@ public class ProjetController {
         
         // On ajoute l'utilisateur au projet
         try{
-            UserProjet userProjet = userProjetDao.createNewUserProjet(droit, new Date(), new Date(), user, projet);
-            if(userProjet == null){
-                try{
+             Projet projet = projetDao.getProjetByName(nomProjet);
+             System.out.println(usersProjet.size());
+            for (int i = 0; i < usersProjet.size(); i++){
+            User newUser = userDao.getUserByPseudo(usersProjet.get(i));
+            System.out.println(droitsUsers.get(i));
+            System.out.println(projet);
+            System.out.println(newUser);
+            userProjetDao.createNewUserProjet(droitsUsers.get(i), new Date(), new Date(), newUser,  projet); 
+             
+            try{
                     returnObject.put("response", "false");
                     returnObject.put("content", "");
                     returnObject.put("errors", "Erreur pendant l'assignation de l'utilisateur au projet");
@@ -492,13 +528,15 @@ public class ProjetController {
                 }
                 // Json Fail
                 catch(Exception e2){return null;} 
-            }
+            
+             }
         }
         catch(Exception e){
             try{
                 returnObject.put("response", "false");
                 returnObject.put("content", "");
                 returnObject.put("errors", "Erreur pendant l'assignation de l'utilisateur au projet");
+                System.out.println(e.getMessage());
                 return returnObject.toString();
             }
             // Json Fail
