@@ -147,7 +147,7 @@ public class UserProjetDao {
             userProjet.setTypeDroit(typeDroit);
       
             try{
-                em.persist(em);
+                em.persist(userProjet);
                 return true;
             }
             catch (Exception e){
