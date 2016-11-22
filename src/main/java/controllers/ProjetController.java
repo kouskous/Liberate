@@ -467,12 +467,13 @@ public class ProjetController {
             }
         }
         
-         // On cherche le projet et les utilisateurs dans la bdd
-         ArrayList<User> usersProjet = new ArrayList<User>();
+        // On cherche le projet et les utilisateurs dans la bdd
+        ArrayList<User> usersProjet = new ArrayList<User>();
+        Projet projet;
         try{
-            Projet projet = projetDao.getProjetByName(nomProjet);
+            projet = projetDao.getProjetByName(nomProjet);
            
-                for (int i = 0; i < usersProjet.size(); i++){
+                for (int i = 0; i < pseudoUsersProjet.size(); i++){
           
                     User user = userDao.getUserByPseudo(pseudoUsersProjet.get(i));
             
@@ -503,8 +504,6 @@ public class ProjetController {
         
         // On ajoute les utilisateurs au projet
         try{
-            Projet projet = projetDao.getProjetByName(nomProjet);
-
             for (int i = 0; i < usersProjet.size(); i++){
                 UserProjet newUser = userProjetDao.createNewUserProjet(droitsUsers.get(i), new Date(), new Date(), usersProjet.get(i),  projet); 
 
