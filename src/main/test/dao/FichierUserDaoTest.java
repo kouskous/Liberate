@@ -81,7 +81,7 @@ public class FichierUserDaoTest {
         Assert.assertEquals(florian ,fichierFlorian.getUser());
         Assert.assertEquals(FichiersUsers.Type.DOSSIER ,dossierFlorian.getType());
 
-        Assert.assertEquals(null, fichierRemiSansFichier);
+        Assert.assertNull(fichierRemiSansFichier);
     }
 
     @Test
@@ -109,7 +109,7 @@ public class FichierUserDaoTest {
         Assert.assertEquals(FichiersUsers.Type.DOSSIER ,dossierFlorian.getType());
         Assert.assertEquals("dossierTest" ,dossierFlorian.getNomPhysique());
 
-        Assert.assertEquals(null, fichierInexistant);
+        Assert.assertNull(fichierInexistant);
     }
 
     @Test
@@ -166,8 +166,8 @@ public class FichierUserDaoTest {
         Assert.assertTrue(resultTrueDossier);
         Assert.assertFalse(resultFalse);
 
-        Assert.assertEquals(null, fichierUserDAO.getFichierUserByNomPhysique("nomPhysiqueTest"));
-        Assert.assertEquals(null, fichierUserDAO.getFichierUserByNomPhysique("dossierTest"));
+        Assert.assertNull(fichierUserDAO.getFichierUserByNomPhysique("nomPhysiqueTest"));
+        Assert.assertNull(fichierUserDAO.getFichierUserByNomPhysique("dossierTest"));
     }
 
     @Test

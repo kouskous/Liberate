@@ -75,7 +75,7 @@ public class UserProjetDaoTest {
         Assert.assertTrue(resultTrue);
         Assert.assertFalse(resultFalse);
 
-        Assert.assertEquals(null, userProjetDao.getUserProjetByUIdPId(florian.getIdUser(), projetFlorian.getIdProjet()));
+        Assert.assertNull(userProjetDao.getUserProjetByUIdPId(florian.getIdUser(), projetFlorian.getIdProjet()));
     }
 
     @Test
