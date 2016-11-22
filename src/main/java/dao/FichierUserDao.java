@@ -253,7 +253,6 @@ public class FichierUserDao {
     }
 
     // TODO: toutes les autres fonctions de modification qu'on aura besoin.
-
     public boolean changeVerrou(FichiersUsers fichierToChange, int verrou){
         if(fichierToChange != null){
             fichierToChange.setVerrou(verrou);
