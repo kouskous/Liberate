@@ -197,18 +197,6 @@ public class UserDao {
         return false;
     }
     
-
-    // Cherche les pseudos contenant une chaine de caractères donnée
-    public List<String> searchUsersByName(String pseudo)
-    {      
-        // Recherche de users par pseudo
-        TypedQuery<String> query = em.createNamedQuery("Pseudo.search", String.class);
-        query.setParameter("name", "%" + pseudo + "%");
-        List<String> results = query.getResultList();
-        
-        return results;
-    }
-    
     // Renvoi la liste de tous les pseudos d'utilisateurs
     public List<String> getAllPseudo()
     {      
