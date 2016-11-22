@@ -17,75 +17,66 @@
      else {
         $('.userproject .alert-error').css("display","none");
     
-          $.ajax({ 
-                 url      : "/Liber8/getUsersInProject?nomProjet="+elementsprojects,
-                 dataType : "json",
-                 type     : "GET",
-                  success  : function(data) {  
-                      console.log(data);
-                      if(data.response ==="true") {
-                         
-                          var contenu = JSON.parse(data.content);
-                          
-                         
-                          
-   
-                              
-                      for (i =0;i<Object.keys(contenu).length-1; i++) 
-                      {
+        $.ajax({ 
+                url      : "/Liber8/getUsersInProject?nomProjet="+elementsprojects,
+                dataType : "json",
+                type     : "GET",
+                success  : function(data) {  
+                    console.log(data);
+                    if(data.response ==="true") {
+                        var contenu = JSON.parse(data.content); 
                         console.log(contenu[0].droit);
-                          if(contenu[0].droit==='admin')
-                          {
+                        for (i =0;i<Object.keys(contenu).length-1; i++) 
+                            {
+                                if(contenu[i+1].droit==='admin')
+                                    {
+                                        option1 ='reporteur';
+                                        option2 = 'developpeur';
+                                    }
+                                else if(contenu[i+1].droit==='reporteur')
+                                    {
+                                        option1 ='admin';
+                                        option2 = 'developpeur';
+                                    }
+                                else if(contenu[i+1].droit==='developpeur')
+                                   {
+                                        option1 ='admin';
+                                        option2 = 'reporteur';
+                                    }  
+                                if(contenu[0].droit=='admin')
+                                    {
+                                        console.log(contenu[0].droit);
+                                        $(".userproject").append('<li><div class="control-group">\n\
+                                        <label class="control-label userline" for="selectError'+i+'">'+contenu[i+1].utilisateur+'</label>\n\
+                                        <div class="controls userline"><select id="selectError'+i+1+'" data-rel="chosen" name="droit'+i+1+'" class="droit">\n\
+                                        <option value="'+contenu[i+1].droit+'">'+contenu[i+1].droit+'</option>\n\
+                                        <option value="'+option1+'">'+option1+'</option><option value="'+option2+'">'+option2+'</option></select><a class="remove_field"><input type="hidden" value="'+contenu[i+1].utilisateur+'" class="utilisateur'+i+1+'" name="utilisateur'+i+1+'"><i class="icon-trash"></i></a></div></div>'); //add input box
+                        		   
+                                    } 
+                                    else if((contenu[0].droit=="reporteur") || (contenu[0].droit=="developpeur") ) {
+                                        console.log(contenu[0].droit);
+                                        console.log('vous etes coucou');
+                                        $(".userproject").append('<li><div class="control-group">\n\
+                                        <label class="control-label userline" for="selectError'+i+'">'+contenu[i+1].utilisateur+'</label>\n\
+                                        <div class="controls userline"><input type ="text" value="'+contenu[i+1].droit+'" disabled></div></div>'); //add input box
+                                        $(".addbouton").click(function(){
+                                            $('.gestionsuser .alert-error').css("display","block");
+                                            $('.gestionsuser .alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>Vous n\'etes pas administrateur, Vous n\'avez pas le droit d\'ajouter un utilisateur. </span>');
+                                            return false; 
+                                        });
+                                        $('#submitaddusrer').click(function(){
+                                           $("#close_modal_btn").trigger("click");
+                                        });     
+                                    }
+                            }
+                    } 
+                    else {
                            
-                                 console.log("hh");
-                          if(contenu[i+1].droit==='admin')
-                          {
-                              option1 ='reporteur';
-                              option2 = 'developpeur';
-                          }
-                          else if(contenu[i+1].droit==='reporteur')
-                          {
-                              option1 ='admin';
-                              option2 = 'developpeur';
-                          }
-                          else if(contenu[i+1].droit==='developpeur')
-                          {
-                              option1 ='admin';
-                              option2 = 'reporteur';
-                          }
-                          
-           $(".userproject").append('<li><div class="control-group">\n\
-	<label class="control-label userline" for="selectError'+i+'">'+contenu[i+1].utilisateur+'</label>\n\
-					                   <div class="controls userline"><select id="selectError'+i+1+'" data-rel="chosen" name="droit'+i+1+'" class="droit">\n\
-                            <option value="'+contenu[i+1].droit+'">'+contenu[i+1].droit+'</option>\n\
-					                   <option value="'+option1+'">'+option1+'</option><option value="'+option2+'">'+option2+'</option></select><a class="remove_field"><input type="hidden" value="'+contenu[i+1].utilisateur+'" class="utilisateur'+i+1+'" name="utilisateur'+i+1+'"><i class="icon-trash"></i></a></div></div>'); //add input box
-                        		
-                     
-                  } else {
-                      console.log("no admin");
-                      
-                      
-                      
-                  }
-                      }
-                      
-                      
-                      
-     } else {
-         $('#gestionsuser .alert-error').css('display','block');
-                          $('#listuser .modal-body .alert-error').css('display','none');
-                         $('#projet .modal-content .alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>'+data.errors+ '</span>');
-       
-     }
-         
-   
-   
-     }
+                    }
+                }
       
-         });
-      console.log(elementsprojects);
-     
-      $.ajax({ 
+        });
+        $.ajax({ 
            url      : "/Liber8/getUsersNotInProject?nomProjet="+elementsprojects,
           dataType : "json",
           success  : function(data) { 
@@ -97,7 +88,7 @@
          availableusers.push(data.content[i].pseudo);
           
      }
-         console.log('adminjdjd');
+         
          console.log(availableusers);
          
             $( "#usersname" ).autocomplete({
