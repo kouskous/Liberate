@@ -11,8 +11,13 @@ import dao.UserDao;
 import dao.UserProjetDao;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
+import javax.transaction.TransactionManager;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  *
@@ -25,10 +30,10 @@ public class beanConfig {
     public EntityManager getEntityManager(){
         return Persistence.createEntityManagerFactory("persistenceUnitLiber8").createEntityManager();
     }
-    
+
     @Bean(name = "FichierUserDao")
     public FichierUserDao getFichierUserDao() {
-        return new FichierUserDao(getEntityManager());
+        return new FichierUserDao();
     }    
     
     @Bean(name = "ProjetDao")
@@ -38,12 +43,12 @@ public class beanConfig {
     
     @Bean(name = "UserDao")
     public UserDao getUserDao() {
-        return new UserDao(getEntityManager());
+        return new UserDao();
     }
     
     @Bean(name = "UserProjetDao")
     public UserProjetDao getUserProjetDao() {
-        return new UserProjetDao(getEntityManager());
+        return new UserProjetDao();
     }
    
 }
