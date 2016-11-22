@@ -74,25 +74,8 @@
         });
     }
     
-
-$( document ).ready(function() {
-    //inclusion de la coloration syntaxique
-    App.editeur = ace.edit("editeur");
-    App.editeur.setTheme("ace/theme/twilight");
-    App.editeur.session.setMode("ace/mode/javascript");   
-
-    //volet gauche resizable
-    $( "#sidebar-left" ).resizable();
-    $( "#sidebar-left" ).resize(function(){
-       left = $( "#sidebar-left" ).css("width");
-       $("#content").css("margin-left", left);
-       $("#content").css("width", (100 - left) + "%" );
-    });
-    
-    
-    defineOngletsEvents();
-    //Recuperation de l'arboresance de l'utilisateur
-    $.ajax({ 
+    function refreshTree(){
+        $.ajax({ 
           url      : "/Liber8/getTree",
           dataType : "json",
           success  : function(data) {  
@@ -107,17 +90,54 @@ $( document ).ready(function() {
                                 if ((data[i]["type"] == "fichier") && (j == slug.length - 1)){
                                     type="isFile";
                                 } 
+                                verouillage = "";
+                                if((data[i]["type"] == "fichier") && (data[i]["verrouillage"] == 1)) {
+                                    verouillage = "verou-bloque";
+                                } else if((data[i]["type"] == "fichier") && (data[i]["verrouillage"] == 2)) {
+                                    verouillage = "verou-reserve";
+                                }
                                 if(element1==null) {
                                     id = parent_id.replace(/\//g,'-');
                                     id = id.replace('.','__');
-                                    $(element).append('<li id="'+id+'" data-url="'+id+'" class="branche-arbre '+type+' noeud"><ul id='+parent_id+'><a>'+slug[j]+'</a></ul></li>');
+                                    $(element).append('<li id="'+id+'" data-url="'+id+'" class="branche-arbre '+type+' '+verouillage+' noeud"><ul id='+parent_id+'><a>'+slug[j]+'</a></ul></li>');
                                 }
                             }
                         });
                         App.tree = $('#arbre').easytree();
                         defineArbreEvents();
                     }       
+        });
+    }
+    
+$( document ).ready(function() {
+    //inclusion de la coloration syntaxique
+    App.editeur = ace.edit("editeur");
+    App.editeur.setTheme("ace/theme/twilight");
+    App.editeur.session.setMode("ace/mode/javascript"); 
+    
+    $("#editeur").on('click',function(){
+        path = App.currentOnglet.replace(/\//g,'-');
+        path = path.replace('.','__');
+        element = $("#"+path);
+        if ($(element).hasClass("verou-reserve")){
+            App.editeur.setReadOnly(false);
+        } else {
+            App.editeur.setReadOnly(true);
+        }
     });
+
+    //volet gauche resizable
+    $( "#sidebar-left" ).resizable();
+    $( "#sidebar-left" ).resize(function(){
+       left = $( "#sidebar-left" ).css("width");
+       $("#content").css("margin-left", left);
+       $("#content").css("width", (100 - left) + "%" );
+    });
+    
+    
+    defineOngletsEvents();
+    //Recuperation de l'arboresance de l'utilisateur
+    refreshTree();
 
     $(".user-action").click(function(){
         url = $(this).data("url");
@@ -174,6 +194,31 @@ $( document ).ready(function() {
             });
         }
         
+    });
+    
+    $("#btn_verrouiller").click(function(){
+        if(App.currentVoletElement != ""){
+            appPath = App.currentVoletElement.slice(4);
+            $.ajax({ 
+                url      : "/Liber8/verrouillerFichier",
+                type     : 'POST',
+                dataType : "json",
+                data     :{
+                              pathLogique: appPath,
+                          },
+                success  : function(data) {  
+                            if(data.response){
+                                toastr.success("Fichier vérouillé");
+                                path = App.currentVoletElement.replace(/\//g,'-');
+                                path = path.replace('.','__');
+                                element = $("#"+path);
+                                $(element).addClass("verou-reserve");
+                            } else {
+                                toastr.warning(data.errors);
+                            }
+                        }       
+            });
+        }
     });
     
 });

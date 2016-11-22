@@ -248,3 +248,23 @@ footer {
     left: 20% !important;
     width: 60% !important;
 }
+
+.verou-bloque span{
+    color: red !important;
+}
+
+.verou-reserve span{
+    color: green !important;
+}
+
+#toolbar{
+    margin:5px;
+}
+
+#btn_verrouiller{
+    color: green;
+}
+
+#btn_deverrouiller{
+    color: red;
+}

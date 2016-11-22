@@ -101,7 +101,7 @@ public class FichierUserDao {
      * @param user l'utilisateur dont on veux l'arborescence
      * @return Renvoie l'arborescence complete depuis la racine de l'utilisateur
      */
-    public Map<String, FichiersUsers.Type> getArborescence(User user){
+    public Collection<FichiersUsers> getArborescence(User user){
         return getArborescence(user, null);
     }
 
@@ -114,7 +114,7 @@ public class FichierUserDao {
      *                si null depuis la racine de l'utilisateur
      * @return Renvoie l'arborescence depuis le dossier en question, ou null si le dossier est un fichier
      */
-    public Map<String, FichiersUsers.Type> getArborescence(User user, FichiersUsers dossier){
+    public Collection<FichiersUsers> getArborescence(User user, FichiersUsers dossier){
         try {
             Map<String, FichiersUsers.Type> arborescence = new Hashtable<>();
             Collection<FichiersUsers> fichiers;
@@ -134,11 +134,8 @@ public class FichierUserDao {
                 fichiers = query.getResultList();
             }
 
-            for (FichiersUsers fichier : fichiers) {
-                arborescence.put(fichier.getPathLogique(), fichier.getType());
-            }
 
-            return arborescence;
+            return fichiers;
         }
         catch(IllegalArgumentException e){
             System.out.println(e.getMessage());
