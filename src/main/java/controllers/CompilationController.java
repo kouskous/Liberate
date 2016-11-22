@@ -161,8 +161,7 @@ public class CompilationController {
             System.out.println("Erreur pendant la récupération de l'arborescence");
             return false;
         }
-        
-  
+       
         // Construction du dossier à partir des paths logiques
         // Pour chaque entrée de l'arborescence
         for (Map.Entry<String, FichiersUsers.Type> entry : arborescence.entrySet())
@@ -170,9 +169,13 @@ public class CompilationController {
             // Si c'est un fichier
             if(entry.getValue() == FichiersUsers.Type.FICHIER){
                 try{              
+                    // On obtient le nom physique du fichier
+                    FichiersUsers fileUser = fichierUserDao.getFichiersByUserAndPath(user, entry.getKey());
+                    if(fileUser == null){throw new Exception("Erreur dans la récupération du fichierUser");}
+                    
                     // Getting file content
                     String fileName = extractFileName(entry.getKey());
-                    String content = new String(Files.readAllBytes(Paths.get(directoryPath + "/../../files/" + fileName)));
+                    String content = new String(Files.readAllBytes(Paths.get(directoryPath + "/../../files/" + fileUser.getNomPhysique())));
                     
                     // Creating compile file and writing content to it
                     File file = new File(directoryPath + "/../../compile_" + user.getPseudo() + "/" + entry.getKey());

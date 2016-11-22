@@ -1,5 +1,6 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
 	
 	<!-- start: Meta -->
@@ -19,7 +20,7 @@
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&subset=latin,cyrillic-ext,latin-ext' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="/Liber8/resources/EasyTree/skin-win8/ui.easytree.css">
         <link id="base-style-responsive" href="/Liber8/resources/liber8/css/newProjet.css" rel="stylesheet">
-        <link rel="stylesheet" href="/Liber8/resources/Toastr/build/toastr.css"/>
+        <link rel="stylesheet" href="/Liber8/resources/Toastr/nuget/content/content/toastr.css"/>
         <!-- end: CSS -->
 	
 
@@ -130,7 +131,7 @@
                                                     </a>
                                                     <ul class="dropdown-menu">
                                                             <li><a href="#"><i class="halflings-icon user"></i> Profile</a></li>
-                                                            <li><a href="/Liber8/logout"><i class="halflings-icon off"></i> Déconnexion</a></li>
+                                                            <li><a href="/Liber8/logout"><i class="halflings-icon off"></i> DÃ©connexion</a></li>
                                                     </ul>
                                         </li>
                                     </ul>
@@ -163,12 +164,7 @@
                                 </ul>
                             </div>
 
-                            <div id="editeur">function foo(items) {
-    var i;
-    for (i = 0; i &lt; items.length; i++) {
-        alert("Ace Rocks " + items[i]);
-    }
-}                           </div>
+                            <div id="editeur"></div>
                         </div>
                     </div>
 		</div>

@@ -121,9 +121,6 @@ $( document ).ready(function() {
 
     $(".user-action").click(function(){
         url = $(this).data("url");
-        path = App.currentVoletElement.replace(/\//g,'-');
-        path = path.replace('.','__');
-        element = $("#"+path);
         $.ajax({ 
         url      : "/Liber8/"+ url,
         dataType : "html",
@@ -147,7 +144,12 @@ $( document ).ready(function() {
                     contenuFichier: content
                 },
       success  : function(data) {  
-                    $.unblockUI();
+                        $.unblockUI();
+                        if(data.response){
+                            toastr.success("Enregistré");
+                        } else {
+                            toastr.warning(data.errors);
+                        }
                     }       
         });
     });

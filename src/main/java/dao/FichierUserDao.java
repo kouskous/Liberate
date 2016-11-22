@@ -27,10 +27,8 @@ public class FichierUserDao {
     }
 
     // Cherche les fichiers d'un utilisateur dans la BDD
-    // - renvoie null s'il n'y a pas de fichiers pour cet user.
     // - renvoie la liste des fichiers de l'user si il y est
     public List<FichiersUsers> getFichiersByUser(User user) {
-
         // Recherche des fichiers
         TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByUser", FichiersUsers.class);
         query.setParameter("user", user);
@@ -88,8 +86,6 @@ public class FichierUserDao {
         }
     }
     
-
-
     /**
      * @author Florian
      *
@@ -116,10 +112,7 @@ public class FichierUserDao {
             Collection<FichiersUsers> fichiers;
 
             if(dossier == null) {
-                fichiers = user.getFichiersUsersCollection();
-                //if(fichiers == null) {
-                  //  return arborescence;
-                //}
+                fichiers = getFichiersByUser(user);
             }
 
             //si le fichier n'est pas un dossier
@@ -150,14 +143,13 @@ public class FichierUserDao {
     // Renvoie le fichier si réussite
     // Renvoie null sinon
     public FichiersUsers createNewFichierUser(String pathLogique, String nomPhysique, String nomReel, Date dateCreation,
-                                              FichiersUsers.Type type, User user){
+                                              FichiersUsers.Type type, User user, int verrou){
 
         // Création nouvel utilisateur
-        FichiersUsers newFichierUsers = new FichiersUsers(pathLogique, nomPhysique, nomReel, dateCreation, type, user);
+        FichiersUsers newFichierUsers = new FichiersUsers(pathLogique, nomPhysique, nomReel, dateCreation, type, user, verrou);
 
         // On essaye d'ajouter l'utilisateur à la persistence
         try{
-
             em.persist(newFichierUsers);
             return newFichierUsers;
         }
@@ -253,7 +245,6 @@ public class FichierUserDao {
     }
 
     // TODO: toutes les autres fonctions de modification qu'on aura besoin.
-
     public boolean changeVerrou(FichiersUsers fichierToChange, int verrou){
         if(fichierToChange != null){
             fichierToChange.setVerrou(verrou);
