@@ -431,7 +431,7 @@ public class ProjetController {
         catch(Exception e2){return null;}  
     }
     
-    // Ajout d'un utilisateur à un projet
+    // Ajout d'utilisateurs à un projet
     // - La requête doit contenir les champs "nomProjet", "utilisateur" et "droit"
     @ResponseBody
     @RequestMapping(value="/newUserProject", method = RequestMethod.POST, produces = "application/json")
@@ -542,19 +542,20 @@ public class ProjetController {
     }
     
     
-    // Suppression d'un utilisateur d'un projet
+    // Suppression d'utilisateurs à un projet
     // - La requête doit contenir les champs "nomProjet" et "utilisateur"
     @ResponseBody
     @RequestMapping(value="/removeUserProject", method = RequestMethod.POST, produces = "application/json")
-    public String removeUserProject(HttpServletRequest request, ModelMap model){
+    public String removeUserProject(HttpServletRequest request, ModelMap model) throws JSONException{
         
         // On créé l'objet à retourner
         JSONObject returnObject = new JSONObject();
 
         // Récupération des paramètres
-        String nomProjet = (String)request.getParameter("nomProjet");
-        String pseudo = (String)request.getParameter("utilisateur");
-        if(nomProjet == null || pseudo == null){
+        String nomProjet = (String)request.getParameter("nomProjet");      
+        JSONObject jsonUsersProjet = new JSONObject(request.getParameter("utilisateur"));
+        
+        if(nomProjet == null || jsonUsersProjet == null){
             try{
                 returnObject.put("response", "false");
                 returnObject.put("content", "");
@@ -565,32 +566,52 @@ public class ProjetController {
             catch(Exception e){return null;}
         }
         
-         // On cherche le projet et l'utilisateur dans la bdd. On vérifie que l'utilisateur est bien assigné au projet
+        // Récupération de tous les pseudo
+        ArrayList<String> pseudoUsersProjet = new ArrayList<String>();                   
+        for (int i = 0; i <= 9; i++){
+            if(jsonUsersProjet.has(Integer.toString(i)) && !jsonUsersProjet.get(Integer.toString(i)).equals("")){
+                pseudoUsersProjet.add((String)jsonUsersProjet.get(Integer.toString(i)));
+            }
+        }
+        
+        // On cherche le projet et les utilisateurs dans la bdd. 
+        // On vérifie que les utilisateurs sont bien assignés au projet
         Projet projet;
         User user;
         UserProjet userProjet;
+        ArrayList<User> userList = new ArrayList<User>();
         try{
             projet = projetDao.getProjetByName(nomProjet);
-            user = userDao.getUserByPseudo(pseudo);
+            
          
-            if(projet == null || user == null){
+            if(projet == null){
                 try{
                     returnObject.put("response", "false");
                     returnObject.put("content", "");
-                    returnObject.put("errors", "Erreur pendant la récupération du projet ou de l'utilisateur");
+                    returnObject.put("errors", "Erreur pendant la récupération du projet");
                     return returnObject.toString();
                 }
                 // Json Fail
                 catch(Exception e2){return null;} 
             }
             else{
-                userProjet = userProjetDao.getUserProjetByUIdPId(user.getIdUser(), projet.getIdProjet());
-                if(userProjet == null){
+                
+                try{
+                    for (int i = 0; i <= 9; i++){
+                        user = userDao.getUserByPseudo(pseudoUsersProjet.get(i));
+                        if(user == null){throw new Exception("Erreur pendant la récupération d'un utilisateur");}
+                        userList.add(user);
+                        
+                        userProjet = userProjetDao.getUserProjetByUIdPId(user.getIdUser(), projet.getIdProjet());
+                        if(userProjet == null){throw new Exception("Erreur un utilisateur n'est pas assigné au projet");}
+                    }
+                }
+                catch(Exception e){
                     try{
-                    returnObject.put("response", "false");
-                    returnObject.put("content", "");
-                    returnObject.put("errors", "Cet utilisateur n'etait pas assigne a ce projet");
-                    return returnObject.toString();
+                        returnObject.put("response", "false");
+                        returnObject.put("content", "");
+                        returnObject.put("errors", e.getMessage());
+                        return returnObject.toString();
                     }
                     // Json Fail
                     catch(Exception e2){return null;} 
@@ -608,25 +629,27 @@ public class ProjetController {
             catch(Exception e2){return null;}  
         }
         
-        // On supprime l'utilisateur du projet
+        // On supprime les utilisateurs du projet
         try{
-            Boolean res = userProjetDao.deleteUserProjet(user, projet);
-            if(res == false){
-                try{
-                    returnObject.put("response", "false");
-                    returnObject.put("content", "");
-                    returnObject.put("errors", "Erreur pendant la suppression de l'utilisateur du projet");
-                    return returnObject.toString();
+            for (int i = 0; i <= userList.size(); i++){
+                Boolean res = userProjetDao.deleteUserProjet(userList.get(i), projet);
+                if(res == false){
+                    try{
+                        returnObject.put("response", "false");
+                        returnObject.put("content", "");
+                        returnObject.put("errors", "Erreur pendant la suppression d'un utilisateur du projet");
+                        return returnObject.toString();
+                    }
+                    // Json Fail
+                    catch(Exception e2){return null;} 
                 }
-                // Json Fail
-                catch(Exception e2){return null;} 
             }
         }
         catch(Exception e){
             try{
                 returnObject.put("response", "false");
                 returnObject.put("content", "");
-                returnObject.put("errors", "Erreur pendant la suppression de l'utilisateur du projet");
+                returnObject.put("errors", "Erreur pendant la suppression d'un utilisateur du projet");
                 return returnObject.toString();
             }
             // Json Fail
@@ -649,16 +672,16 @@ public class ProjetController {
     // - La requête doit contenir les champs "nomProjet", "utilisateur" et "droits"
     @ResponseBody
     @RequestMapping(value="/changeRightsUserProject", method = RequestMethod.POST, produces = "application/json")
-    public String changeRightsUserProject(HttpServletRequest request, ModelMap model){
+    public String changeRightsUserProject(HttpServletRequest request, ModelMap model) throws JSONException{
         
         // On créé l'objet à retourner
         JSONObject returnObject = new JSONObject();
 
         // Récupération des paramètres
         String nomProjet = (String)request.getParameter("nomProjet");
-        String pseudo = (String)request.getParameter("utilisateur");
-        String droit = (String)request.getParameter("droit");
-        if(nomProjet == null || pseudo == null || droit == null){
+        JSONObject jsonUsersProjet = new JSONObject(request.getParameter("utilisateur"));
+        JSONObject jsonDroitsProjet = new JSONObject(request.getParameter("droit"));      
+        if(nomProjet == null || jsonUsersProjet == null || jsonDroitsProjet == null){
             try{
                 returnObject.put("response", "false");
                 returnObject.put("content", "");
@@ -669,15 +692,27 @@ public class ProjetController {
             catch(Exception e){return null;}
         }
         
-         // On cherche le projet et l'utilisateur dans la bdd. On vérifie que l'utilisateur est bien assigné au projet
+        // Récupération de tous les pseudo et droits
+        ArrayList<String> pseudoUsersProjet = new ArrayList<String>();
+        ArrayList<String> droitsUsers = new ArrayList<String>();                    
+        for (int i = 0; i <= 9; i++){
+            if(jsonUsersProjet.has(Integer.toString(i)) && !jsonUsersProjet.get(Integer.toString(i)).equals("")){
+                pseudoUsersProjet.add((String)jsonUsersProjet.get(Integer.toString(i)));
+            }
+
+            if(jsonDroitsProjet.has(Integer.toString(i)) && !jsonDroitsProjet.get(Integer.toString(i)).equals("")){
+                droitsUsers.add((String)jsonDroitsProjet.get(Integer.toString(i)));
+            }
+        }
+        
+         // On cherche le projet et les utilisateurs dans la bdd. On vérifie que l'utilisateur est bien assigné au projet
         Projet projet;
         User user;
         UserProjet userProjet;
+        ArrayList<UserProjet> userList = new ArrayList<UserProjet>();
         try{
             projet = projetDao.getProjetByName(nomProjet);
-            user = userDao.getUserByPseudo(pseudo);
-         
-            if(projet == null || user == null){
+            if(projet == null){
                 try{
                     returnObject.put("response", "false");
                     returnObject.put("content", "");
@@ -687,18 +722,14 @@ public class ProjetController {
                 // Json Fail
                 catch(Exception e2){return null;} 
             }
-            else{
+            
+            for (int i = 0; i <= 9; i++){
+                user = userDao.getUserByPseudo(pseudoUsersProjet.get(i));
+                if(user == null){throw new Exception("Erreur pendant la récupération d'un utilisateur");}
+
                 userProjet = userProjetDao.getUserProjetByUIdPId(user.getIdUser(), projet.getIdProjet());
-                if(userProjet == null){
-                    try{
-                    returnObject.put("response", "false");
-                    returnObject.put("content", "");
-                    returnObject.put("errors", "Cet utilisateur n'etait pas assigne a ce projet");
-                    return returnObject.toString();
-                    }
-                    // Json Fail
-                    catch(Exception e2){return null;} 
-                }
+                if(userProjet == null){throw new Exception("Erreur pendant la récupération d'un utilisateur");}
+                userList.add(userProjet);
             }
         }
         catch(Exception e){
@@ -712,18 +743,20 @@ public class ProjetController {
             catch(Exception e2){return null;}  
         }
         
-        // On change les droits de l'utilisateur du projet
+        // On change les droits des utilisateurs du projet
         try{
-            Boolean res = userProjetDao.changeDroitsUserProjet(droit, userProjet);
-            if(res == false){
-                try{
-                    returnObject.put("response", "false");
-                    returnObject.put("content", "");
-                    returnObject.put("errors", "Erreur pendant le changements des droits");
-                    return returnObject.toString();
+            for (int i = 0; i < userList.size(); i++){
+                Boolean res = userProjetDao.changeDroitsUserProjet(droitsUsers.get(i), userList.get(i));
+                if(res == false){
+                    try{
+                        returnObject.put("response", "false");
+                        returnObject.put("content", "");
+                        returnObject.put("errors", "Erreur pendant le changements des droits");
+                        return returnObject.toString();
+                    }
+                    // Json Fail
+                    catch(Exception e2){return null;} 
                 }
-                // Json Fail
-                catch(Exception e2){return null;} 
             }
         }
         catch(Exception e){
