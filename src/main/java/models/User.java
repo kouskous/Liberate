@@ -6,6 +6,7 @@
 package models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import javax.persistence.*;
@@ -95,8 +96,8 @@ public class User implements Serializable {
     public User() {
     }
 
-    public User(String pseudo, String email, String nom, String prenom, Date dateCreation, 
-            Date dateModification) {
+    public User(String pseudo, String email, String nom, String prenom, Date dateCreation,
+                Date dateModification) {
         this.pseudo = pseudo;
         this.email = email;
         this.nom = nom;
@@ -165,7 +166,6 @@ public class User implements Serializable {
     public Integer getIdUser() {
         return idUser;
     }
-    
     
     
     @XmlTransient
