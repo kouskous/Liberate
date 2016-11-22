@@ -54,19 +54,7 @@
                                         </li>
                                         
                                         <li class="btn_action">
-                                            <a class="user-action" href="#" data-toggle="modal" data-target="#projet" data-url="newDossier"><i class="halflings-icon white plus-sign"></i>Dossier </a>
-                                        </li>
-                                        
-                                        <li class="btn_action">
-                                            <a class="user-action" href="#" data-toggle="modal" data-target="#projet" data-url="newFile"><i class="halflings-icon white plus-sign"></i>Fichier </a>
-                                        </li>
-                                        
-                                        <li class="btn_action">
-                                            <a href="#"><i class="icon-signin"></i>Importer</a>
-                                        </li>
-                                        
-                                        <li class="btn_action">
-                                            <a href="#"><i class="icon-signout"></i>Exporter</a>
+                                            <a href="#"><i class="icon-download-alt"></i>Pull</a>
                                         </li>
                                         
                                         <li class="btn_action">
@@ -147,6 +135,14 @@
 			<!-- start: Main Menu -->
 			<div id="sidebar-left" class="span2 ui-widget-content">
 				<div class="nav-collapse sidebar-nav overscrollfolder">
+                                    <div id="toolbar">
+                                        
+                                        <button class="user-action" data-toggle="modal" data-target="#projet" data-url="newDossier"><i class="icon-folder-open"></i></i></button>
+                                        <button class="user-action" data-toggle="modal" data-target="#projet" data-url="newFile"><i class="icon-file"></i></button>
+                                        <button id="btn_supprimer"><i class="icon-trash"></i></button>
+                                        <button id="btn_verrouiller"><i class="icon-lock"></i></button>
+                                        <button id="btn_deverrouiller"><i class="icon-unlock"></i></button>
+                                    </div>    
                                     <div id="arbre">
                                         <ul id ="Root">
 

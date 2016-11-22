@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collection;
 
 import models.FichiersUsers;
 import models.User;
@@ -71,19 +72,21 @@ public class PrincipalController {
     
     JSONArray list = new JSONArray();
         
-    Map<String, FichiersUsers.Type> arborescence = fichierUserDao.getArborescence(user);
-    for (Map.Entry<String, FichiersUsers.Type> fichier: arborescence.entrySet()) {
+    Collection<FichiersUsers> arborescence = fichierUserDao.getArborescence(user);
+    for (FichiersUsers fichier: arborescence) {
         JSONObject response = new JSONObject();
-        if(fichier.getValue() == FichiersUsers.Type.FICHIER){
+        if(fichier.getType() == FichiersUsers.Type.FICHIER){
             try{
-                response.put("path","/Root"+fichier.getKey());
+                response.put("path","/Root"+fichier.getPathLogique());
                 response.put("type","fichier");
+                response.put("verrouillage",fichier.getVerrou());
             } catch(Exception e){
             }
         }else {
             try{
-                response.put("path", "/Root"+fichier.getKey());
+                response.put("path", "/Root"+fichier.getPathLogique());
                 response.put("type","dossier");
+                response.put("verrouillage",fichier.getVerrou());
             } catch(Exception e){
             }
         }
