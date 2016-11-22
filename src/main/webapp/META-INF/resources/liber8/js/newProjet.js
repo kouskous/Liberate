@@ -39,10 +39,8 @@ $(document).ready(function() {
                            
                 success  : function(data) {
                    if(data.errors!==""){
-                    
-                         $('#projet .modal-content .alert-error').css('display','block');
-                          $('#listuser .modal-body .alert-error').css('display','none');
-                         $('#projet .modal-content .alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>'+data.errors+ '</span>');
+                         $("#close_modal_btn").trigger("click");
+                         toastr.warning(data.errors);
                     }
                     else if(data.response==="true"){
                             $("#close_modal_btn").trigger("click");
@@ -56,7 +54,7 @@ $(document).ready(function() {
                             App.tree.rebuildTree();
                             $("#"+sourceNode.id).addClass("branche-arbre");
                             defineArbreEvents();
-                            App.currentVoletElement = "Root-"+nomprojet;
+                            App.currentVoletElement = "Root/"+nomprojet;
                     }
                 }
             });
