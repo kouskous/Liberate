@@ -103,6 +103,22 @@ public class CompilationController {
             catch(Exception e2){return null;}
         }
         
+        // Si projet Java, récupération de la classe principale en paramètre
+        String mainClass = new String();
+        if(projet.getLangage() == "java"){
+            mainClass = (String)request.getParameter("mainClass");
+            if(mainClass == null){
+                try{
+                    returnObject.put("response", "false");
+                    returnObject.put("content", "");
+                    returnObject.put("errors", "Projet Java et pas de classe principale");
+                    return returnObject.toString();
+                }
+                // Json fail
+                catch(Exception e2){return null;}
+            }
+        }
+        
         // Création du dossier avec hiérarchie pour la compilation
         ServletContext ctx = request.getServletContext();
         String path = ctx.getRealPath("/");
@@ -117,16 +133,32 @@ public class CompilationController {
             catch(Exception e2){return null;}
         }
         
-        // Compilation TIME
-        if(!buildAndCreateExec(path, projet.getLangage(), user, nomProjet)){
-            try{
-                returnObject.put("response", "false");
-                returnObject.put("content", getCompileErrors(path, user, nomProjet));
-                returnObject.put("errors", "Erreur lors de la compilation");
-                return returnObject.toString();
+        // Compilation pour projets C/C++
+        if(projet.getLangage() == "c" || projet.getLangage() == "c++"){
+            if(!buildAndCreateExecC(path, user, projet.getLangage(), nomProjet)){
+                try{
+                    returnObject.put("response", "false");
+                    returnObject.put("content", getCompileErrors(path, user, nomProjet));
+                    returnObject.put("errors", "Erreur lors de la compilation");
+                    return returnObject.toString();
+                }
+                // Json fail
+                catch(Exception e2){return null;}
             }
-            // Json fail
-            catch(Exception e2){return null;}
+        }
+        
+        // Compilation pour projets Java
+        if(projet.getLangage() == "java"){
+            if(!buildAndCreateJarJava(path, user, nomProjet, mainClass)){
+                try{
+                    returnObject.put("response", "false");
+                    returnObject.put("content", getCompileErrors(path, user, nomProjet));
+                    returnObject.put("errors", "Erreur lors de la compilation");
+                    return returnObject.toString();
+                }
+                // Json fail
+                catch(Exception e2){return null;}
+            }
         }
         
         // Reussite
@@ -198,105 +230,123 @@ public class CompilationController {
         return filename;
     }
     
-    private boolean buildAndCreateExec(String directoryPath, String language, User user, String nomProjet)
-    {
-        if(language.equals("c") || (language).equals("c++")){
-            
-            // Recopier le makefile dans le dossier de compilation
-            // Getting file content
-            String content;
-            try{
-                if(language.equals("c")){
-                    content = new String(Files.readAllBytes(Paths.get(directoryPath + "/../../scripts/makefile_c")));
-                }
-                else{
-                    content = new String(Files.readAllBytes(Paths.get(directoryPath + "/../../scripts/makefile_c++")));
-                }
-                if(content == null)
-                    throw new Exception("Erreur pendant la récupération du contenu du makefile");
+    private boolean buildAndCreateExecC(String directoryPath, User user, String language, String nomProjet)
+    {            
+        // Recopier le makefile dans le dossier de compilation
+        // Getting file content
+        String content;
+        try{
+            if(language.equals("c")){
+                content = new String(Files.readAllBytes(Paths.get(directoryPath + "/../../scripts/makefile_c")));
             }
-            catch(Exception e){
-                System.out.println("Erreur pendant la récupération du contenu du makefile");
-                return false;
+            else{
+                content = new String(Files.readAllBytes(Paths.get(directoryPath + "/../../scripts/makefile_c++")));
             }
-            
-            // Creating makefile and writing content to it
-            try{
-                File file = new File(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "makefile");
-                FileWriter writer = new FileWriter(file);
-                writer.write(content);
-                writer.close();
-            }
-            catch(Exception e){
-                System.out.println("Erreur pendant l'ecriture du makefile");
-                return false;
-            }
-            
-            // Executing make command
-            String pathToMakeFile = directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet;
-            try{
-                ProcessBuilder builder = new ProcessBuilder("make");
-                builder.directory(new File(pathToMakeFile));
-                builder.redirectError(new File(pathToMakeFile + "/errors.txt"));
-                Process p = builder.start();
-                p.waitFor();
-            }
-            catch(Exception e){
-                System.out.println("Erreur pendant l'execution du makefile");
-                return false;
-            }
-            
-            // Moving exe to right folder
-            try{                
-                File file = new File(directoryPath + "/../../execs_" + user.getPseudo() + "/" + "exe");
-                file.getParentFile().mkdirs();
-                
-                if(new File(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "exe").exists()){
-                    FileOutputStream fos = new FileOutputStream(file);
-                    fos.write(Files.readAllBytes(
-                            Paths.get(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "exe")));
-                    fos.close();
-                }
-                else{
-                    return false;
-                }
-            }
-            catch(Exception e){
-                System.out.println("Erreur pendant le déplacement de l'executable");
-                return false;
-            }
-            
-            // Moving errors to right folder
-            try{                
-                File file = new File(directoryPath + "/../../execs_" + user.getPseudo() + "/" + "errors.txt");
-                file.getParentFile().mkdirs();
-                
-                if(new File(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "errors.txt").exists()){
-                    FileOutputStream fos = new FileOutputStream(file);
-                    fos.write(Files.readAllBytes(
-                            Paths.get(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "errors.txt")));
-                    fos.close();
-                }
-            }
-            catch(Exception e){
-                System.out.println("Erreur pendant le déplacement du fichier d'erreurs");
-                return false;
-            }
-            
-            // Deleting compile folder
-            try{
-                deleteFile(new File(pathToMakeFile + "/../../compile_" + user.getPseudo()));
-            }
-            catch(Exception e){
-                System.out.println("Erreur pendant la suppression du dossier de compile");
-                return false;
-            }
-            
-            return true;
+            if(content == null)
+                throw new Exception("Erreur pendant la récupération du contenu du makefile");
         }
-        return false;
+        catch(Exception e){
+            System.out.println("Erreur pendant la récupération du contenu du makefile");
+            return false;
+        }
+
+        // Creating makefile and writing content to it
+        try{
+            File file = new File(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "makefile");
+            FileWriter writer = new FileWriter(file);
+            writer.write(content);
+            writer.close();
+        }
+        catch(Exception e){
+            System.out.println("Erreur pendant l'ecriture du makefile");
+            return false;
+        }
+
+        // Executing make command
+        String pathToMakeFile = directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet;
+        try{
+            ProcessBuilder builder = new ProcessBuilder("make");
+            builder.directory(new File(pathToMakeFile));
+            builder.redirectError(new File(pathToMakeFile + "/errors.txt"));
+            Process p = builder.start();
+            p.waitFor();
+        }
+        catch(Exception e){
+            System.out.println("Erreur pendant l'execution du makefile");
+            return false;
+        }
+
+        // Moving exe to right folder
+        try{                
+            File file = new File(directoryPath + "/../../execs_" + user.getPseudo() + "/" + "exe");
+            file.getParentFile().mkdirs();
+
+            if(new File(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "exe").exists()){
+                FileOutputStream fos = new FileOutputStream(file);
+                fos.write(Files.readAllBytes(
+                        Paths.get(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "exe")));
+                fos.close();
+            }
+            else{
+                return false;
+            }
+        }
+        catch(Exception e){
+            System.out.println("Erreur pendant le déplacement de l'executable");
+            return false;
+        }
+
+        // Moving errors to right folder
+        try{                
+            File file = new File(directoryPath + "/../../execs_" + user.getPseudo() + "/" + "errors.txt");
+            file.getParentFile().mkdirs();
+
+            if(new File(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "errors.txt").exists()){
+                FileOutputStream fos = new FileOutputStream(file);
+                fos.write(Files.readAllBytes(
+                        Paths.get(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "errors.txt")));
+                fos.close();
+            }
+        }
+        catch(Exception e){
+            System.out.println("Erreur pendant le déplacement du fichier d'erreurs");
+            return false;
+        }
+
+        // Deleting compile folder
+        try{
+            deleteFile(new File(pathToMakeFile + "/../../compile_" + user.getPseudo()));
+        }
+        catch(Exception e){
+            System.out.println("Erreur pendant la suppression du dossier de compile");
+            return false;
+        }
+
+        return true;
     }
         
+    private boolean buildAndCreateJarJava(String directoryPath, User user, String nomProjet, String mainClass)
+    {
+        // Compilation des sources java
+        String pathToProject = directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet;
+        
+        try{
+            ProcessBuilder builder = new ProcessBuilder("find . -name *.java -exec javac");
+            builder.directory(new File(pathToProject));
+            builder.redirectError(new File(pathToProject + "/errors.txt"));
+            Process p = builder.start();
+            p.waitFor();
+        }
+        catch(Exception e){
+            System.out.println("Erreur pendant la compilation javac");
+            return false;
+        }
+        
+        //find . -name \*.php -exec sed -i 's/a remplacer/remplacement/g' {} \;
+        //
+        return true;
+    }
+    
     private void deleteFile(File element) {
         if (element.isDirectory()) {
             for (File sub : element.listFiles()) {
