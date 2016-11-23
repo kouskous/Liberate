@@ -553,7 +553,8 @@ public class ProjetController {
 
         // Récupération des paramètres
         String nomProjet = (String)request.getParameter("nomProjet");      
-        JSONObject jsonUsersProjet = new JSONObject(request.getParameter("utilisateur"));
+        JSONObject jsonUsersProjet = new JSONObject(request.getParameter("utilisateurdelete"));
+        
         
         if(nomProjet == null || jsonUsersProjet == null){
             try{
@@ -571,6 +572,7 @@ public class ProjetController {
         for (int i = 0; i <= 9; i++){
             if(jsonUsersProjet.has(Integer.toString(i)) && !jsonUsersProjet.get(Integer.toString(i)).equals("")){
                 pseudoUsersProjet.add((String)jsonUsersProjet.get(Integer.toString(i)));
+                
             }
         }
         
@@ -597,12 +599,17 @@ public class ProjetController {
             else{
                 
                 try{
-                    for (int i = 0; i <= 9; i++){
+                    int retval = pseudoUsersProjet.size();
+                    System.out.println(retval);
+                    for (int i = 0; i < pseudoUsersProjet.size(); i++){
                         user = userDao.getUserByPseudo(pseudoUsersProjet.get(i));
+                        
                         if(user == null){throw new Exception("Erreur pendant la récupération d'un utilisateur");}
                         userList.add(user);
+
                         
                         userProjet = userProjetDao.getUserProjetByUIdPId(user.getIdUser(), projet.getIdProjet());
+                        
                         if(userProjet == null){throw new Exception("Erreur un utilisateur n'est pas assigné au projet");}
                     }
                 }
@@ -631,6 +638,9 @@ public class ProjetController {
         
         // On supprime les utilisateurs du projet
         try{
+            System.out.println(userList);
+            System.out.println(userList.size());
+            
             for (int i = 0; i <= userList.size(); i++){
                 Boolean res = userProjetDao.deleteUserProjet(userList.get(i), projet);
                 if(res == false){

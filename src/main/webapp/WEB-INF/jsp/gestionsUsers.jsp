@@ -62,7 +62,8 @@
 
     </div>
      </div>
-</div>    
+</div> 
+           <div class="usersdelete"></div>
       
      <script src="/Liber8/resources/liber8/js/gestionuser.js"></script> 
      
