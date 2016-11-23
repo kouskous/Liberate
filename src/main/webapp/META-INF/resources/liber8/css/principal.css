@@ -259,6 +259,7 @@ footer {
 
 #toolbar{
     margin:5px;
+    min-width: 400px;
 }
 
 #btn_verrouiller{
@@ -274,11 +275,11 @@ footer {
     color: blue;
 }
 
-#btn_new_folder{
+#btnNewFolder{
     color: brown;
 }
 
-#btn_new_file{
+#btnNewFile{
     color: white;
 }
 

@@ -72,7 +72,6 @@ $(document).ready(function() {
         dataType : "json",
         success  : function(data) { 
             var nameusers = data.response;
-            console.log(nameusers);
             availableTags = JSON.parse(nameusers);
             $( "#usersname" ).autocomplete({
                 source: availableTags
