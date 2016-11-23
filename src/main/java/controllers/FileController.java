@@ -6,24 +6,27 @@
 package controllers;
 
 import dao.FichierUserDao;
+import dao.VersionDao;
+import dao.ProjetDao;
+import dao.FichiersVersionDao;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.transaction.Transactional;
 import models.FichiersUsers;
+import models.FichiersVersion;
+import models.Projet;
 import models.User;
+import models.Version;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -42,6 +45,9 @@ public class FileController {
     
     @Autowired
     FichierUserDao fichierUserDao;
+    VersionDao versionDao;
+    ProjetDao projetDao;
+    FichiersVersionDao fichiersVersionDao;
     
     public FileController(){
     }
@@ -152,87 +158,7 @@ public class FileController {
     }
     
     
-     @ResponseBody 
-    @RequestMapping(value="/closeFile", method = RequestMethod.POST, produces = "application/json")
-    public String closeFile(HttpServletRequest request, ModelMap model){           
-        
-        // On crÃ©Ã© l'objet Ã  retourner
-        JSONObject returnObject = new JSONObject();   
-        
-        try{
-            returnObject.put("response", "");
-            returnObject.put("errors", "");
-            
-            // On vÃ©rifie qu'une session est bien ouverte
-            HttpSession session= request.getSession();
-            User user = (User)session.getAttribute("user");
-
-            if(user == null){
-                returnObject.put("errors", "No user");
-                return returnObject.toString();
-            }
-            else{
-                String pathFichier = (String)request.getParameter("pathFichier");
-                
-                if(pathFichier == null){
-                    returnObject.put("errors", "No filepath");
-                    return returnObject.toString();
-                }
-                else{
-                    
-                    String fileName = extractFileName((String)request.getParameter("pathFichier"));
-                    
-                    FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathFichier"), 
-                    fileName, 
-                    fileName, 
-                    new Date(), true, user,0);
-                    
-                    if(newFile == null){
-                        returnObject.put("errors", "Failed to create file");
-                        return returnObject.toString();
-                    }
-                    else{
-                        try{
-
-                            try{                          
-                                ServletContext ctx = request.getServletContext();
-                                String path = ctx.getRealPath("/");
-                                
-                                // TODO: change this path when deploying to server
-                                FileOutputStream out = new FileOutputStream(path + "/../../files/" + fileName);
-                            }
-                            catch(Exception e){
-                                returnObject.put("response",e.getMessage());
-                                return returnObject.toString();
-                            }
-                            
-                            returnObject.put("response",true);
-                            return returnObject.toString();
-                        }
-                        catch(Exception e){
-                            returnObject.put("errors","Erreur BDD");
-                            return returnObject.toString();
-                        }
-                    }
-                }
-            }
-        }
-        catch(Exception e){
-            System.out.println("Erreur JSON");
-            System.out.println(e.getMessage());
-            
-            //TODO: ce try-catch ne sert qu'Ã  afficher les erreurs
-            try{
-                JSONObject obj = new JSONObject();
-                obj.put("errors",e.getMessage());
-                return obj.toString();
-            }
-            catch(Exception er){
-                
-            }
-            return null;
-        }
-    }
+     
     @ResponseBody 
     @RequestMapping(value="/newDossier", method = RequestMethod.POST, produces = "application/json")
     public String newDossier(HttpServletRequest request, ModelMap model){           
@@ -412,12 +338,7 @@ public class FileController {
         
     FichiersUsers file = fichierUserDao.getPathByPathLogique(user,request.getParameter("pathLogique"));
     String pathPhysique =file.getNomPhysique();
-    List<FichiersUsers> files =fichierUserDao.getPathsByPathLogique(user,request.getParameter("pathLogique"));
-    int verrou = file.getVerrou();
-    if(verrou==0){
-        boolean verrouillage = fichierUserDao.changeVerrou(file, 2);
-        boolean verrouillageAutre =fichierUserDao.changeVerrouAutre(files, 1);   
-    }
+    
     
         JSONObject response = new JSONObject();
          try{
@@ -462,4 +383,199 @@ public class FileController {
     return  response.toString();
        
     }
+    
+    @ResponseBody
+    @RequestMapping(value="/pushProjet", method = RequestMethod.GET,produces = "application/json")
+    public String pusherProjet(HttpServletRequest request) throws JSONException{
+  
+    // Pas de session ouverte
+    JSONObject returnObject = new JSONObject();
+    
+    
+    try{
+            returnObject.put("response", "");
+            returnObject.put("errors", "");
+            
+            // On vÃ©rifie qu'une session est bien ouverte
+            HttpSession session= request.getSession();
+            User user = (User)session.getAttribute("user");
+
+            if(user == null){
+                returnObject.put("response","false");
+                returnObject.put("errors", "No user");
+                return returnObject.toString();
+            }
+            else{
+                
+                //Le projet qu'on souhaite pusher
+                Projet projet = projetDao.getProjetByName(request.getParameter("projet"));
+                if(projet==null){
+                    returnObject.put("response","false");
+                    returnObject.put("errors", "No project with this name");
+                    return returnObject.toString();
+                }
+                //La derniere version existante du projet
+                Version lastVersion = versionDao.getLastVersionByProjet(projet);
+                
+                if(lastVersion==null){
+                    Version newVersion = versionDao.createNewVersion(lastVersion.getNumVersion()+1,new Date(),user,projet,"test");
+                    if(newVersion==null){
+                        returnObject.put("response","false");
+                        returnObject.put("errors", "Erreur lors de la creation de la nouvelle version");
+                        return returnObject.toString();
+                        }
+                    }
+                else{
+                       //On recupere tous les fichiers qu'on a verrouillé
+                       List<FichiersUsers> lockedFiles = fichierUserDao.getLockedByUserAndProjet(user, request.getParameter("projet"));
+                       if(lockedFiles==null){
+                           returnObject.put("response","false");
+                           returnObject.put("errors", "Rien a pushé");
+                           return returnObject.toString();
+                       }else{
+                           //On recupere les fichiers de la derniere version
+                           List<FichiersVersion> fichiersLastVersion = fichiersVersionDao.getFileByVersion(lastVersion);
+                           
+                           //Puis on cree une nouvelle version
+                           Version newVersion = versionDao.createNewVersion(lastVersion.getNumVersion()+1,new Date(),user,projet,"test");
+                           if(newVersion==null){
+                               returnObject.put("response","false");
+                               returnObject.put("errors", "Erreur lors de la creation de la nouvelle version");
+                               return returnObject.toString();
+                           }
+                           for(int i=0;i<lockedFiles.size();i++){
+                               FichiersVersion file = fichiersVersionDao.createNewFichierVersion(lockedFiles.get(i).getPathLogique(), lockedFiles.get(i).getNomPhysique(),lockedFiles.get(i).getNomReel(), new Date(), true, newVersion);
+                               if(file==null){
+                                   returnObject.put("response","false");
+                                    returnObject.put("errors", "Erreur lors de la creation du fichier :"+i);
+                                    return returnObject.toString();
+                                }
+                               for(int j=0;j<fichiersLastVersion.size();j++){
+                                   if(lockedFiles.get(i).getPathLogique()!=fichiersLastVersion.get(j).getPathLogique()){
+                                       FichiersVersion file2 = fichiersVersionDao.createNewFichierVersion(fichiersLastVersion.get(j).getPathLogique(), fichiersLastVersion.get(j).getNomPhysique(),fichiersLastVersion.get(j).getNomReel(), new Date(), true, newVersion);
+                                        if(file2==null){
+                                            returnObject.put("response","false");
+                                            returnObject.put("errors", "Erreur lors de la creation du fichier :"+j);
+                                            return returnObject.toString();
+                                        }
+                                   }
+                           }
+                           //Puis on ajoute les fichers verrouillés a cette nouvelle version:
+                           //dans la base dans le cas de nouveaux fichiers, puis aussi en physique
+                           //(càd copie du contenu des fichiers verrouillés dans les fichers correpondant dans la version)
+                           
+                           //On peut ensuite enlever le verrou sur ces fichiers.(seulement pour moi 2-->0)
+                           }
+                           for(int k =0 ;k<lockedFiles.size();k++){
+                           boolean test = fichierUserDao.changeVerrou(lockedFiles.get(k),0);
+                           if(!test){
+                               returnObject.put("response","false");
+                               returnObject.put("errors","Le verrou n'a pas été relaché pour "+lockedFiles.get(k).getNomPhysique());
+                               return returnObject.toString();
+                           }
+                       }
+             
+                       }
+                   }
+                returnObject.put("result", "true");
+                return returnObject.toString();
+            }
+        }
+        catch(Exception e){
+            System.out.println("Erreur JSON");
+            System.out.println(e.getMessage());
+            
+            //TODO: ce try-catch ne sert qu'Ã  afficher les erreurs
+            try{
+                JSONObject obj = new JSONObject();
+                obj.put("errors",e.getMessage());
+                obj.put("response","false");
+                return obj.toString();
+            }
+            catch(Exception er){
+                
+            }
+            return null;
+        }
+    }
+    
+    @ResponseBody
+    @RequestMapping(value="/verrouillerFichier", method = RequestMethod.GET,produces = "application/json")
+    public String verrouillerFichier(HttpServletRequest request) throws JSONException{
+  
+    // Pas de session ouverte
+    JSONObject returnObject = new JSONObject();
+    
+    
+    try{
+            returnObject.put("response", "");
+            returnObject.put("errors", "");
+            
+            // On vÃ©rifie qu'une session est bien ouverte
+            HttpSession session= request.getSession();
+            User user = (User)session.getAttribute("user");
+
+            if(user == null){
+                returnObject.put("response","false");
+                returnObject.put("errors", "No user");
+                return returnObject.toString();
+            }
+            else
+            {
+                //On recupere le fichier grace a sn pathLogique
+                FichiersUsers file = fichierUserDao.getPathByPathLogique(user,request.getParameter("pathLogique"));
+                if(file==null){
+                    returnObject.put("response","false");
+                    returnObject.put("errors", "Pas de fichier trouvé pour ce pathLogique");
+                    return returnObject.toString();
+                }
+                int verrou = file.getVerrou();
+                if(verrou==0){
+                    //On essaye de mettre le verrou sur le fichier pour nous
+                    boolean verrouMoi = fichierUserDao.changeVerrou(file, 2);
+                    if(!verrouMoi){
+                        returnObject.put("response","false");
+                        returnObject.put("errors", "La mise en place du verrou a échoué (val. 2)");
+                        return returnObject.toString();
+                    }
+                    //On recupere les fichiers qui correspondent au mien pour les autres utilisateurs
+                    List<FichiersUsers> files =fichierUserDao.getPathsByPathLogique(user,request.getParameter("pathLogique"));
+                    if(files!=null){
+                        boolean verrouAutre = fichierUserDao.changeVerrouAutre(files, 1);
+                        if(!verrouAutre){
+                            returnObject.put("response","false");
+                            returnObject.put("errors", "La mise en place du verrou sur les fichiers des autres utilisateurs a échoué (val. 1)");
+                            return returnObject.toString();
+                        }
+                    }
+                    returnObject.put("response","true");
+                    return returnObject.toString();
+                }else if (verrou==2){
+                    returnObject.put("response","false");
+                    returnObject.put("errors", "Vous avez deja verrouillé ce fichier!");
+                    return returnObject.toString();
+                }else{
+                    returnObject.put("response","false");
+                    returnObject.put("errors", "Ce fichier a deja été verrouillé par un autre utilisateur!");
+                    return returnObject.toString();
+                }
+            }
+        }
+        catch(Exception e){
+            System.out.println("Erreur JSON");
+            System.out.println(e.getMessage());
+            
+            //TODO: ce try-catch ne sert qu'Ã  afficher les erreurs
+            try{
+                JSONObject obj = new JSONObject();
+                obj.put("response","false");
+                obj.put("errors",e.getMessage());
+                return obj.toString();
+            }
+            catch(Exception er){
+                
+            }
+            return null;
+        }
+}
 }
