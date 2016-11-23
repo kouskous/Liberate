@@ -121,7 +121,7 @@ public class CompilationController {
         if(!buildAndCreateExec(path, projet.getLangage(), user, nomProjet)){
             try{
                 returnObject.put("response", "false");
-                returnObject.put("content", "");
+                returnObject.put("content", getCompileErrors(path, user, nomProjet));
                 returnObject.put("errors", "Erreur lors de la compilation");
                 return returnObject.toString();
             }
@@ -132,7 +132,7 @@ public class CompilationController {
         // Reussite
         try{
             returnObject.put("response", "true");
-            returnObject.put("content", "");
+            returnObject.put("content", getCompileErrors(path, user, nomProjet));
             returnObject.put("errors", "");
             return returnObject.toString();
         }
@@ -235,9 +235,11 @@ public class CompilationController {
             // Executing make command
             String pathToMakeFile = directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet;
             try{
-                Runtime rt = Runtime.getRuntime();
-                Process pr = rt.exec("make", null, new File(pathToMakeFile));
-                pr.waitFor();
+                ProcessBuilder builder = new ProcessBuilder("make");
+                builder.directory(new File(pathToMakeFile));
+                builder.redirectError(new File(pathToMakeFile + "/errors.txt"));
+                Process p = builder.start();
+                p.waitFor();
             }
             catch(Exception e){
                 System.out.println("Erreur pendant l'execution du makefile");
@@ -248,16 +250,39 @@ public class CompilationController {
             try{                
                 File file = new File(directoryPath + "/../../execs_" + user.getPseudo() + "/" + "exe");
                 file.getParentFile().mkdirs();
-                FileOutputStream fos = new FileOutputStream(file);
-                fos.write(Files.readAllBytes(
-                        Paths.get(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "exe")));
-                fos.close();
+                
+                if(new File(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "exe").exists()){
+                    FileOutputStream fos = new FileOutputStream(file);
+                    fos.write(Files.readAllBytes(
+                            Paths.get(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "exe")));
+                    fos.close();
+                }
+                else{
+                    return false;
+                }
             }
             catch(Exception e){
                 System.out.println("Erreur pendant le déplacement de l'executable");
                 return false;
             }
-           
+            
+            // Moving errors to right folder
+            try{                
+                File file = new File(directoryPath + "/../../execs_" + user.getPseudo() + "/" + "errors.txt");
+                file.getParentFile().mkdirs();
+                
+                if(new File(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "errors.txt").exists()){
+                    FileOutputStream fos = new FileOutputStream(file);
+                    fos.write(Files.readAllBytes(
+                            Paths.get(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "errors.txt")));
+                    fos.close();
+                }
+            }
+            catch(Exception e){
+                System.out.println("Erreur pendant le déplacement du fichier d'erreurs");
+                return false;
+            }
+            
             // Deleting compile folder
             try{
                 deleteFile(new File(pathToMakeFile + "/../../compile_" + user.getPseudo()));
@@ -281,6 +306,23 @@ public class CompilationController {
         element.delete();
     }
 
+    private String getCompileErrors(String directoryPath, User user, String nomProjet)
+    {
+        File file = new File(directoryPath + "/../../execs_" + user.getPseudo() + "/" + "errors.txt");
+        if(!file.exists()){
+            return new String("");
+        }
+        else{
+            try{
+                return new String(Files.readAllBytes(
+                        Paths.get(directoryPath + "/../../execs_" + user.getPseudo() + "/" + "errors.txt")));
+            }
+            catch(Exception e){
+                return new String("");
+            }
+        }
+    }
+    
     // Téléchargement de l'executable
     @ResponseBody
     @RequestMapping(value="/downloadExec", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
