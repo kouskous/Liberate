@@ -14,6 +14,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -43,6 +44,24 @@ public class UserProjetDaoTest {
         userProjetDao.createNewUserProjet("Admin", Date.from(Instant.now()), Date.from(Instant.now()), florian, projetFlorian);
 
         Assert.assertEquals("Admin", userProjetDao.getUserProjetByUIdPId(florian.getIdUser(), projetFlorian.getIdProjet()).getTypeDroit());
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void getProjetsByUser() throws Exception {
+        User florian = userDAO.createNewUser("fbautry", "florian@test.test", "Bautry", "Florian", Date.from(Instant.now()), Date.from(Instant.now()), "mdp");
+
+        Projet projetFlorian1 = projetDAO.createNewProjet("MonProjet1", Date.from(Instant.now()), Date.from(Instant.now()), "Java");
+        Projet projetFlorian2 = projetDAO.createNewProjet("MonProjet2", Date.from(Instant.now()), Date.from(Instant.now()), "Java");
+
+        userProjetDao.createNewUserProjet("Admin", Date.from(Instant.now()), Date.from(Instant.now()), florian, projetFlorian1);
+        userProjetDao.createNewUserProjet("Admin", Date.from(Instant.now()), Date.from(Instant.now()), florian, projetFlorian2);
+
+        Collection<Projet> projets = userProjetDao.getProjetsByUser(florian);
+
+        Assert.assertTrue(projets.contains(projetFlorian1));
+        Assert.assertTrue(projets.contains(projetFlorian2));
     }
 
     @Test

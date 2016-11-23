@@ -5,6 +5,8 @@
  */
 package dao;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -51,6 +53,40 @@ public class UserProjetDao {
         else{
             throw new Exception("Erreur BDD: plusieurs UserProjets avec la même paire User/Projet");
         }
+    }
+
+    /**
+     * @param user l'utilisateur
+     * @return une collection vide si il n'y a rien.
+     *          les projets de l'utilisateur sinon.
+     */
+    public Collection<Projet> getProjetsByUser(User user){
+
+        // Recherche du UserProjet par idUser et idProjet (unique)
+        TypedQuery<UserProjet> query = em.createNamedQuery("UserProjet.findByIdU", UserProjet.class);
+        query.setParameter("idU", user.getIdUser());
+        List<UserProjet> userProjets = query.getResultList();
+
+        ProjetDao projetDao = new ProjetDao(em);
+
+        Collection<Projet> result = new ArrayList<>();
+        // Si aucun UserProjet n'est trouvé avec ces ID
+        if(userProjets.isEmpty()){
+            return result;
+        }
+        // Un UserProjet a été trouvé
+        else {
+            for (UserProjet userProjet : userProjets) {
+                try {
+                    result.add(projetDao.getProjetByName(userProjet.getProjet().getNom()));
+                }
+                catch (Exception e) {
+                    System.err.println(e.getMessage());
+                }
+            }
+        }
+
+        return result;
     }
        
     // Création d'un nouveau UserProjet
