@@ -118,17 +118,17 @@ public class FichierUserDaoTest {
     public void getArborescence() throws Exception {
         User florian = userDAO.createNewUser("fbautry", "florian@test.test", "Bautry", "Florian", Date.from(Instant.now()), Date.from(Instant.now()), "mdp");
 
-        fichierUserDAO.createNewFichierUser("/dossier1/fichierTest", "fichierTest", "fichierTest", Date.from(Instant.now()), FichiersUsers.Type.FICHIER, florian, 0);
-        fichierUserDAO.createNewFichierUser("/dossier1/dossierTest", "dossierTest", "dossierTest", Date.from(Instant.now()), FichiersUsers.Type.DOSSIER, florian, 4);
+        FichiersUsers fichierTest = fichierUserDAO.createNewFichierUser("/dossier1/fichierTest", "fichierTest", "fichierTest", Date.from(Instant.now()), FichiersUsers.Type.FICHIER, florian, 0);
+        FichiersUsers dossierTest = fichierUserDAO.createNewFichierUser("/dossier1/dossierTest", "dossierTest", "dossierTest", Date.from(Instant.now()), FichiersUsers.Type.DOSSIER, florian, 4);
 
-        Map<String, FichiersUsers.Type> arborescenceFlorian = fichierUserDAO.getArborescence(florian);
+        Collection<FichiersUsers> arborescenceFlorian = fichierUserDAO.getArborescence(florian);
 
-        Assert.assertEquals(FichiersUsers.Type.FICHIER ,arborescenceFlorian.get("/dossier1/fichierTest"));
-        Assert.assertEquals(FichiersUsers.Type.DOSSIER ,arborescenceFlorian.get("/dossier1/dossierTest"));
+        Assert.assertTrue(arborescenceFlorian.contains(fichierTest));
+        Assert.assertTrue(arborescenceFlorian.contains(dossierTest));
 
         User remi = userDAO.createNewUser("remiSansFichiers", "remi@test.test", "Test", "Remi", Date.from(Instant.now()), Date.from(Instant.now()), "mdp");
 
-        Map<String, FichiersUsers.Type> arborescenceRemi = fichierUserDAO.getArborescence(remi);
+        Collection<FichiersUsers> arborescenceRemi = fichierUserDAO.getArborescence(remi);
 
         Assert.assertTrue(arborescenceRemi.isEmpty());
     }
