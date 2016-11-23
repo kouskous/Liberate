@@ -146,8 +146,7 @@ public class UserProjetDao {
     // - Renvoie vrai si réussite
     // - Faux sinon
     public boolean changeDroitsUserProjet(String typeDroit, UserProjet userProjet){
-        
-        em.getTransaction().begin();
+
         
         // Vérification que typeDroit est une chaine de caractère valide
         if (typeDroit.equals("admin") || typeDroit.equals("developpeur") || typeDroit.equals("reporteur")){
@@ -155,7 +154,6 @@ public class UserProjetDao {
       
             try{
                 em.persist(userProjet);
-                em.getTransaction().commit();
                 return true;
             }
             catch (Exception e){

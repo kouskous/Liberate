@@ -134,9 +134,7 @@ public class ProjetController {
                                     // Pour chaque autre utilisateur a ajouter, on le trouve dans la BDD et on l'ajoute avec ses droits
                                     for (int i = 0; i < usersProjet.size(); i++){
                                         User newUser = userDao.getUserByPseudo(usersProjet.get(i));
-                                           System.out.println(projet);
-            System.out.println(newUser);
-            System.out.print(droitsUsers.get(i));
+                                 
                                         userProjetDao.createNewUserProjet(droitsUsers.get(i), new Date(), new Date(), newUser, projet);
                                         if(userProjetDao == null)
                                             throw new Exception();
@@ -599,8 +597,7 @@ public class ProjetController {
             else{
                 
                 try{
-                    int retval = pseudoUsersProjet.size();
-                    System.out.println(retval);
+                    
                     for (int i = 0; i < pseudoUsersProjet.size(); i++){
                         user = userDao.getUserByPseudo(pseudoUsersProjet.get(i));
                         
@@ -638,11 +635,11 @@ public class ProjetController {
         
         // On supprime les utilisateurs du projet
         try{
-            System.out.println(userList);
-            System.out.println(userList.size());
             
-            for (int i = 0; i <= userList.size(); i++){
+            
+            for (int i = 0; i < userList.size(); i++){
                 Boolean res = userProjetDao.deleteUserProjet(userList.get(i), projet);
+                System.out.print(res);
                 if(res == false){
                     try{
                         returnObject.put("response", "false");
@@ -722,6 +719,7 @@ public class ProjetController {
         ArrayList<UserProjet> userList = new ArrayList<UserProjet>();
         try{
             projet = projetDao.getProjetByName(nomProjet);
+            
             if(projet == null){
                 try{
                     returnObject.put("response", "false");
@@ -733,8 +731,9 @@ public class ProjetController {
                 catch(Exception e2){return null;} 
             }
             
-            for (int i = 0; i <= 9; i++){
+            for (int i = 0; i < pseudoUsersProjet.size(); i++){
                 user = userDao.getUserByPseudo(pseudoUsersProjet.get(i));
+                System.out.println(user);
                 if(user == null){throw new Exception("Erreur pendant la récupération d'un utilisateur");}
 
                 userProjet = userProjetDao.getUserProjetByUIdPId(user.getIdUser(), projet.getIdProjet());
@@ -755,13 +754,16 @@ public class ProjetController {
         
         // On change les droits des utilisateurs du projet
         try{
+            System.out.println(userList.size());
             for (int i = 0; i < userList.size(); i++){
+                System.out.println(droitsUsers.get(i));
                 Boolean res = userProjetDao.changeDroitsUserProjet(droitsUsers.get(i), userList.get(i));
+                
                 if(res == false){
                     try{
                         returnObject.put("response", "false");
                         returnObject.put("content", "");
-                        returnObject.put("errors", "Erreur pendant le changements des droits");
+                        returnObject.put("errors", "Erreur pendant xx le changements des droits");
                         return returnObject.toString();
                     }
                     // Json Fail
@@ -773,6 +775,7 @@ public class ProjetController {
             try{
                 returnObject.put("response", "false");
                 returnObject.put("content", "");
+                System.out.println(e.getMessage());
                 returnObject.put("errors", "Erreur pendant le changements des droits");
                 return returnObject.toString();
             }
