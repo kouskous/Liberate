@@ -134,7 +134,7 @@ public class CompilationController {
         }
         
         // Compilation pour projets C/C++
-        if(projet.getLangage() == "c" || projet.getLangage() == "c++"){
+        if(projet.getLangage().equals("c") || projet.getLangage().equals("c++")){
             if(!buildAndCreateExecC(path, user, projet.getLangage(), nomProjet)){
                 try{
                     returnObject.put("response", "false");
@@ -148,7 +148,7 @@ public class CompilationController {
         }
         
         // Compilation pour projets Java
-        if(projet.getLangage() == "java"){
+        if(projet.getLangage().equals("java")){
             if(!buildAndCreateJarJava(path, user, nomProjet, mainClass)){
                 try{
                     returnObject.put("response", "false");
@@ -329,21 +329,20 @@ public class CompilationController {
     {
         // Compilation des sources java
         String pathToProject = directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet;
-        
         try{
-            ProcessBuilder builder = new ProcessBuilder("find . -name *.java -exec javac");
+            ProcessBuilder builder = new ProcessBuilder("echo fred");//"find . -name *.java -exec javac {} \\;");
+            //System.out.println("\"find -name *.java -exec javac {} \\\\;\"");
             builder.directory(new File(pathToProject));
+            builder.redirectOutput(new File(pathToProject + "/blabla.txt"));
             builder.redirectError(new File(pathToProject + "/errors.txt"));
             Process p = builder.start();
             p.waitFor();
         }
         catch(Exception e){
-            System.out.println("Erreur pendant la compilation javac");
+            System.out.println("Erreur pendant la compilation javac: " + e.getMessage());
             return false;
         }
-        
-        //find . -name \*.php -exec sed -i 's/a remplacer/remplacement/g' {} \;
-        //
+
         return true;
     }
     
