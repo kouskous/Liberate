@@ -268,3 +268,20 @@ footer {
 #btn_deverrouiller{
     color: red;
 }
+
+
+#btn_sauvegarder{
+    color: blue;
+}
+
+#btn_new_folder{
+    color: brown;
+}
+
+#btn_new_file{
+    color: white;
+}
+
+#btn_rename{
+    color: orange;
+}
