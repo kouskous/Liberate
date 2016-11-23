@@ -35,7 +35,7 @@ public class FichiersVersionDao{
     
     //Pour creer un fichierVersion
     public FichiersVersion createNewFichierVersion(String pathLogique, String nomPhysique, String nomReel, Date dateCreation,
-            boolean type, Version version){
+            FichiersVersion.Type type, Version version){
 
         // Création nouvel utilisateur
         FichiersVersion newFichierVersion = new FichiersVersion(pathLogique, nomPhysique, nomReel, dateCreation, type, version);
@@ -60,7 +60,7 @@ public class FichiersVersionDao{
         List<FichiersVersion> results = query.getResultList();
         
         if(results.size()!=0){
-            if(results.get(0).getType())
+            
              return results;
         }
         return null;

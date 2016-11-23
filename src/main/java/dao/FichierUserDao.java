@@ -16,25 +16,19 @@ import org.springframework.stereotype.Repository;
  *
  * @author Florian
  */
+@Transactional
 public class FichierUserDao {
-    
+
+    @PersistenceContext
     EntityManager em;
 
-    public FichierUserDao(){
-    
-    }
-    
-    public FichierUserDao(EntityManager em_){
-        em = em_;
-    }
-    
-    public EntityManager getEntityManager(){
-        return this.em;
+    public EntityManager getEntityManager() {
+        return em;
     }
 
     // Cherche les fichiers d'un utilisateur dans la BDD
-    // - renvoie null s'il n'y a pas de fichiers pour cet user.
     // - renvoie la liste des fichiers de l'user si il y est
+    // - renvoie une liste vide sinon
     public Collection<FichiersUsers> getFichiersByUser(User user) {
 
         // Recherche des fichiers
@@ -44,7 +38,7 @@ public class FichierUserDao {
 
         // Si aucun fichier n'est trouvé avec cet user
         if(results.isEmpty()){
-            return null;
+            return new ArrayList<>();
         }
         // Des fichiers ont été trouvés
         return results;
@@ -98,7 +92,7 @@ public class FichierUserDao {
         }
     }
     
-    
+
 
     /**
      * @author Florian
@@ -107,7 +101,7 @@ public class FichierUserDao {
      * @param user l'utilisateur dont on veux l'arborescence
      * @return Renvoie l'arborescence complete depuis la racine de l'utilisateur
      */
-    public Map<String, Boolean> getArborescence(User user){
+    public Collection<FichiersUsers> getArborescence(User user){
         return getArborescence(user, null);
     }
 
@@ -120,18 +114,17 @@ public class FichierUserDao {
      *                si null depuis la racine de l'utilisateur
      * @return Renvoie l'arborescence depuis le dossier en question, ou null si le dossier est un fichier
      */
-    public Map<String, Boolean> getArborescence(User user, FichiersUsers dossier){
-        //TODO changer le Type de fichier en enumeration
+    public Collection<FichiersUsers> getArborescence(User user, FichiersUsers dossier){
         try {
-            Map<String, Boolean> arborescence = new Hashtable<>();
+            Map<String, FichiersUsers.Type> arborescence = new Hashtable<>();
             Collection<FichiersUsers> fichiers;
 
             if(dossier == null) {
-                fichiers = user.getFichiersUsersCollection();
+                fichiers = getFichiersByUser(user);
             }
 
             //si le fichier n'est pas un dossier
-            else if (dossier.getType() == true) {
+            else if (dossier.getType() != FichiersUsers.Type.DOSSIER) {
                 throw new IllegalArgumentException();
             }
             else {
@@ -141,11 +134,8 @@ public class FichierUserDao {
                 fichiers = query.getResultList();
             }
 
-            for (FichiersUsers fichier : fichiers) {
-                arborescence.put(fichier.getPathLogique(), fichier.getType());
-            }
 
-            return arborescence;
+            return fichiers;
         }
         catch(IllegalArgumentException e){
             System.out.println(e.getMessage());
@@ -158,16 +148,14 @@ public class FichierUserDao {
     // Renvoie le fichier si réussite
     // Renvoie null sinon
     public FichiersUsers createNewFichierUser(String pathLogique, String nomPhysique, String nomReel, Date dateCreation,
-                                     boolean type, User user,int verrou){
+                                              FichiersUsers.Type type, User user, int verrou){
 
         // Création nouvel utilisateur
-        FichiersUsers newFichierUsers = new FichiersUsers(pathLogique, nomPhysique, nomReel, dateCreation, type, user,verrou);
+        FichiersUsers newFichierUsers = new FichiersUsers(pathLogique, nomPhysique, nomReel, dateCreation, type, user, verrou);
 
         // On essaye d'ajouter l'utilisateur à la persistence
         try{
-            em.getTransaction().begin();
             em.persist(newFichierUsers);
-            em.getTransaction().commit();
             return newFichierUsers;
         }
         catch(Exception e){
@@ -188,9 +176,7 @@ public class FichierUserDao {
 
             // Si on l'a trouvé, on le supprime
             if(fichiersUsersToDelete != null){
-                em.getTransaction().begin();
                 em.remove(fichiersUsersToDelete);
-                em.getTransaction().commit();
                 return true;
             }
             else{
@@ -204,33 +190,35 @@ public class FichierUserDao {
             return false;
         }
     }
-    
+
     public FichiersUsers getPathByPathLogique(User user,String pathLogique){
         TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByUserAndPath", FichiersUsers.class);
         query.setParameter("user", user);
         query.setParameter("pathLogique", pathLogique);
         List<FichiersUsers> results = query.getResultList();
-        
+
         if(results.size()==1){
-            if(results.get(0).getType())
+            if(results.get(0).getType() == FichiersUsers.Type.FICHIER)
              return results.get(0);
         }
         return null;
     }
-    
+
     public List<FichiersUsers> getPathsByPathLogique(User user,String pathLogique){
         TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByNotUserAndPath", FichiersUsers.class);
         query.setParameter("user", user);
         query.setParameter("pathLogique", pathLogique);
         List<FichiersUsers> results = query.getResultList();
-        
+
         if(results.size()!=0){
-            if(results.get(0).getType())
+            if(results.get(0).getType() == FichiersUsers.Type.FICHIER){
+                System.out.println(results.size());
              return results;
+            }
         }
         return null;
     }
-    
+
     public List<FichiersUsers> getLockedByUserAndProjet(User user,String projet){
         TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findLockedByUserAndProjet", FichiersUsers.class);
         query.setParameter("user", user);
@@ -238,7 +226,7 @@ public class FichierUserDao {
         List<FichiersUsers> results = query.getResultList();
         
         if(results.size()!=0){
-            if(results.get(0).getType())
+            
              return results;
         }
         return null;
@@ -249,9 +237,9 @@ public class FichierUserDao {
         query.setParameter("user", user);
         query.setParameter("pathLogique", pathLogique);
         List<FichiersUsers> results = query.getResultList();
-        
+
         if(results.size()==1){
-            if(results.get(0).getType())
+            if(results.get(0).getType() == FichiersUsers.Type.FICHIER)
              return results.get(0).getVerrou();
         }
         return 5;
@@ -263,7 +251,7 @@ public class FichierUserDao {
         List<FichiersUsers> results = query.getResultList();
         
         if(results.size()!=0){
-            if(results.get(0).getType())
+           
              return results;
         }
         return null;
@@ -277,13 +265,10 @@ public class FichierUserDao {
      * @param newPathLogique le nouveau chemin physique
      * @return Renvoie vrai si réussi, faux sinon
      */
-    @Transactional
     public boolean changePathLogique(FichiersUsers fichierToChange, String newPathLogique){
         if(fichierToChange != null){
             fichierToChange.setPathLogique(newPathLogique);
-            em.getTransaction().begin();
             em.persist(fichierToChange);
-            em.getTransaction().commit();
             return true;
         }
         else{
@@ -292,28 +277,26 @@ public class FichierUserDao {
     }
 
     // TODO: toutes les autres fonctions de modification qu'on aura besoin.
-    
     public boolean changeVerrou(FichiersUsers fichierToChange, int verrou){
         if(fichierToChange != null){
+            
             fichierToChange.setVerrou(verrou);
-            em.getTransaction().begin();
+             
             em.persist(fichierToChange);
-            em.getTransaction().commit();
+            
             return true;
         }
         else{
             return false;
         }
     }
-    
+
     public boolean changeVerrouAutre(List<FichiersUsers> fichiersToChange, int verrou){
         if(fichiersToChange != null){
-            em.getTransaction().begin();
             for(int i=0;i<fichiersToChange.size();i++){
             fichiersToChange.get(i).setVerrou(verrou);
             em.persist(fichiersToChange.get(i));
             }
-            em.getTransaction().commit();
             return true;
         }
         else{

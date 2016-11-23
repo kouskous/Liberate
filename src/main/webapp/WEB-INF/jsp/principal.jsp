@@ -1,5 +1,6 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
 	
 	<!-- start: Meta -->
@@ -18,9 +19,8 @@
         <link id="base-style-responsive" href="/Liber8/resources/liber8/css/principal.css" rel="stylesheet">
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&subset=latin,cyrillic-ext,latin-ext' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="/Liber8/resources/EasyTree/skin-win8/ui.easytree.css">
-        <link rel="stylesheet" href="/Liber8/resources/highlight/styles/darcula.css">
-        <script src="/Liber8/resources/highlight/highlight.pack.js"></script>
-        <script>hljs.initHighlightingOnLoad();</script>
+        <link id="base-style-responsive" href="/Liber8/resources/liber8/css/newProjet.css" rel="stylesheet">
+        <link rel="stylesheet" href="/Liber8/resources/Toastr/nuget/content/content/toastr.css"/>
         <!-- end: CSS -->
 	
 
@@ -54,19 +54,7 @@
                                         </li>
                                         
                                         <li class="btn_action">
-                                            <a class="user-action" href="#" data-toggle="modal" data-target="#projet" data-url=""><i class="halflings-icon white plus-sign"></i>Dossier </a>
-                                        </li>
-                                        
-                                        <li class="btn_action">
-                                            <a class="user-action" href="#" data-toggle="modal" data-target="#projet" data-url="newFile"><i class="halflings-icon white plus-sign"></i>Fichier </a>
-                                        </li>
-                                        
-                                        <li class="btn_action">
-                                            <a href="#"><i class="icon-signin"></i>Importer</a>
-                                        </li>
-                                        
-                                        <li class="btn_action">
-                                            <a href="#"><i class="icon-signout"></i>Exporter</a>
+                                            <a href="#"><i class="icon-download-alt"></i>Pull</a>
                                         </li>
                                         
                                         <li class="btn_action">
@@ -131,7 +119,7 @@
                                                     </a>
                                                     <ul class="dropdown-menu">
                                                             <li><a href="#"><i class="halflings-icon user"></i> Profile</a></li>
-                                                            <li><a href="/Liber8/logout"><i class="halflings-icon off"></i> Déconnexion</a></li>
+                                                            <li><a href="/Liber8/logout"><i class="halflings-icon off"></i> DÃ©connexion</a></li>
                                                     </ul>
                                         </li>
                                     </ul>
@@ -147,6 +135,14 @@
 			<!-- start: Main Menu -->
 			<div id="sidebar-left" class="span2 ui-widget-content">
 				<div class="nav-collapse sidebar-nav overscrollfolder">
+                                    <div id="toolbar">
+                                        
+                                        <button class="user-action" data-toggle="modal" data-target="#projet" data-url="newDossier"><i class="icon-folder-open"></i></i></button>
+                                        <button class="user-action" data-toggle="modal" data-target="#projet" data-url="newFile"><i class="icon-file"></i></button>
+                                        <button id="btn_supprimer"><i class="icon-trash"></i></button>
+                                        <button id="btn_verrouiller"><i class="icon-lock"></i></button>
+                                        <button id="btn_deverrouiller"><i class="icon-unlock"></i></button>
+                                    </div>    
                                     <div id="arbre">
                                         <ul id ="Root">
 
@@ -164,12 +160,7 @@
                                 </ul>
                             </div>
 
-                            <div id="editeur">function foo(items) {
-    var i;
-    for (i = 0; i &lt; items.length; i++) {
-        alert("Ace Rocks " + items[i]);
-    }
-}                           </div>
+                            <div id="editeur"></div>
                         </div>
                     </div>
 		</div>
@@ -187,6 +178,7 @@
 	
 	<!-- start: JavaScript-->
 
+                
 		<script src="/Liber8/resources/metro/js/jquery-1.9.1.min.js"></script>
                 
                 <script src="/Liber8/resources/metro/js/jquery-migrate-1.0.0.min.js"></script>
@@ -249,8 +241,12 @@
                 
                 <script src="/Liber8/resources/EasyTree/jquery.easytree.js"></script>  
                 
-                <script src="/Liber8/resources/liber8/js/principal.js"></script>
+                <script src="/Liber8/resources/blockUi/jquery.blockUI.js"></script>
                 
+                <script src="/Liber8/resources/Toastr/toastr.js"></script>
+                
+                <script src="/Liber8/resources/liber8/js/principal.js"></script>
+
                 <script src="/Liber8/resources/Ace/src/ace.js" type="text/javascript" charset="utf-8"></script>
                  
                 
@@ -259,7 +255,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <button id="close_modal_btn" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>
       <div id="modal_content">
       </div>

@@ -70,6 +70,7 @@
 								<button type="submit" class="btn btn-primary">Se connecter</button>
 							</div>
 							<div class="clearfix"></div>
+						</fieldset>
 					</form>
 					<hr>
 					<h3>mot de passe oublié?</h3>

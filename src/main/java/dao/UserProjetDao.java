@@ -5,6 +5,8 @@
  */
 package dao;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -21,21 +23,11 @@ import org.springframework.stereotype.Repository;
  *
  * @author Luc Di Sanza
  */
+@Transactional
 public class UserProjetDao {
-    
+
+    @PersistenceContext
     EntityManager em;
-    
-    public UserProjetDao(){
-        
-    }
-    
-    public EntityManager getEntityManager(){
-        return this.em;
-    }
-    
-    public UserProjetDao(EntityManager em){
-        this.em = em;
-    }
     
     // Cherche le UserProjet dans la BDD
     // - renvoie null si il n'y est pas.
@@ -62,11 +54,44 @@ public class UserProjetDao {
             throw new Exception("Erreur BDD: plusieurs UserProjets avec la même paire User/Projet");
         }
     }
+
+    /**
+     * @param user l'utilisateur
+     * @return une collection vide si il n'y a rien.
+     *          les projets de l'utilisateur sinon.
+     */
+    public Collection<Projet> getProjetsByUser(User user){
+
+        // Recherche du UserProjet par idUser et idProjet (unique)
+        TypedQuery<UserProjet> query = em.createNamedQuery("UserProjet.findByIdU", UserProjet.class);
+        query.setParameter("idU", user.getIdUser());
+        List<UserProjet> userProjets = query.getResultList();
+
+        ProjetDao projetDao = new ProjetDao(em);
+
+        Collection<Projet> result = new ArrayList<>();
+        // Si aucun UserProjet n'est trouvé avec ces ID
+        if(userProjets.isEmpty()){
+            return result;
+        }
+        // Un UserProjet a été trouvé
+        else {
+            for (UserProjet userProjet : userProjets) {
+                try {
+                    result.add(projetDao.getProjetByName(userProjet.getProjet().getNom()));
+                }
+                catch (Exception e) {
+                    System.err.println(e.getMessage());
+                }
+            }
+        }
+
+        return result;
+    }
        
     // Création d'un nouveau UserProjet
     // Renvoie le UserProjet si réussite
     // Renvoie null sinon
-    @Transactional
     public UserProjet createNewUserProjet(String typeDroit, Date dateCreation, Date dateModification, 
             User user, Projet projet){
         
@@ -77,9 +102,8 @@ public class UserProjetDao {
             
             // On essaye d'ajouter le UserProjet à la persistence
             try{
-                em.getTransaction().begin();
+
                 em.persist(newUserProjet);
-                em.getTransaction().commit();
                 return newUserProjet;
             }
             catch(Exception e){
@@ -104,9 +128,7 @@ public class UserProjetDao {
             
             // Si on l'a trouvé, on le supprime
             if(userProjetToDelete != null){
-                em.getTransaction().begin();
                 em.remove(userProjetToDelete);
-                em.getTransaction().commit();
                 return true;
             }
             else{
@@ -154,7 +176,6 @@ public class UserProjetDao {
     // TypeDroit doit faire partie de {"Admin", "Dev", "Reporter"}
     // - Renvoie vrai si réussite
     // - Faux sinon
-    @Transactional
     public boolean changeDroitsUserProjet(String typeDroit, UserProjet userProjet){
         
         // Vérification que typeDroit est une chaine de caractère valide
@@ -162,9 +183,7 @@ public class UserProjetDao {
             userProjet.setTypeDroit(typeDroit);
       
             try{
-                em.getTransaction().begin();
-                em.persist(em);
-                em.getTransaction().commit();
+                em.persist(userProjet);
                 return true;
             }
             catch (Exception e){

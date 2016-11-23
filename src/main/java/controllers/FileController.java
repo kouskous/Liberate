@@ -10,16 +10,24 @@ import dao.VersionDao;
 import dao.ProjetDao;
 import dao.FichiersVersionDao;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.persistence.EntityManager;
+import javax.persistence.Persistence;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.transaction.Transactional;
 import models.FichiersUsers;
 import models.FichiersVersion;
 import models.Projet;
@@ -61,7 +69,10 @@ public class FileController {
     public String index(HttpServletRequest request, ModelMap model){
         return "newFile";
     }
-    
+    @RequestMapping(value="/newDossier", method = RequestMethod.GET)
+    public String indexD(HttpServletRequest request, ModelMap model){
+        return "newDossier";
+    }
     @RequestMapping(value="/saveFile", method = RequestMethod.GET)
     public String indexSave(HttpServletRequest request, ModelMap model){
         return "saveFile";
@@ -102,13 +113,16 @@ public class FileController {
                     return returnObject.toString();
                 }
                 else{
+                    // Nom du fichier
+                    String fileName = extractFileName((String)request.getParameter("pathFichier"));  
                     
-                    String fileName = extractFileName((String)request.getParameter("pathFichier"));
-                    
+                    // Génération du path physique
+                    UUID idOne = UUID.randomUUID();
+
                     FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathFichier"), 
+                    idOne.toString(), 
                     fileName, 
-                    fileName, 
-                    new Date(), true, user,0);
+                    new Date(), FichiersUsers.Type.FICHIER, user, 0);
                     
                     if(newFile == null){
                         returnObject.put("errors", "Failed to create file");
@@ -122,7 +136,7 @@ public class FileController {
                                 String path = ctx.getRealPath("/");
                                 
                                 // TODO: change this path when deploying to server
-                                FileOutputStream out = new FileOutputStream(path + "/../../files/" + fileName);
+                                FileOutputStream out = new FileOutputStream(path + "/../../files/" + idOne.toString());
                             }
                             catch(Exception e){
                                 returnObject.put("response",e.getMessage());
@@ -163,69 +177,74 @@ public class FileController {
     @RequestMapping(value="/newDossier", method = RequestMethod.POST, produces = "application/json")
     public String newDossier(HttpServletRequest request, ModelMap model){           
         
-        EntityManager em = fichierUserDao.getEntityManager();
-        
         // On créé l'objet à retourner
         JSONObject returnObject = new JSONObject();   
         
-        try{
-            returnObject.put("response", "");
-            returnObject.put("errors", "");
-            
-            // On vérifie qu'une session est bien ouverte
-            HttpSession session= request.getSession();
-            User user = (User)session.getAttribute("user");
-
-            if(user == null){
+        // On vérifie qu'une session est bien ouverte
+        HttpSession session= request.getSession();
+        User user = (User)session.getAttribute("user");
+        
+        if(user == null){
+            try{
+                returnObject.put("response", "false");
+                returnObject.put("content", "");
                 returnObject.put("errors", "No user");
                 return returnObject.toString();
             }
-            else{
-                    em.getTransaction().begin();
-                    
-                    String fileName = extractFileName((String)request.getParameter("pathFichier"));
-                    System.out.print(fileName);
-                    FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathFichier"), 
-                    null, 
-                    fileName, 
-                    new Date(), false, user,4);
-                    
-                    if(newFile == null){
-                        returnObject.put("errors", "Failed to create file");
-                        return returnObject.toString();
-                    }
-                    else{
-                        try{
-                            em.persist(newFile);
-                            em.getTransaction().commit();
-                            em.close();
-                            
-                            returnObject.put("response",true);
-                            return returnObject.toString();
-                        }
-                        catch(Exception e){
-                            em.close();
-                            returnObject.put("errors","Erreur BDD");
-                            return returnObject.toString();
-                        }
-                    }
+            // JSon fail
+            catch(Exception e){return null;}
+        }
+        
+        // Extraction du nom de dossier
+        String fileName = extractFileName((String)request.getParameter("pathDossier"));
+        
+         // Génération du path physique
+        UUID idOne = UUID.randomUUID();
+        
+        if(fileName == null){
+            try{
+                returnObject.put("response", "false");
+                returnObject.put("content", "");
+                returnObject.put("errors", "Erreur pendant la récupération du nom de dossier");
+                return returnObject.toString();
+            }
+            // JSon fail
+            catch(Exception e){return null;}
+        }
+        
+        // Création du dossier
+        try{
+            FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathDossier"), 
+            idOne.toString(), 
+            fileName, 
+            new Date(), 
+            FichiersUsers.Type.DOSSIER, 
+            user, 4);
+            
+            if(newFile == null){
+                throw new Exception("Erreur pendant la création du dossier");
             }
         }
         catch(Exception e){
-            System.out.println("Erreur JSON");
-            System.out.println(e.getMessage());
-            
-            //TODO: ce try-catch ne sert qu'à afficher les erreurs
             try{
-                JSONObject obj = new JSONObject();
-                obj.put("errors",e.getMessage());
-                return obj.toString();
+                returnObject.put("response", "false");
+                returnObject.put("content", "");
+                returnObject.put("errors", "Erreur pendant la création du dossier");
+                return returnObject.toString();
             }
-            catch(Exception er){
-                
-            }
-            return null;
+            // JSon fail
+            catch(Exception e2){return null;}
         }
+        
+        // Réussite
+        try{
+            returnObject.put("response", "true");
+            returnObject.put("content", "");
+            returnObject.put("errors", "");
+            return returnObject.toString();
+        }
+        // Json fail
+        catch(Exception e){return null;}
     }
         
     // Enregistre un fichier
@@ -285,7 +304,7 @@ public class FileController {
                             ServletContext ctx = request.getServletContext();
                             String path = ctx.getRealPath("/");
                             
-                            FileOutputStream out = new FileOutputStream(path + "/../../files/" + fileName);
+                            FileOutputStream out = new FileOutputStream(path + "/../../files/" + fichier.getNomPhysique());
                             out.write(contenuFichier.getBytes());
                         }
                         catch(Exception e){
@@ -326,40 +345,58 @@ public class FileController {
     @ResponseBody
     @RequestMapping(value="/getFile", method = RequestMethod.POST,produces = "application/json")
     public String contentFile(HttpServletRequest request){
-            // On vérifie qu'une session n'est pas déjà ouverte
-    HttpSession session= request.getSession();
-    User user = (User)session.getAttribute("user");
-    // Pas de session ouverte
-    if(user == null) return "redirect:/login";
-
-    
-    
-    JSONArray list = new JSONArray();
         
-    FichiersUsers file = fichierUserDao.getPathByPathLogique(user,request.getParameter("pathLogique"));
-    String pathPhysique =file.getNomPhysique();
-    
-    
+        // On vérifie qu'une session est ouverte
+        HttpSession session= request.getSession();
+        User user = (User)session.getAttribute("user");
+
+        // Pas de session ouverte
+        if(user == null) return "redirect:/login";
+        
+        // Objet réponse
         JSONObject response = new JSONObject();
-         try{
-            response.put("pathLogique","");
-            response.put("pathPhysique","");
-            response.put("content","");
+        
+        FichiersUsers file = fichierUserDao.getPathByPathLogique(user,request.getParameter("pathLogique"));
+        if(file == null){
+            try{
+                response.put("pathLogique","");
+                response.put("pathPhysique","");
+                response.put("content","");
+                response.put("errors", "Erreur dans la récupération du contenu d'un fichier");
+                return response.toString();
             }
-         catch (Exception e){
-                }
+            // Json Fail
+            catch (Exception e){return null;}
+        }      
+          
+        // Récupération du path physique
+        String pathPhysique =file.getNomPhysique();
+        if(pathPhysique == null){
+            try{
+                response.put("pathLogique","");
+                response.put("pathPhysique","");
+                response.put("content","");
+                response.put("errors", "Erreur dans la récupération du path physique d'un fichier");
+                return response.toString();
+            }		
+            // Json fail
+            catch (Exception e){System.out.println(e.toString()); return null;}
+        }
+        
         if(pathPhysique != null){
             try{
-            response.put("pathLogique",request.getParameter("pathLogique"));
-            response.put("pathPhysique",pathPhysique);
+                response.put("pathLogique",request.getParameter("pathLogique"));
+                response.put("pathPhysique",pathPhysique);
+                response.put("content","");
             }		
-                catch (Exception e){
-                    System.out.println(e.toString());
-                }
+            // Json fail
+            catch (Exception e){System.out.println(e.toString()); return null;}
+            
+            // Récupération du contenu du fichier
             try{
                 ServletContext ctx = request.getServletContext();
                 String path = ctx.getRealPath("/");
-                InputStream flux=new FileInputStream(path+"/../../files/" +pathPhysique); 
+                InputStream flux=new FileInputStream(path+"/../../files/" + pathPhysique); 
                 InputStreamReader lecture=new InputStreamReader(flux);
                 BufferedReader buff=new BufferedReader(lecture);
                 String ligne;
@@ -380,8 +417,7 @@ public class FileController {
                     
                 }
         }
-    return  response.toString();
-       
+        return  response.toString();
     }
     
     @ResponseBody
@@ -444,7 +480,7 @@ public class FileController {
                                return returnObject.toString();
                            }
                            for(int i=0;i<lockedFiles.size();i++){
-                               FichiersVersion file = fichiersVersionDao.createNewFichierVersion(lockedFiles.get(i).getPathLogique(), lockedFiles.get(i).getNomPhysique(),lockedFiles.get(i).getNomReel(), new Date(), true, newVersion);
+                               FichiersVersion file = fichiersVersionDao.createNewFichierVersion(lockedFiles.get(i).getPathLogique(), lockedFiles.get(i).getNomPhysique(),lockedFiles.get(i).getNomReel(), new Date(), FichiersVersion.Type.FICHIER, newVersion);
                                if(file==null){
                                    returnObject.put("response","false");
                                     returnObject.put("errors", "Erreur lors de la creation du fichier :"+i);
@@ -452,7 +488,7 @@ public class FileController {
                                 }
                                for(int j=0;j<fichiersLastVersion.size();j++){
                                    if(lockedFiles.get(i).getPathLogique()!=fichiersLastVersion.get(j).getPathLogique()){
-                                       FichiersVersion file2 = fichiersVersionDao.createNewFichierVersion(fichiersLastVersion.get(j).getPathLogique(), fichiersLastVersion.get(j).getNomPhysique(),fichiersLastVersion.get(j).getNomReel(), new Date(), true, newVersion);
+                                       FichiersVersion file2 = fichiersVersionDao.createNewFichierVersion(fichiersLastVersion.get(j).getPathLogique(), fichiersLastVersion.get(j).getNomPhysique(),fichiersLastVersion.get(j).getNomReel(), new Date(), FichiersVersion.Type.FICHIER, newVersion);
                                         if(file2==null){
                                             returnObject.put("response","false");
                                             returnObject.put("errors", "Erreur lors de la creation du fichier :"+j);
@@ -500,8 +536,8 @@ public class FileController {
     }
     
     @ResponseBody
-    @RequestMapping(value="/verrouillerFichier", method = RequestMethod.GET,produces = "application/json")
-    public String verrouillerFichier(HttpServletRequest request) throws JSONException{
+    @RequestMapping(value="/verrouillerFichier", method = RequestMethod.POST,produces = "application/json")
+    public String verrouillerFichier(HttpServletRequest request){
   
     // Pas de session ouverte
     JSONObject returnObject = new JSONObject();
@@ -524,6 +560,7 @@ public class FileController {
             {
                 //On recupere le fichier grace a sn pathLogique
                 FichiersUsers file = fichierUserDao.getPathByPathLogique(user,request.getParameter("pathLogique"));
+                System.out.println("file : "+file);
                 if(file==null){
                     returnObject.put("response","false");
                     returnObject.put("errors", "Pas de fichier trouv� pour ce pathLogique");
@@ -532,7 +569,9 @@ public class FileController {
                 int verrou = file.getVerrou();
                 if(verrou==0){
                     //On essaye de mettre le verrou sur le fichier pour nous
+                    System.out.println("avant");
                     boolean verrouMoi = fichierUserDao.changeVerrou(file, 2);
+                    System.out.println("apres");
                     if(!verrouMoi){
                         returnObject.put("response","false");
                         returnObject.put("errors", "La mise en place du verrou a �chou� (val. 2)");
@@ -540,8 +579,10 @@ public class FileController {
                     }
                     //On recupere les fichiers qui correspondent au mien pour les autres utilisateurs
                     List<FichiersUsers> files =fichierUserDao.getPathsByPathLogique(user,request.getParameter("pathLogique"));
+                    System.out.println("files : "+files);
                     if(files!=null){
                         boolean verrouAutre = fichierUserDao.changeVerrouAutre(files, 1);
+                        System.out.println("verrouAutre : "+verrouAutre);
                         if(!verrouAutre){
                             returnObject.put("response","false");
                             returnObject.put("errors", "La mise en place du verrou sur les fichiers des autres utilisateurs a �chou� (val. 1)");

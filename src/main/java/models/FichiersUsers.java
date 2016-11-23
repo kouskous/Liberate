@@ -7,19 +7,7 @@ package models;
 
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -46,6 +34,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 public class FichiersUsers implements Serializable {
 
+    public enum Type {DOSSIER, FICHIER}
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -68,10 +58,11 @@ public class FichiersUsers implements Serializable {
     @Column(name = "dateCreation")
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateCreation;
-    
+
+    @Enumerated(EnumType.STRING)
     @Basic(optional = false)
     @Column(name = "type")
-    private boolean type;
+    private Type type;
     
     @JoinColumn(name = "idU", referencedColumnName = "idU")
     @ManyToOne(optional = false)
@@ -85,7 +76,7 @@ public class FichiersUsers implements Serializable {
     }
 
     public FichiersUsers(String pathLogique, String nomPhysique, String nomReel, Date dateCreation,
-            boolean type, User user, int verrou) {
+                         Type type, User user, int verrou) {
         this.pathLogique = pathLogique;
         this.nomPhysique = nomPhysique;
         this.nomReel = nomReel;
@@ -127,11 +118,11 @@ public class FichiersUsers implements Serializable {
         this.dateCreation = dateCreation;
     }
 
-    public boolean getType() {
+    public Type getType() {
         return type;
     }
 
-    public void setType(boolean type) {
+    public void setType(Type type) {
         this.type = type;
     }
 

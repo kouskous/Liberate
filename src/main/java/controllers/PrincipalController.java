@@ -13,6 +13,9 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collection;
+
+import models.FichiersUsers;
 import models.User;
 import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
@@ -69,19 +72,21 @@ public class PrincipalController {
     
     JSONArray list = new JSONArray();
         
-    Map<String, Boolean> arborescence = fichierUserDao.getArborescence(user);
-    for (Map.Entry<String, Boolean> fichier: arborescence.entrySet()) {
+    Collection<FichiersUsers> arborescence = fichierUserDao.getArborescence(user);
+    for (FichiersUsers fichier: arborescence) {
         JSONObject response = new JSONObject();
-        if(fichier.getValue() == true){
+        if(fichier.getType() == FichiersUsers.Type.FICHIER){
             try{
-                response.put("path","/Root"+fichier.getKey());
+                response.put("path","/Root"+fichier.getPathLogique());
                 response.put("type","fichier");
+                response.put("verrouillage",fichier.getVerrou());
             } catch(Exception e){
             }
         }else {
             try{
-                response.put("path", "/Root"+fichier.getKey());
+                response.put("path", "/Root"+fichier.getPathLogique());
                 response.put("type","dossier");
+                response.put("verrouillage",fichier.getVerrou());
             } catch(Exception e){
             }
         }
