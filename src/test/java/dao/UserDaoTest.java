@@ -122,7 +122,7 @@ public class UserDaoTest {
 
         List<String> pseudos = userDao.getAllPseudo();
 
-        Assert.assertEquals("fbautry", pseudos.get(0));
-        Assert.assertEquals("fbautry2", pseudos.get(1));
+        Assert.assertTrue(pseudos.contains("fbautry"));
+        Assert.assertTrue(pseudos.contains("fbautry2"));
     }
 }
