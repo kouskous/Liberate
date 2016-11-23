@@ -330,10 +330,8 @@ public class CompilationController {
         // Compilation des sources java
         String pathToProject = directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet;
         try{
-            ProcessBuilder builder = new ProcessBuilder("echo fred");//"find . -name *.java -exec javac {} \\;");
-            //System.out.println("\"find -name *.java -exec javac {} \\\\;\"");
+            ProcessBuilder builder = new ProcessBuilder("find", "-name", "*.java", "-exec", "javac", "{}", ";");
             builder.directory(new File(pathToProject));
-            builder.redirectOutput(new File(pathToProject + "/blabla.txt"));
             builder.redirectError(new File(pathToProject + "/errors.txt"));
             Process p = builder.start();
             p.waitFor();
@@ -342,8 +340,91 @@ public class CompilationController {
             System.out.println("Erreur pendant la compilation javac: " + e.getMessage());
             return false;
         }
+        
+        if(new File(pathToProject + "/" + "main.class").exists()){
+        
+            // Création du manifest
+            try{
+                File file = new File(pathToProject + "/" + "MANIFEST.MF");
+                FileWriter writer = new FileWriter(file);
+                writer.write("Main-Class: " + "main\n");
+                writer.close();
+            }
+            catch(Exception e){
+                System.out.println("Erreur pendant la création du manifest pour le jar");
+                return false;
+            }
 
-        return true;
+            // Création du jar
+            try{
+                // Init du jar
+                ProcessBuilder builder = new ProcessBuilder("jar", "-cvmf", "MANIFEST.MF", nomProjet+".jar");//, "main.class");
+                builder.directory(new File(pathToProject));
+                Process p = builder.start();
+                p.waitFor();
+                
+                // Ajout de tous les .class
+                ProcessBuilder builder2 = new ProcessBuilder("find", "-name", "*.class", "-exec", "jar", "-uf", nomProjet+".jar", "{}", ";");
+                builder2.directory(new File(pathToProject));
+                Process p2 = builder2.start();
+                p.waitFor();
+            }
+            catch(Exception e){
+                System.out.println("Erreur pendant la création du jar");
+                return false;
+            }
+            
+            // Moving jar to right folder
+            /*try{                
+                File file = new File(directoryPath + "/../../execs_" + user.getPseudo() + "/" + nomProjet + ".jar");
+                file.getParentFile().mkdirs();
+
+                if(new File(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + nomProjet + ".jar").exists()){
+                    FileOutputStream fos = new FileOutputStream(file);
+                    fos.write(Files.readAllBytes(
+                            Paths.get(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + nomProjet + ".jar")));
+                    fos.close();
+                }
+                else{
+                    return false;
+                }
+            }
+            catch(Exception e){
+                System.out.println("Erreur pendant le déplacement de l'executable");
+                return false;
+            }
+
+            // Moving errors to right folder
+            try{                
+                File file = new File(directoryPath + "/../../execs_" + user.getPseudo() + "/" + "errors.txt");
+                file.getParentFile().mkdirs();
+
+                if(new File(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "errors.txt").exists()){
+                    FileOutputStream fos = new FileOutputStream(file);
+                    fos.write(Files.readAllBytes(
+                            Paths.get(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "errors.txt")));
+                    fos.close();
+                }
+            }
+            catch(Exception e){
+                System.out.println("Erreur pendant le déplacement du fichier d'erreurs");
+                return false;
+            }*/
+
+            // Deleting compile folder
+            /*try{
+                deleteFile(new File(pathToMakeFile + "/../../compile_" + user.getPseudo()));
+            }
+            catch(Exception e){
+                System.out.println("Erreur pendant la suppression du dossier de compile");
+                return false;
+            }*/
+            
+            
+            return true;
+        }
+
+        return false;
     }
     
     private void deleteFile(File element) {
