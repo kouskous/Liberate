@@ -151,27 +151,35 @@ $( document ).ready(function() {
     });    
     
     /** Sauvegarder le fichier dont l'onglet est sélectionné **/
-    $("#saveAction").click(function(){
-       content = App.editeur.getValue();
-       path = (App.currentOnglet).slice(4);
-       $.blockUI({ message: '<h2><img src="/Liber8/resources/blockUi/busy.gif" /> Enregistrement...</h2>' });
-       $.ajax({ 
-      url      : "/Liber8/saveFile",
-      type     : 'POST',
-      dataType : "json",
-      data     :{
-                    pathFichier: path,
-                    contenuFichier: content
-                },
-      success  : function(data) {  
-                        $.unblockUI();
-                        if(data.response){
-                            toastr.success("Enregistré");
-                        } else {
-                            toastr.warning(data.errors);
-                        }
-                    }       
-        });
+    $("#btn_sauvegarder").click(function(){
+        path = App.currentOnglet.replace(/\//g,'-');
+        path = path.replace('.','__');
+        element = $("#"+path);
+        if(element.hasClass("verou-reserve")) {
+            content = App.editeur.getValue();
+            path = (App.currentOnglet).slice(4);
+            $.blockUI({ message: '<h2><img src="/Liber8/resources/blockUi/busy.gif" /> Enregistrement...</h2>' });
+            $.ajax({ 
+                url      : "/Liber8/saveFile",
+                type     : 'POST',
+                dataType : "json",
+                data     :{
+                              pathFichier: path,
+                              contenuFichier: content
+                          },
+                success  : function(data) {  
+                                  $.unblockUI();
+                                  if(data.response){
+                                      toastr.success("Enregistré");
+                                  } else {
+                                      toastr.warning(data.errors);
+                                  }
+                              }       
+                  });
+        }
+        else {
+            toastr.warning("Vous ne pouvez enregistrer que les fichiers vérouillés actuellement en cours d'édition");
+        }
     });
     
     $("#editeur").keyup(function(){
@@ -221,6 +229,38 @@ $( document ).ready(function() {
         }
     });
     
+    /** Supprimer le fichier sélectionné dans le volet **/
+    $("#btn_supprimer").click(function(){
+        path = App.currentVoletElement.replace(/\//g,'-');
+        path = path.replace('.','__');
+        element = $("#"+path);
+        if(element.hasClass("verou-reserve")) {
+            path = (App.currentVoletElement).slice(4);
+            $.blockUI({ message: '<h2><img src="/Liber8/resources/blockUi/busy.gif" /> Suppression...</h2>' });
+            $.ajax({ 
+            url      : "/Liber8/removeFile",
+            type     : 'POST',
+            dataType : "json",
+            data     :{
+                          pathFichier: path,
+                      },
+            success  : function(data) {  
+                              $.unblockUI();
+                              if(data.response){
+                                    currentVolet = App.currentVoletElement.slice(4);
+                                    $(".close-onglet[data-id='"+ currentVolet +"']").trigger("click");
+                                    refreshTree();
+                                    toastr.success("Suppression réussie");
+                              } else {
+                                    toastr.warning(data.errors);
+                              }
+                        }       
+            });
+        }
+        else {
+            toastr.warning("Vous ne pouvez supprimer que les fichiers que vous avez vérouillés");
+        }   
+    });
+
+  
 });
-
-

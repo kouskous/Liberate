@@ -65,6 +65,11 @@ public class FileController {
         return "saveFile";
     }
     
+    @RequestMapping(value="/renameFile", method = RequestMethod.GET)
+    public String renameFile(HttpServletRequest request, ModelMap model){
+        return "renameFile";
+    }
+    
     // Création d'un fichier vide
     // Création d'un fichier
     // - Nécessite le champs "pathFichier" dans la requête
@@ -109,7 +114,7 @@ public class FileController {
                     FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathFichier"), 
                     idOne.toString(), 
                     fileName, 
-                    new Date(), FichiersUsers.Type.FICHIER, user, 0);
+                    new Date(), FichiersUsers.Type.FICHIER, user, 2);
                     
                     if(newFile == null){
                         returnObject.put("errors", "Failed to create file");

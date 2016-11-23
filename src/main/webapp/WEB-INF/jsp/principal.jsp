@@ -62,10 +62,6 @@
                                         </li>
                                         
                                         <li class="btn_action">
-                                            <a href="#" id="saveAction"><i class="icon-save"></i>Enregistrer</a>
-                                        </li>
-                                        
-                                        <li class="btn_action">
                                             <a id="btn_compile" href="#"><i class="icon-play"></i>Compiler</a>
                                         </li>
 
@@ -139,6 +135,8 @@
                                         
                                         <button class="user-action" data-toggle="modal" data-target="#projet" data-url="newDossier"><i class="icon-folder-open"></i></i></button>
                                         <button class="user-action" data-toggle="modal" data-target="#projet" data-url="newFile"><i class="icon-file"></i></button>
+                                        <button class="user-action" data-toggle="modal" data-target="#projet" data-url="renameFile"><i class="icon-edit"></i></button>
+                                        <button id="btn_sauvegarder"><i class="icon-save"></i></button>
                                         <button id="btn_supprimer"><i class="icon-trash"></i></button>
                                         <button id="btn_verrouiller"><i class="icon-lock"></i></button>
                                         <button id="btn_deverrouiller"><i class="icon-unlock"></i></button>

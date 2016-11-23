@@ -47,6 +47,7 @@ $( document ).ready(function() {
                                   App.tree.rebuildTree();
                                   $("#"+sourceNode.id).addClass("isFile");
                                   $("#"+sourceNode.id).addClass("branche-arbre");
+                                  $("#"+sourceNode.id).addClass("verou-reserve");
                                   defineArbreEvents();
                                   $("#"+sourceNode.id).trigger("dblclick");
                                   $("#"+path).next().css("display","block");
