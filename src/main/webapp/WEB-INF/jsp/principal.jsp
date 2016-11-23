@@ -133,9 +133,9 @@
 				<div class="nav-collapse sidebar-nav overscrollfolder">
                                     <div id="toolbar">
                                         
-                                        <button class="user-action" data-toggle="modal" data-target="#projet" data-url="newDossier"><i class="icon-folder-open"></i></i></button>
-                                        <button class="user-action" data-toggle="modal" data-target="#projet" data-url="newFile"><i class="icon-file"></i></button>
-                                        <button class="user-action" data-toggle="modal" data-target="#projet" data-url="renameFile"><i class="icon-edit"></i></button>
+                                        <button id="btn_new_folder" class="user-action" data-toggle="modal" data-target="#projet" data-url="newDossier"><i class="icon-folder-open"></i></i></button>
+                                        <button id="btn_new_file" class="user-action" data-toggle="modal" data-target="#projet" data-url="newFile"><i class="icon-file"></i></button>
+                                        <button id="btn_rename" class="user-action" data-toggle="modal" data-target="#projet" data-url="renameFile"><i class="icon-edit"></i></button>
                                         <button id="btn_sauvegarder"><i class="icon-save"></i></button>
                                         <button id="btn_supprimer"><i class="icon-trash"></i></button>
                                         <button id="btn_verrouiller"><i class="icon-lock"></i></button>

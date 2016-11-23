@@ -206,28 +206,82 @@ $( document ).ready(function() {
     
     $("#btn_verrouiller").click(function(){
         if(App.currentVoletElement != ""){
-            appPath = App.currentVoletElement.slice(4);
-            $.ajax({ 
-                url      : "/Liber8/verrouillerFichier",
-                type     : 'POST',
-                dataType : "json",
-                data     :{
-                              pathLogique: appPath,
-                          },
-                success  : function(data) {  
-                            if(data.response){
-                                toastr.success("Fichier vérouillé");
-                                path = App.currentVoletElement.replace(/\//g,'-');
-                                path = path.replace('.','__');
-                                element = $("#"+path);
-                                $(element).addClass("verou-reserve");
-                            } else {
-                                toastr.warning(data.errors);
-                            }
-                        }       
-            });
+            path = App.currentVoletElement.replace(/\//g,'-');
+            path = path.replace('.','__');
+            element = $("#"+path);
+            if(element.hasClass("isFile")) {
+                if(!(element.hasClass("verou-reserve") || element.hasClass("verou-bloque"))) {
+                    appPath = App.currentVoletElement.slice(4);
+                    $.ajax({ 
+                        url      : "/Liber8/verrouillerFichier",
+                        type     : 'POST',
+                        dataType : "json",
+                        data     :{
+                                      pathLogique: appPath,
+                                  },
+                        success  : function(data) {  
+                                    if(data.response){
+                                        toastr.success("Fichier vérouillé");
+                                        path = App.currentVoletElement.replace(/\//g,'-');
+                                        path = path.replace('.','__');
+                                        element = $("#"+path);
+                                        $(element).addClass("verou-reserve");
+                                    } else {
+                                        toastr.warning(data.errors);
+                                    }
+                                }       
+                    });
+                }
+                else {
+                    toastr.warning("Le fichier selectionné est déjà vérrouillé");
+                }
+            }
+            else {
+                toastr.warning("Veuillez sélectionner un fichier");
+            }
         }
     });
+    
+    $("#btn_déverrouiller").click(function(){
+        if(App.currentVoletElement != ""){
+            path = App.currentVoletElement.replace(/\//g,'-');
+            path = path.replace('.','__');
+            element = $("#"+path);
+            if(element.hasClass("isFile")) {
+                if(element.hasClass("verou-reserve")) {
+                    appPath = App.currentVoletElement.slice(4);
+                    $.ajax({ 
+                        url      : "/Liber8/deverrouillerFichier",
+                        type     : 'POST',
+                        dataType : "json",
+                        data     :{
+                                      pathLogique: appPath,
+                                  },
+                        success  : function(data) {  
+                                    if(data.response){
+                                        toastr.success("Fichier vérouillé");
+                                        path = App.currentVoletElement.replace(/\//g,'-');
+                                        path = path.replace('.','__');
+                                        element = $("#"+path);
+                                        currentVolet = App.currentVoletElement.slice(4);
+                                        $(".close-onglet[data-id='"+ currentVolet +"']").trigger("click");
+                                        $(element).removeClass("verou-reserve");
+                                    } else {
+                                        toastr.warning(data.errors);
+                                    }
+                                }       
+                    });
+                }
+                else {
+                    toastr.warning("Le fichier selectionné doit être un fichier que vous avez vérrouillé");
+                }
+            }
+            else {
+                toastr.warning("Veuillez sélectionner un fichier");
+            }
+        }
+    });
+    
     
     /** Supprimer le fichier sélectionné dans le volet **/
     $("#btn_supprimer").click(function(){
