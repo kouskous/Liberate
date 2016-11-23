@@ -51,6 +51,7 @@ public class UserProjetDaoTest {
     @Rollback
     public void getProjetsByUser() throws Exception {
         User florian = userDAO.createNewUser("fbautry", "florian@test.test", "Bautry", "Florian", Date.from(Instant.now()), Date.from(Instant.now()), "mdp");
+        User remi = userDAO.createNewUser("remiSansFichiers", "remi@test.test", "SansFichiers", "Remi", Date.from(Instant.now()), Date.from(Instant.now()), "mdp");
 
         Projet projetFlorian1 = projetDAO.createNewProjet("MonProjet1", Date.from(Instant.now()), Date.from(Instant.now()), "Java");
         Projet projetFlorian2 = projetDAO.createNewProjet("MonProjet2", Date.from(Instant.now()), Date.from(Instant.now()), "Java");
@@ -59,9 +60,12 @@ public class UserProjetDaoTest {
         userProjetDao.createNewUserProjet("Admin", Date.from(Instant.now()), Date.from(Instant.now()), florian, projetFlorian2);
 
         Collection<Projet> projets = userProjetDao.getProjetsByUser(florian);
+        Collection<Projet> projetsVide = userProjetDao.getProjetsByUser(remi);
 
         Assert.assertTrue(projets.contains(projetFlorian1));
         Assert.assertTrue(projets.contains(projetFlorian2));
+
+        Assert.assertTrue(projetsVide.isEmpty());
     }
 
     @Test
