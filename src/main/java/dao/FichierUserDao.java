@@ -296,10 +296,16 @@ public class FichierUserDao {
 
     public boolean changeVerrouAutre(List<FichiersUsers> fichiersToChange, int verrou){
         if(fichiersToChange != null){
-            for(int i=0;i<fichiersToChange.size();i++){
-            fichiersToChange.get(i).setVerrou(verrou);
-            em.persist(fichiersToChange.get(i));
-            }
+            try{
+                for(int i=0;i<fichiersToChange.size();i++){
+                fichiersToChange.get(i).setVerrou(verrou);
+                em.merge(fichiersToChange.get(i));
+                }
+            }catch(Exception e){
+                    System.out.println("Erreur lors du changement du verrou sur le fichier. verrou= "+verrou);
+                    System.out.println(e.getMessage());
+                    return false;
+                    }
             return true;
         }
         else{
