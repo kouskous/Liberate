@@ -86,20 +86,20 @@
                                 var element = document.getElementById(parent_id);
                                 parent_id=parent_id+"/"+slug[j];
                                 var element1 =document.getElementById(parent_id);
-                                type="isFolder"
-                                if ((data[i]["type"] == "fichier") && (j == slug.length - 1)){
-                                    type="isFile";
+                                type="isFolder ";
+                                if ((data[i]["type"] === "fichier") && (j === slug.length - 1)){
+                                    type="isFile ";
                                 } 
                                 verouillage = "";
-                                if((data[i]["type"] == "fichier") && (data[i]["verrouillage"] == 1)) {
-                                    verouillage = "verou-bloque";
-                                } else if((data[i]["type"] == "fichier") && (data[i]["verrouillage"] == 2)) {
-                                    verouillage = "verou-reserve";
+                                if((data[i]["type"] === "fichier") && (data[i]["verrouillage"] === 1)) {
+                                    verouillage = "verou-bloque ";
+                                } else if((data[i]["type"] === "fichier") && (data[i]["verrouillage"] === 2)) {
+                                    verouillage = "verou-reserve ";
                                 }
-                                if(element1==null) {
+                                if(element1=== null) {
                                     id = parent_id.replace(/\//g,'-');
                                     id = id.replace('.','__');
-                                    $(element).append('<li id="'+id+'" data-url="'+id+'" class="branche-arbre '+type+' '+verouillage+' noeud"><ul id='+parent_id+'><a>'+slug[j]+'</a></ul></li>');
+                                    $(element).append('<li id="'+id+'" data-url="'+id+'" class="branche-arbre '+ type + verouillage+'noeud"><ul id='+parent_id+'><a>'+slug[j]+'</a></ul></li>');
                                 }
                             }
                         });

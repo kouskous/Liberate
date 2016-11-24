@@ -51,12 +51,12 @@ $( document ).ready(function() {
                                   sourceNode.text = foldername;
                                   sourceNode.id = path+"-"+foldername.replace('.','__');
                                   sourceNode.isFolder = true;
+                                  sourceNode.isExpanded = true;
                                   App.tree.addNode(sourceNode, path);
                                   App.tree.rebuildTree();
-                                  $("#"+sourceNode.id).addClass("isFolder");
                                   $("#"+sourceNode.id).addClass("branche-arbre");
                                   defineArbreEvents();
-                                  $("#"+sourceNode.id).trigger("dblclick");
+                                  $("#"+sourceNode.id).trigger("click");
                                   $("#"+path).next().css("display","block");
                                   App.tree.activateNode(sourceNode.id);
                              }       

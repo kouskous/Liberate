@@ -49,9 +49,10 @@ $(document).ready(function() {
                             sourceNode.text = nomprojet;
                             sourceNode.id = "Root-"+nomprojet;
                             sourceNode.isFolder = true;
+                            sourceNode.isExpanded = true;
                             App.tree.addNode(sourceNode);
                             App.tree.activateNode("Root-"+nomprojet);
-                            App.tree.rebuildTree();
+                            //App.tree.rebuildTree();
                             $("#"+sourceNode.id).addClass("branche-arbre");
                             defineArbreEvents();
                             App.currentVoletElement = "Root/"+nomprojet;
