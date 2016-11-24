@@ -40,7 +40,9 @@
             id = $(this).attr("id");
             id = id.replace(/-/g,'/');
             id = id.replace('__','.');
+            console.log(id);
             App.currentVoletElement = id;
+            console.log(App.currentVoletElement);
         });
     } 
     
@@ -158,10 +160,14 @@ $( document ).ready(function() {
        App.onglets[App.currentOnglet] = App.editeur.getValue(); 
     });
     
-        
+   
     $("#btn_compile").click(function(){
+        
+        
         /**if(App.currentVoletElement != ""){**/
-            appPath = App.currentVoletElement.slice(5);
+            apppa = App.currentVoletElement;
+            appPath =apppa.slice(5);
+            console.log(appPath);
             $.ajax({ 
                 url      : "/Liber8/compile",
                 type     : 'POST',
@@ -170,6 +176,13 @@ $( document ).ready(function() {
                               nomProjet: appPath
                           },
                 success  : function(data) {  
+                    console.log(data);
+                    $.unblockUI();
+                        if(data.response==="true"){
+                            toastr.success("compilé");
+                        } else {
+                            toastr.warning(data.errors);
+                        }
                         }       
             });
         

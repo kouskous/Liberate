@@ -1,0 +1,5 @@
+find: illegal option -- n
+usage: find [-H | -L | -P] [-EXdsx] [-f path] path ... [expression]
+       find [-H | -L | -P] [-EXdsx] -f path [path ...] [expression]
+clang: error: no input files
+make: *** [exe] Error 1
