@@ -38,20 +38,26 @@ public class ProjetDao {
     public Projet getProjetByName(String nom) throws Exception{
         
         // Recherche du projet par nom (unique)
+        
         TypedQuery<Projet> query = em.createNamedQuery("Projet.findByNom", Projet.class);
+        
         query.setParameter("nom", nom);
+        
         List<Projet> results = query.getResultList();
         
         // Si aucun projet n'est trouvé avec ce nom
         if(results.isEmpty()){
+            
             return null;
         }
         // Un projet a été trouvé
         else if(results.size() == 1){
+          
             return results.get(0);
         }
         // Anomalie: plusieurs projets ont été trouvé avec le même nom
         else{
+            
             throw new Exception("Erreur BDD: plusieurs projets avec le même nom");
         }
     }

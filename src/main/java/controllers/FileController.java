@@ -53,8 +53,11 @@ public class FileController {
     
     @Autowired
     FichierUserDao fichierUserDao;
+    @Autowired
     VersionDao versionDao;
+    @Autowired
     ProjetDao projetDao;
+    @Autowired
     FichiersVersionDao fichiersVersionDao;
     
     public FileController(){
@@ -422,7 +425,7 @@ public class FileController {
     
     @ResponseBody
     @RequestMapping(value="/pushProjet", method = RequestMethod.GET,produces = "application/json")
-    public String pusherProjet(HttpServletRequest request) throws JSONException{
+    public String pusherProjet(HttpServletRequest request) {
   
     // Pas de session ouverte
     JSONObject returnObject = new JSONObject();
@@ -437,35 +440,48 @@ public class FileController {
             User user = (User)session.getAttribute("user");
 
             if(user == null){
-                returnObject.put("response","false");
+                System.out.println("user null");
+                returnObject.put("response",false);
                 returnObject.put("errors", "No user");
                 return returnObject.toString();
             }
             else{
-                
+                System.out.println("user pas null");
                 //Le projet qu'on souhaite pusher
                 Projet projet = projetDao.getProjetByName(request.getParameter("projet"));
+                System.out.println("user pas null");
                 if(projet==null){
-                    returnObject.put("response","false");
+                    System.out.println("projet null");
+                    returnObject.put("response",false);
                     returnObject.put("errors", "No project with this name");
                     return returnObject.toString();
                 }
+                System.out.println("projet pas null");
                 //La derniere version existante du projet
                 Version lastVersion = versionDao.getLastVersionByProjet(projet);
                 
                 if(lastVersion==null){
-                    Version newVersion = versionDao.createNewVersion(lastVersion.getNumVersion()+1,new Date(),user,projet,"test");
+                    System.out.println("lastVersion null");
+                    Version newVersion = versionDao.createNewVersion(1,new Date(),user,projet,"test");
                     if(newVersion==null){
-                        returnObject.put("response","false");
+                        System.out.println("newVersion null");
+                        returnObject.put("response",false);
                         returnObject.put("errors", "Erreur lors de la creation de la nouvelle version");
                         return returnObject.toString();
                         }
+                    //On recupere la liste des fichierUser pour ce projet puis on les met dans fichiersVersion
+                    List<FichiersUsers> filesFromProjet =fichierUserDao.getByUserAndProjet(user, projet.getNom());
+                    if(filesFromProjet==null){
+                        returnObject.put("response",false);
+                        returnObject.put("errors", "Rien a pushé");
+                        return returnObject.toString();
                     }
-                else{
+                }else{
                        //On recupere tous les fichiers qu'on a verrouillé
                        List<FichiersUsers> lockedFiles = fichierUserDao.getLockedByUserAndProjet(user, request.getParameter("projet"));
                        if(lockedFiles==null){
-                           returnObject.put("response","false");
+                           System.out.println("lockedFiles null");
+                           returnObject.put("response",false);
                            returnObject.put("errors", "Rien a pushé");
                            return returnObject.toString();
                        }else{
@@ -475,14 +491,16 @@ public class FileController {
                            //Puis on cree une nouvelle version
                            Version newVersion = versionDao.createNewVersion(lastVersion.getNumVersion()+1,new Date(),user,projet,"test");
                            if(newVersion==null){
-                               returnObject.put("response","false");
+                               System.out.println("newVersion null");
+                               returnObject.put("response",false);
                                returnObject.put("errors", "Erreur lors de la creation de la nouvelle version");
                                return returnObject.toString();
                            }
                            for(int i=0;i<lockedFiles.size();i++){
                                FichiersVersion file = fichiersVersionDao.createNewFichierVersion(lockedFiles.get(i).getPathLogique(), lockedFiles.get(i).getNomPhysique(),lockedFiles.get(i).getNomReel(), new Date(), FichiersVersion.Type.FICHIER, newVersion);
                                if(file==null){
-                                   returnObject.put("response","false");
+                                   System.out.println("file null");
+                                   returnObject.put("response",false);
                                     returnObject.put("errors", "Erreur lors de la creation du fichier :"+i);
                                     return returnObject.toString();
                                 }
@@ -490,7 +508,8 @@ public class FileController {
                                    if(lockedFiles.get(i).getPathLogique()!=fichiersLastVersion.get(j).getPathLogique()){
                                        FichiersVersion file2 = fichiersVersionDao.createNewFichierVersion(fichiersLastVersion.get(j).getPathLogique(), fichiersLastVersion.get(j).getNomPhysique(),fichiersLastVersion.get(j).getNomReel(), new Date(), FichiersVersion.Type.FICHIER, newVersion);
                                         if(file2==null){
-                                            returnObject.put("response","false");
+                                            System.out.println("file2 null");
+                                            returnObject.put("response",false);
                                             returnObject.put("errors", "Erreur lors de la creation du fichier :"+j);
                                             return returnObject.toString();
                                         }
@@ -505,7 +524,8 @@ public class FileController {
                            for(int k =0 ;k<lockedFiles.size();k++){
                            boolean test = fichierUserDao.changeVerrou(lockedFiles.get(k),0);
                            if(!test){
-                               returnObject.put("response","false");
+                               System.out.println("user null");
+                               returnObject.put("response",false);
                                returnObject.put("errors","Le verrou n'a pas été relaché pour "+lockedFiles.get(k).getNomPhysique());
                                return returnObject.toString();
                            }
@@ -513,7 +533,7 @@ public class FileController {
              
                        }
                    }
-                returnObject.put("result", "true");
+                returnObject.put("response", true);
                 return returnObject.toString();
             }
         }
@@ -524,8 +544,9 @@ public class FileController {
             //TODO: ce try-catch ne sert qu'Ã  afficher les erreurs
             try{
                 JSONObject obj = new JSONObject();
+                System.out.println("catch");
+                obj.put("response",false);
                 obj.put("errors",e.getMessage());
-                obj.put("response","false");
                 return obj.toString();
             }
             catch(Exception er){
