@@ -793,5 +793,138 @@ public class ProjetController {
         // Json Fail
         catch(Exception e2){return null;}  
     }
+    @ResponseBody
+    @RequestMapping(value="/gestionUsers", method = RequestMethod.POST, produces = "application/json")
+    public String EditUserProject(HttpServletRequest request, ModelMap model) throws JSONException{
+         // Obtention de la session
+        HttpSession session= request.getSession();
+        User principal = (User)session.getAttribute("user");
+        // On créé l'objet à retourner
+        JSONObject returnObject = new JSONObject();
+       // Récupération des paramètres
+        String nomProjet = (String)request.getParameter("nomProjet");
+        JSONObject jsonUsersProjet = new JSONObject(request.getParameter("utilisateurs"));
+        JSONObject jsonDroitsProjet = new JSONObject(request.getParameter("droits"));      
+        if(nomProjet == null || jsonUsersProjet == null || jsonDroitsProjet == null){
+            try{
+                returnObject.put("response", "false");
+                returnObject.put("content", "");
+                returnObject.put("errors", "Parametres manquants");
+                return returnObject.toString();
+            }
+            // JSon Fail
+            catch(Exception e){return null;}
+        }
+        
+        // Récupération de tous les pseudo et droits
+        ArrayList<String> pseudoUsersProjet = new ArrayList<String>();
+        ArrayList<String> droitsUsers = new ArrayList<String>();                    
+        for (int i = 0; i <= 9; i++){
+            if(jsonUsersProjet.has(Integer.toString(i)) && !jsonUsersProjet.get(Integer.toString(i)).equals("")){
+                pseudoUsersProjet.add((String)jsonUsersProjet.get(Integer.toString(i)));
+            }
+
+            if(jsonDroitsProjet.has(Integer.toString(i)) && !jsonDroitsProjet.get(Integer.toString(i)).equals("")){
+                droitsUsers.add((String)jsonDroitsProjet.get(Integer.toString(i)));
+            }
+        }
+        
+         // On cherche le projet et les utilisateurs dans la bdd. On vérifie que l'utilisateur est bien assigné au projet
+        Projet projet;
+        User user;
+        UserProjet userProjet;
+        ArrayList<UserProjet> userList = new ArrayList<UserProjet>();
+ 
+        try{
+            projet = projetDao.getProjetByName(nomProjet);
+            
+            if(projet == null){
+                try{
+                    returnObject.put("response", "false");
+                    returnObject.put("content", "");
+                    returnObject.put("errors", "Erreur pendant la récupération du projet ou de l'utilisateur");
+                    return returnObject.toString();
+                }
+                // Json Fail
+                catch(Exception e2){return null;} 
+            }
+            List<User> users = userProjetDao.getAllUsersByProjet(projet);
+      
+            boolean b=true;
+            for(User u : users){
+                int uid = u.getIdUser();
+                int pid = principal.getIdUser();
+                if(uid != pid){
+                    if(!pseudoUsersProjet.contains(u.getPseudo())){
+                        b=userProjetDao.deleteUserProjet(u, projet);
+                    }
+                }
+            }
+            if(!b){
+                try{
+                    returnObject.put("response", "false");
+                    returnObject.put("content", "");
+                    returnObject.put("errors", "Erreur pendant la modification des utilisateurs");
+                    return returnObject.toString();
+                }
+                // Json Fail
+                catch(Exception e2){return null;} 
+                
+            }
+            for (int i = 0; i < pseudoUsersProjet.size(); i++){
+                user = userDao.getUserByPseudo(pseudoUsersProjet.get(i));
+                System.out.println(user);
+                if(user == null){throw new Exception("Erreur pendant la récupération d'un utilisateur");}
+                if(users.contains(user)){
+                    System.out.println("ok");
+                    userProjet = userProjetDao.getUserProjetByUIdPId(user.getIdUser(), projet.getIdProjet());
+                    if(userProjet == null){throw new Exception("Erreur pendant la récupération d'un utilisateur");}
+                    System.out.println("ok1");
+                    b=userProjetDao.changeDroitsUserProjet(droitsUsers.get(i), user.getIdUser(), projet.getIdProjet());
+                    System.out.println("ok2");
+                    if(!b){
+                        try{
+                            returnObject.put("response", "false");
+                            returnObject.put("content", "");
+                            returnObject.put("errors", "Erreur pendant la modification des utilisateurs");
+                            return returnObject.toString();
+                        }
+                        // Json Fail
+                        catch(Exception e2){return null;} 
+
+                    }
+                }else{
+                    System.out.println("ok3");
+                    userProjet=userProjetDao.createNewUserProjet(droitsUsers.get(i), new Date(), new Date(), user, projet);
+                    if(userProjet == null){throw new Exception("Erreur pendant la récupération d'un utilisateur");}
+                    System.out.println("ok4");
+                }
+                System.out.println("ok5");
+                userList.add(userProjet);
+            }
+        }
+        catch(Exception e){
+            try{
+                returnObject.put("response", "false");
+                returnObject.put("content", "");
+                returnObject.put("errors", "Erreur pendant la récupération du projet ou de l'utilisateur");
+                return returnObject.toString();
+            }
+            // Json Fail
+            catch(Exception e2){return null;}  
+        }
+        
+        
+        
+        // Réussite
+        try{
+            returnObject.put("response", "true");
+            returnObject.put("content", "");
+            returnObject.put("errors", "");
+            return returnObject.toString();
+        }
+        // Json Fail
+        catch(Exception e2){return null;}  
+    }
     
 }

@@ -6,11 +6,12 @@
  */
 
  $( function() {
+     // deja supprimer tableau 
+      
      
      elementsprojects = App.currentVoletElement.split('/')[1];
       $('.addbouton').click(function(){
-           numberpofelementadd = $('.userproject li').length;
-           console.log(numberpofelementadd);
+           
       });
      
     if (typeof elementsprojects  === "undefined") {
@@ -32,7 +33,7 @@
                     console.log(data);
                     if(data.response ==="true") {
                         var contenu = JSON.parse(data.content); 
-                        console.log(contenu[0].droit);
+                     
                         for (i =0;i<Object.keys(contenu).length-1; i++) 
                             {
                                 if(contenu[i+1].droit==='admin')
@@ -50,9 +51,12 @@
                                         option1 ='admin';
                                         option2 = 'reporteur';
                                     }  
-                                if(contenu[0].droit=='admin')
+                                if(contenu[0].droit==='admin')
                                     {
-                                        console.log(contenu[0].droit);
+                                     
+                                       
+                                       
+                                       
                                         $(".userproject").append('<li><div class="control-group">\n\
                                         <label class="control-label userline" for="selectError'+i+'">'+contenu[i+1].utilisateur+'</label>\n\
                                         <div class="controls userline"><select id="selectError'+i+1+'" data-rel="chosen" name="droit'+i+1+'" class="droit">\n\
@@ -60,8 +64,8 @@
                                         <option value="'+option1+'">'+option1+'</option><option value="'+option2+'">'+option2+'</option></select><a class="remove_field"><input type="hidden" value="'+contenu[i+1].utilisateur+'" class=" add utilisateur'+i+1+'" name="utilisateur'+i+1+'"><i class="icon-trash"></i></a></div></div>'); //add input box
                         		   
                                     } 
-                                    else if((contenu[0].droit=="reporteur") || (contenu[0].droit=="developpeur") ) {
-                                        console.log(contenu[0].droit);
+                                    else if((contenu[0].droit==="reporteur") || (contenu[0].droit==="developpeur") ) {
+                                       
                                        
                                         $(".userproject").append('<li><div class="control-group">\n\
                                         <label class="control-label userline" for="selectError'+i+'">'+contenu[i+1].utilisateur+'</label>\n\
@@ -83,6 +87,11 @@
                 }
       
         });
+        
+     
+    
+     
+   
         $.ajax({ 
            url      : "/Liber8/getUsersNotInProject?nomProjet="+elementsprojects,
           dataType : "json",
@@ -98,7 +107,7 @@
                  $( "#usersname" ).autocomplete({
                source: availableusers
              });
-                console.log(availableusers);
+               
      
      
           }
@@ -137,7 +146,9 @@
                                              if(availableusers[i] === getname) {
                                              availableusers.splice(i, 1);
                                             }
+                                            
                                         }
+                                       
                                     }
             
                     }
@@ -147,7 +158,13 @@
         $(adduser).on("click",".remove_field", function(e){ //user click on remove text
                 e.preventDefault(); 
                 var valeursupprimer = $(this).parents('li').find('.add').val();
-                $('.usersdelete').append( '<input type="hidden" value="'+valeursupprimer+'"  class="remove" />');
+                var supprimer = $(this).parents('li').find('input:hidden');
+              
+                
+  
+                $(supprimer).empty();;
+                
+               
                 $(this).parents('li').remove(); 
                 availableusers.push(valeursupprimer );
                 numberinput--;
@@ -158,121 +175,42 @@
       
     
     $("#submitaddusrer").click(function(e){
-       var elementsatfer = $('.add').length;
-       var elementsremove = $('.remove').length;
-       console.log(elementsatfer);
-       console.log(numberpofelementadd);
-      
-       if((elementsatfer - numberpofelementadd)  > 0 && elementsremove ===0 )
-       {
-         addUser();
-         console.log("add");
-       }
-       else if((numberpofelementadd - elementsremove >= 0) && elementsremove !==0 )
-       {
-           
-         removeUser();
-         console.log("remove");
-       }
-       else if(elementsremove ===0 && (elementsatfer === numberpofelementadd))
-       {
-           changeDroitUser();
-       }
-   });
-   
-        function addUser() {
+        
             var utilisateur = {};
             var droit = {};
             var i =0;
             var j =0;
-            $(' .add').each(function(){
-            utilisateur[i++] = this.value;       
+            $('input:hidden').each(function(){
+                utilisateur[i++] = this.value;
             });
             $('.droit').each(function(){
-            droit[j++] = this.value;    
-             });
-            $.ajax({ 
-                url      : "/Liber8/newUserProject",
+                droit[j++] = this.value;
+            });
+             $.ajax({ 
+                url      : "/Liber8/gestionUsers?nomProjet="+elementsprojects,
                 dataType : "json",
                 type     : "POST",
                 data     : {
-                       nomProjet :  elementsprojects,
-                       utilisateur: JSON.stringify(utilisateur),
-                       droit: JSON.stringify(droit)
+                       nomProjet : elementsprojects,
+                       utilisateurs: JSON.stringify(utilisateur),
+                       droits: JSON.stringify(droit)
                    },
                            
                 success  : function(data) {
                     console.log(data);
                    if(data.errors!==""){
-                    $('#projet .modal-content .alert-error').css('display','block');
-                    $('#listuser .modal-body .alert-error').css('display','none');
-                    $('#projet .modal-content .alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>'+data.errors+ '</span>');
-                    }            
+                    
+                         $('#projet .modal-content .alert-error').css('display','block');
+                          $('#listuser .modal-body .alert-error').css('display','none');
+                         $('#projet .modal-content .alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>'+data.errors+ '</span>');
+                    }
                     else if(data.response==="true"){
-                    $('#projet .modal-content .alert-error').css('display','none');
-                     $("#close_modal_btn").trigger("click");
-                             }
-                }
-            });
-            
-        }
-         function removeUser() {
-              var userdelete = {};
-            $(' .remove').each(function(){
-            userdelete[i++] = this.value;  
-            });
-            
-            $.ajax({ 
-                url      : "/Liber8/removeUserProject",
-                dataType : "json",
-                type     : "POST",
-                data     : {
-                       nomProjet :  elementsprojects,
-                       utilisateurdelete: JSON.stringify(userdelete)
-                     
-                   },
                            
-                success  : function(data) {
-                  console.log(data);
-                }
-            });
-         }
-         function changeDroitUser() {
-            var utilisateur = {};
-            var droit = {};
-            var i =0;
-            var j =0;
-            $(' .add').each(function(){
-            utilisateur[i++] = this.value;       
-            });
-            $('.droit').each(function(){
-            droit[j++] = this.value;    
-             });
-            $.ajax({ 
-                url      : "/Liber8/changeRightsUserProject",
-                dataType : "json",
-                type     : "POST",
-                data     : {
-                       nomProjet :  elementsprojects,
-                       utilisateur: JSON.stringify(utilisateur),
-                       droit: JSON.stringify(droit)
-                   },
-                           
-                success  : function(data) {
-                    console.log(data);
-                   if(data.errors!==""){
-                    $('#projet .modal-content .alert-error').css('display','block');
-                    $('#listuser .modal-body .alert-error').css('display','none');
-                    $('#projet .modal-content .alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>'+data.errors+ '</span>');
-                    }            
-                    else if(data.response==="true"){
-                    $('#projet .modal-content .alert-error').css('display','none');
-                     $("#close_modal_btn").trigger("click");
-                             }
+                    }
                 }
             });
             
-        }
+        });
        
  });
  
