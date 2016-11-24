@@ -592,7 +592,16 @@ public class FileController {
         }
             
         // Renommage du fichier
-        
+        if(!fichierUserDao.renameFichier(fichier, nomFichier)){
+            try{
+                returnObject.put("response", "false");
+                returnObject.put("content","");
+                returnObject.put("errors", "Une erreur est survenue pendant le renommage du fichier");
+                return returnObject.toString();
+            }
+            // Json fail
+            catch(Exception e2){System.out.println(e2.getMessage()); return null;}
+        }
         
         // Réussite
         try{

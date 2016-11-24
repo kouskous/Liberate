@@ -1,5 +1,6 @@
 package dao;
 
+import java.io.File;
 import models.FichiersUsers;
 import models.User;
 
@@ -274,6 +275,27 @@ public class FichierUserDao {
             return true;
         }
         else{
+            return false;
+        }
+    }
+    
+    public boolean renameFichier(FichiersUsers fichier, String newName){
+        
+        // Mise à jour du fichier
+        fichier.setNomReel(newName); // Nouveau nom
+        
+        // Mise à jour du pathLogique
+        String oldPath = fichier.getPathLogique();
+        String path = new File(oldPath).getPath();
+        fichier.setPathLogique(path + "/" + newName);
+        
+        try{
+            em.merge(fichier);
+            return true;
+        }
+        catch(Exception e){
+            System.out.println("Erreur pendant le renommage d'un fichier");
+            System.out.println(e.getMessage());
             return false;
         }
     }
