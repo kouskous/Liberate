@@ -195,7 +195,6 @@
                    },
                            
                 success  : function(data) {
-                    console.log(data);
                    if(data.errors!==""){
                     
                          $('#projet .modal-content .alert-error').css('display','block');

@@ -639,7 +639,6 @@ public class ProjetController {
             
             for (int i = 0; i < userList.size(); i++){
                 Boolean res = userProjetDao.deleteUserProjet(userList.get(i), projet);
-                System.out.print(res);
                 if(res == false){
                     try{
                         returnObject.put("response", "false");
@@ -733,7 +732,6 @@ public class ProjetController {
             
             for (int i = 0; i < pseudoUsersProjet.size(); i++){
                 user = userDao.getUserByPseudo(pseudoUsersProjet.get(i));
-                System.out.println(user);
                 if(user == null){throw new Exception("Erreur pendant la récupération d'un utilisateur");}
 
                 userProjet = userProjetDao.getUserProjetByUIdPId(user.getIdUser(), projet.getIdProjet());
@@ -754,9 +752,7 @@ public class ProjetController {
         
         // On change les droits des utilisateurs du projet
         try{
-            System.out.println(userList.size());
             for (int i = 0; i < userList.size(); i++){
-                System.out.println(droitsUsers.get(i));
                 Boolean res = userProjetDao.changeDroitsUserProjet(droitsUsers.get(i), userList.get(i));
                 
                 if(res == false){
@@ -775,7 +771,6 @@ public class ProjetController {
             try{
                 returnObject.put("response", "false");
                 returnObject.put("content", "");
-                System.out.println(e.getMessage());
                 returnObject.put("errors", "Erreur pendant le changements des droits");
                 return returnObject.toString();
             }
@@ -873,15 +868,11 @@ public class ProjetController {
             }
             for (int i = 0; i < pseudoUsersProjet.size(); i++){
                 user = userDao.getUserByPseudo(pseudoUsersProjet.get(i));
-                System.out.println(user);
                 if(user == null){throw new Exception("Erreur pendant la récupération d'un utilisateur");}
                 if(users.contains(user)){
-                    System.out.println("ok");
                     userProjet = userProjetDao.getUserProjetByUIdPId(user.getIdUser(), projet.getIdProjet());
                     if(userProjet == null){throw new Exception("Erreur pendant la récupération d'un utilisateur");}
-                    System.out.println("ok1");
                     b=userProjetDao.changeDroitsUserProjet(droitsUsers.get(i), user.getIdUser(), projet.getIdProjet());
-                    System.out.println("ok2");
                     if(!b){
                         try{
                             returnObject.put("response", "false");
@@ -894,12 +885,9 @@ public class ProjetController {
 
                     }
                 }else{
-                    System.out.println("ok3");
                     userProjet=userProjetDao.createNewUserProjet(droitsUsers.get(i), new Date(), new Date(), user, projet);
                     if(userProjet == null){throw new Exception("Erreur pendant la récupération d'un utilisateur");}
-                    System.out.println("ok4");
                 }
-                System.out.println("ok5");
                 userList.add(userProjet);
             }
         }
