@@ -34,7 +34,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 public class FichiersUsers implements Serializable {
 
-    public enum Type {DOSSIER, FICHIER}
+    public enum Type {DOSSIER, FICHIER};
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

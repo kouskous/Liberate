@@ -209,8 +209,8 @@ $( document ).ready(function() {
                               pathLogique: appPath,
                           },
                 success  : function(data) {  
-                            if(data.response==true){
-                                toastr.success("Fichier vérouillé");
+                            if(data.response){
+                                toastr.success("Fichier vérrouillé");
                                 path = App.currentVoletElement.replace(/\//g,'-');
                                 path = path.replace('.','__');
                                 element = $("#"+path);

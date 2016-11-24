@@ -552,7 +552,7 @@ public class FileController {
             User user = (User)session.getAttribute("user");
 
             if(user == null){
-                returnObject.put("response","false");
+                returnObject.put("response",false);
                 returnObject.put("errors", "No user");
                 return returnObject.toString();
             }
@@ -562,18 +562,18 @@ public class FileController {
                 FichiersUsers file = fichierUserDao.getPathByPathLogique(user,request.getParameter("pathLogique"));
                 System.out.println("file : "+file);
                 if(file==null){
-                    returnObject.put("response","false");
+                    returnObject.put("response",false);
                     returnObject.put("errors", "Pas de fichier trouvé pour ce pathLogique");
                     return returnObject.toString();
                 }
                 int verrou = file.getVerrou();
                 if(verrou==0){
                     //On essaye de mettre le verrou sur le fichier pour nous
-                    System.out.println("avant");
+                    
                     boolean verrouMoi = fichierUserDao.changeVerrou(file, 2);
-                    System.out.println("apres");
+                    
                     if(!verrouMoi){
-                        returnObject.put("response","false");
+                        returnObject.put("response",false);
                         returnObject.put("errors", "La mise en place du verrou a échoué (val. 2)");
                         return returnObject.toString();
                     }
@@ -584,19 +584,19 @@ public class FileController {
                         boolean verrouAutre = fichierUserDao.changeVerrouAutre(files, 1);
                         System.out.println("verrouAutre : "+verrouAutre);
                         if(!verrouAutre){
-                            returnObject.put("response","false");
+                            returnObject.put("response",false);
                             returnObject.put("errors", "La mise en place du verrou sur les fichiers des autres utilisateurs a échoué (val. 1)");
                             return returnObject.toString();
                         }
                     }
-                    returnObject.put("response","true");
+                    returnObject.put("response",true);
                     return returnObject.toString();
                 }else if (verrou==2){
-                    returnObject.put("response","false");
+                    returnObject.put("response",false);
                     returnObject.put("errors", "Vous avez deja verrouillé ce fichier!");
                     return returnObject.toString();
                 }else{
-                    returnObject.put("response","false");
+                    returnObject.put("response",false);
                     returnObject.put("errors", "Ce fichier a deja été verrouillé par un autre utilisateur!");
                     return returnObject.toString();
                 }
@@ -609,7 +609,7 @@ public class FileController {
             //TODO: ce try-catch ne sert qu'Ã  afficher les erreurs
             try{
                 JSONObject obj = new JSONObject();
-                obj.put("response","false");
+                obj.put("response",false);
                 obj.put("errors",e.getMessage());
                 return obj.toString();
             }

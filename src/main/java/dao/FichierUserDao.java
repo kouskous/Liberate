@@ -279,12 +279,15 @@ public class FichierUserDao {
     // TODO: toutes les autres fonctions de modification qu'on aura besoin.
     public boolean changeVerrou(FichiersUsers fichierToChange, int verrou){
         if(fichierToChange != null){
-            
             fichierToChange.setVerrou(verrou);
-             
-            em.persist(fichierToChange);
-            
-            return true;
+            try{
+             em.merge(fichierToChange);
+             return true;
+            }catch(Exception e){
+            System.out.println("Erreur lors du changement de verrou a la valeur "+verrou);
+            System.out.println(e.getMessage());
+                return false;
+            }
         }
         else{
             return false;
