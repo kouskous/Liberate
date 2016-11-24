@@ -97,6 +97,10 @@ public class UserProjetDao {
         
         if (user != null && projet != null){
             
+            if (!(typeDroit.equals("admin") || typeDroit.equals("developpeur") || typeDroit.equals("reporteur"))){
+                return null;
+            }
+            
             // Création nouveau UserProjet
             UserProjet newUserProjet = new UserProjet(typeDroit, dateCreation, dateModification, user, projet);
             
@@ -151,7 +155,7 @@ public class UserProjetDao {
     public boolean changeDroitsUserProjet(String typeDroit, int idUser, int idProjet){
         
         // On teste que typeDroit est une chaine de caractère valide
-        if (typeDroit.equals("Admin") || typeDroit.equals("Dev") || typeDroit.equals("Reporter")){
+        if (typeDroit.equals("admin") || typeDroit.equals("developpeur") || typeDroit.equals("reporteur")){
             try{
                 UserProjet userProjet = getUserProjetByUIdPId(idUser, idProjet);
 
@@ -177,9 +181,10 @@ public class UserProjetDao {
     // - Renvoie vrai si réussite
     // - Faux sinon
     public boolean changeDroitsUserProjet(String typeDroit, UserProjet userProjet){
+
         
         // Vérification que typeDroit est une chaine de caractère valide
-        if (typeDroit.equals("Admin") || typeDroit.equals("Dev") || typeDroit.equals("Reporter")){
+        if (typeDroit.equals("admin") || typeDroit.equals("developpeur") || typeDroit.equals("reporteur")){
             userProjet.setTypeDroit(typeDroit);
       
             try{
@@ -195,6 +200,54 @@ public class UserProjetDao {
         else{ // typeDroit n'est pas une chaine de caractères valide
             return false;
         }
-        
     }
+    
+    // Renvoi la liste de tous les utilisateurs qui participent à un projet
+    public List<User> getAllUsersByProjet(Projet projet)
+    {      
+        // Recherche de users du projet
+        TypedQuery<UserProjet> query = em.createNamedQuery("UserProjet.findByIdP", UserProjet.class);
+        query.setParameter("idP", projet.getIdProjet());
+        List<UserProjet> results = query.getResultList();
+        List<User> listUsers = new ArrayList<User>();
+        for (int i = 0; i < results.size(); i++){
+            listUsers.add(results.get(i).getUser());
+        }
+        
+        return listUsers;
+    }
+    
+    // Renvoi la liste de tous les utilisateurs qui ne participent pas à un projet
+    public List<User> getAllUsersNotInProjet(Projet projet)
+    {            
+        // Recherche de tous les users
+        TypedQuery<User> query = em.createNamedQuery("User.findAll", User.class);
+        List<User> allUsers = query.getResultList();
+        
+        // Recherche des users du projet
+        List<User> usersProjet = getAllUsersByProjet(projet);
+        
+        // Différence entre les deux
+        allUsers.removeAll(usersProjet);
+        
+        return allUsers;
+    }
+    
+    // Renvoi les droits de l'utilisateurs donné associé au projet donné
+    public String getDroits(User user, Projet projet)
+    {
+        try{
+            UserProjet userProjet = getUserProjetByUIdPId(user.getIdUser(), projet.getIdProjet());
+            if(userProjet == null){
+                return null;
+            }
+            else{
+                return userProjet.getTypeDroit();
+            }
+        }
+        catch(Exception e){
+            return null;
+        }
+    }
+    
 }
