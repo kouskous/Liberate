@@ -175,7 +175,11 @@ public class FichierUserDao {
             FichiersUsers fichiersUsersToDelete = this.getFichierUserByNomPhysique(nomPhysique);
 
             // Si on l'a trouvé, on le supprime
-            if(fichiersUsersToDelete != null){
+            if(fichiersUsersToDelete != null){                
+                if (!em.contains(fichiersUsersToDelete)){
+                    fichiersUsersToDelete = em.merge(fichiersUsersToDelete);
+                }
+                fichiersUsersToDelete.getUser().getFichiersUsersCollection().remove(fichiersUsersToDelete);
                 em.remove(fichiersUsersToDelete);
                 return true;
             }

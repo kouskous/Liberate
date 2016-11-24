@@ -12,6 +12,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
@@ -65,10 +68,10 @@ public class FileController {
         return "saveFile";
     }
     
-    @RequestMapping(value="/renameFile", method = RequestMethod.GET)
+   /* @RequestMapping(value="/renameFile", method = RequestMethod.GET)
     public String renameFile(HttpServletRequest request, ModelMap model){
         return "renameFile";
-    }
+    }*/
     
     // Création d'un fichier vide
     // Création d'un fichier
@@ -415,7 +418,7 @@ public class FileController {
     // - errors contient retour d'erreur si echec
     // - renvoie null si erreur Json
     @ResponseBody 
-    @RequestMapping(value="/deleteFile", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value="/deleteFile", method = RequestMethod.POST, produces = "application/json")
     public String deleteFile(HttpServletRequest request, ModelMap model){           
         
         // On créé l'objet à retourner
@@ -479,8 +482,10 @@ public class FileController {
         String nomPhysique = fichier.getNomPhysique();
         ServletContext ctx = request.getServletContext();
         String path = ctx.getRealPath("/");
-        File file = new File(path + "../../files/" + nomPhysique);
-        if(!file.delete()){
+        try {
+           Files.delete(FileSystems.getDefault().getPath(path + "/../../files/", nomPhysique));
+        }
+        catch(Exception e){
             try{
                 returnObject.put("response", "false");
                 returnObject.put("content","");
@@ -505,6 +510,89 @@ public class FileController {
             }
         }
         catch(Exception e){System.out.println(e.getMessage()); return null;}
+        
+        // Réussite
+        try{
+            returnObject.put("response", "true");
+            returnObject.put("content","");
+            returnObject.put("errors", "");
+            return returnObject.toString();
+        }
+        // Json fail
+        catch(Exception e2){System.out.println(e2.getMessage()); return null;}
+    }
+    
+    // Rennomage d'un fichier
+    // - Nécessite les champs "pathFichier" et "nomFichier" dans la requête
+    //
+    // Renvoie un Json avec clés "response" et "errors"
+    // - response contient true si réussite
+    // - errors contient retour d'erreur si echec
+    // - renvoie null si erreur Json
+    @ResponseBody 
+    @RequestMapping(value="/renameFile", method = RequestMethod.GET, produces = "application/json")
+    public String renameFile(HttpServletRequest request, ModelMap model){           
+        
+        // On créé l'objet à retourner
+        JSONObject returnObject = new JSONObject();   
+        
+        // Récupération de la session de l'utilisateur
+        HttpSession session= request.getSession();
+        User user = (User)session.getAttribute("user");
+
+        if(user == null){
+            try{
+                returnObject.put("response", "false");
+                returnObject.put("content","");
+                returnObject.put("errors", "No user");
+                return returnObject.toString();
+            }
+            // Json fail
+            catch(Exception e){System.out.println(e.getMessage()); return null;}
+        }
+
+        // Récupération paramètres pathFichier et nomFichier
+        String pathFichier = (String)request.getParameter("pathFichier");
+        String nomFichier = (String)request.getParameter("nomFichier");
+        if(pathFichier == null || nomFichier == null){
+            try{
+                returnObject.put("response", "false");
+                returnObject.put("content","");
+                returnObject.put("errors", "Pas de chemin de fichier indiqué ou pas de nom");
+                return returnObject.toString();
+            }
+            // Json fail
+            catch(Exception e){System.out.println(e.getMessage()); return null;}
+        }
+        
+        // Récupération du fichier en base
+        FichiersUsers fichier;
+        try{
+            fichier = fichierUserDao.getFichiersByUserAndPath(user, pathFichier);
+            if (fichier == null){
+                try{
+                returnObject.put("response", "false");
+                returnObject.put("content","");
+                returnObject.put("errors", "Le fichier n'a pas été trouvé en base de données");
+                return returnObject.toString();
+            }
+            // Json fail
+            catch(Exception e2){System.out.println(e2.getMessage()); return null;}
+            }
+        }
+        catch(Exception e){
+            try{
+                returnObject.put("response", "false");
+                returnObject.put("content","");
+                returnObject.put("errors", "Une erreur est survenue pendant la récupération du fichier en base");
+                return returnObject.toString();
+            }
+            // Json fail
+            catch(Exception e2){System.out.println(e2.getMessage()); return null;}
+        }
+            
+        // Renommage du fichier
+        
         
         // Réussite
         try{
