@@ -122,7 +122,7 @@ public class FileController {
                     FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathFichier"), 
                     idOne.toString(), 
                     fileName, 
-                    new Date(), FichiersUsers.Type.FICHIER, user, 0);
+                    new Date(), FichiersUsers.Type.FICHIER, user, 2);
                     
                     if(newFile == null){
                         returnObject.put("errors", "Failed to create file");
