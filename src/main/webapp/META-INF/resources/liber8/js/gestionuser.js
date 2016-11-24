@@ -30,7 +30,7 @@
                 dataType : "json",
                 type     : "GET",
                 success  : function(data) {  
-                    console.log(data);
+                   
                     if(data.response ==="true") {
                         var contenu = JSON.parse(data.content); 
                      
@@ -172,8 +172,6 @@
       
        
   }
-      
-    
     $("#submitaddusrer").click(function(e){
         
             var utilisateur = {};
@@ -201,15 +199,18 @@
                    if(data.errors!==""){
                     
                          $('#projet .modal-content .alert-error').css('display','block');
-                          $('#listuser .modal-body .alert-error').css('display','none');
+                          $('#gestionuser .modal-body .alert-error').css('display','none');
                          $('#projet .modal-content .alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>'+data.errors+ '</span>');
                     }
                     else if(data.response==="true"){
-                           
+                           $("#close_modal_btn").trigger("click");
                     }
                 }
             });
             
+        });
+        $(".onclose").click(function(){
+           $('#gestionuser').modal('hide');
         });
        
  });
