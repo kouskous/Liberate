@@ -27,8 +27,8 @@ public class FichierUserDao {
     }
 
     // Cherche les fichiers d'un utilisateur dans la BDD
-    // - renvoie null s'il n'y a pas de fichiers pour cet user.
     // - renvoie la liste des fichiers de l'user si il y est
+    // - renvoie une liste vide sinon
     public Collection<FichiersUsers> getFichiersByUser(User user) {
 
         // Recherche des fichiers
@@ -38,7 +38,7 @@ public class FichierUserDao {
 
         // Si aucun fichier n'est trouvé avec cet user
         if(results.isEmpty()){
-            return null;
+            return new ArrayList<>();
         }
         // Des fichiers ont été trouvés
         return results;
@@ -101,7 +101,7 @@ public class FichierUserDao {
      * @param user l'utilisateur dont on veux l'arborescence
      * @return Renvoie l'arborescence complete depuis la racine de l'utilisateur
      */
-    public Map<String, FichiersUsers.Type> getArborescence(User user){
+    public Collection<FichiersUsers> getArborescence(User user){
         return getArborescence(user, null);
     }
 
@@ -114,7 +114,7 @@ public class FichierUserDao {
      *                si null depuis la racine de l'utilisateur
      * @return Renvoie l'arborescence depuis le dossier en question, ou null si le dossier est un fichier
      */
-    public Map<String, FichiersUsers.Type> getArborescence(User user, FichiersUsers dossier){
+    public Collection<FichiersUsers> getArborescence(User user, FichiersUsers dossier){
         try {
             Map<String, FichiersUsers.Type> arborescence = new Hashtable<>();
             Collection<FichiersUsers> fichiers;
@@ -134,11 +134,8 @@ public class FichierUserDao {
                 fichiers = query.getResultList();
             }
 
-            for (FichiersUsers fichier : fichiers) {
-                arborescence.put(fichier.getPathLogique(), fichier.getType());
-            }
 
-            return arborescence;
+            return fichiers;
         }
         catch(IllegalArgumentException e){
             System.out.println(e.getMessage());
@@ -253,7 +250,6 @@ public class FichierUserDao {
     }
 
     // TODO: toutes les autres fonctions de modification qu'on aura besoin.
-
     public boolean changeVerrou(FichiersUsers fichierToChange, int verrou){
         if(fichierToChange != null){
             fichierToChange.setVerrou(verrou);

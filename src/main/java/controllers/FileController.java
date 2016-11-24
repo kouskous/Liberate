@@ -12,8 +12,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.persistence.EntityManager;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -61,6 +65,11 @@ public class FileController {
         return "saveFile";
     }
     
+    @RequestMapping(value="/renameFile", method = RequestMethod.GET)
+    public String renameFile(HttpServletRequest request, ModelMap model){
+        return "renameFile";
+    }
+    
     // Création d'un fichier vide
     // Création d'un fichier
     // - Nécessite le champs "pathFichier" dans la requête
@@ -96,13 +105,16 @@ public class FileController {
                     return returnObject.toString();
                 }
                 else{
+                    // Nom du fichier
+                    String fileName = extractFileName((String)request.getParameter("pathFichier"));  
                     
-                    String fileName = extractFileName((String)request.getParameter("pathFichier"));
-                    
+                    // Génération du path physique
+                    UUID idOne = UUID.randomUUID();
+
                     FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathFichier"), 
+                    idOne.toString(), 
                     fileName, 
-                    fileName, 
-                    new Date(), FichiersUsers.Type.FICHIER, user, 0);
+                    new Date(), FichiersUsers.Type.FICHIER, user, 2);
                     
                     if(newFile == null){
                         returnObject.put("errors", "Failed to create file");
@@ -116,7 +128,7 @@ public class FileController {
                                 String path = ctx.getRealPath("/");
                                 
                                 // TODO: change this path when deploying to server
-                                FileOutputStream out = new FileOutputStream(path + "/../../files/" + fileName);
+                                FileOutputStream out = new FileOutputStream(path + "/../../files/" + idOne.toString());
                             }
                             catch(Exception e){
                                 returnObject.put("response",e.getMessage());
@@ -175,6 +187,10 @@ public class FileController {
         
         // Extraction du nom de dossier
         String fileName = extractFileName((String)request.getParameter("pathDossier"));
+        
+         // Génération du path physique
+        UUID idOne = UUID.randomUUID();
+        
         if(fileName == null){
             try{
                 returnObject.put("response", "false");
@@ -189,7 +205,7 @@ public class FileController {
         // Création du dossier
         try{
             FichiersUsers newFile = fichierUserDao.createNewFichierUser((String)request.getParameter("pathDossier"), 
-            fileName, 
+            idOne.toString(), 
             fileName, 
             new Date(), 
             FichiersUsers.Type.DOSSIER, 
@@ -278,7 +294,7 @@ public class FileController {
                             ServletContext ctx = request.getServletContext();
                             String path = ctx.getRealPath("/");
                             
-                            FileOutputStream out = new FileOutputStream(path + "/../../files/" + fileName);
+                            FileOutputStream out = new FileOutputStream(path + "/../../files/" + fichier.getNomPhysique());
                             out.write(contenuFichier.getBytes());
                         }
                         catch(Exception e){
@@ -319,46 +335,58 @@ public class FileController {
     @ResponseBody
     @RequestMapping(value="/getFile", method = RequestMethod.POST,produces = "application/json")
     public String contentFile(HttpServletRequest request){
-            // On vérifie qu'une session n'est pas déjà ouverte
-    HttpSession session= request.getSession();
-    User user = (User)session.getAttribute("user");
-    // Pas de session ouverte
-    if(user == null) return "redirect:/login";
-
-    
-    
-    JSONArray list = new JSONArray();
         
-    FichiersUsers file = fichierUserDao.getPathByPathLogique(user,request.getParameter("pathLogique"));
-    System.out.println("REQUEST"+request.getParameter("pathLogique"));
-    String pathPhysique =file.getNomPhysique();
-    List<FichiersUsers> files =fichierUserDao.getPathsByPathLogique(user,request.getParameter("pathFichier"));
-    int verrou = file.getVerrou();
-    if(verrou==0){
-        boolean verrouillage = fichierUserDao.changeVerrou(file, 2);
-        boolean verrouillageAutre =fichierUserDao.changeVerrouAutre(files, 1);   
-    }
-    
+        // On vérifie qu'une session est ouverte
+        HttpSession session= request.getSession();
+        User user = (User)session.getAttribute("user");
+
+        // Pas de session ouverte
+        if(user == null) return "redirect:/login";
+        
+        // Objet réponse
         JSONObject response = new JSONObject();
-         try{
-            response.put("pathLogique","");
-            response.put("pathPhysique","");
-            response.put("content","");
+        
+        FichiersUsers file = fichierUserDao.getPathByPathLogique(user,request.getParameter("pathLogique"));
+        if(file == null){
+            try{
+                response.put("pathLogique","");
+                response.put("pathPhysique","");
+                response.put("content","");
+                response.put("errors", "Erreur dans la récupération du contenu d'un fichier");
+                return response.toString();
             }
-         catch (Exception e){
-                }
+            // Json Fail
+            catch (Exception e){return null;}
+        }      
+          
+        // Récupération du path physique
+        String pathPhysique =file.getNomPhysique();
+        if(pathPhysique == null){
+            try{
+                response.put("pathLogique","");
+                response.put("pathPhysique","");
+                response.put("content","");
+                response.put("errors", "Erreur dans la récupération du path physique d'un fichier");
+                return response.toString();
+            }		
+            // Json fail
+            catch (Exception e){System.out.println(e.toString()); return null;}
+        }
+        
         if(pathPhysique != null){
             try{
-            response.put("pathLogique",request.getParameter("pathLogique"));
-            response.put("pathPhysique",pathPhysique);
+                response.put("pathLogique",request.getParameter("pathLogique"));
+                response.put("pathPhysique",pathPhysique);
+                response.put("content","");
             }		
-                catch (Exception e){
-                    System.out.println(e.toString());
-                }
+            // Json fail
+            catch (Exception e){System.out.println(e.toString()); return null;}
+            
+            // Récupération du contenu du fichier
             try{
                 ServletContext ctx = request.getServletContext();
                 String path = ctx.getRealPath("/");
-                InputStream flux=new FileInputStream(path+"/../../files/" +pathPhysique); 
+                InputStream flux=new FileInputStream(path+"/../../files/" + pathPhysique); 
                 InputStreamReader lecture=new InputStreamReader(flux);
                 BufferedReader buff=new BufferedReader(lecture);
                 String ligne;
@@ -375,7 +403,6 @@ public class FileController {
                     return e.toString();
                 }
         }
-    return  response.toString();
-       
+        return  response.toString();
     }
 }

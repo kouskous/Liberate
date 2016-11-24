@@ -9,10 +9,14 @@ package controllers;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import dao.FichierUserDao;
+import dao.UserProjetDao;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import models.FichiersUsers;
 import models.User;
@@ -26,8 +30,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
+import models.Projet;
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -39,6 +45,9 @@ public class PrincipalController {
     
     @Autowired
     FichierUserDao fichierUserDao;
+    
+    @Autowired
+    UserProjetDao userProjetDao;
     
     public PrincipalController(){
     }
@@ -71,19 +80,21 @@ public class PrincipalController {
     
     JSONArray list = new JSONArray();
         
-    Map<String, FichiersUsers.Type> arborescence = fichierUserDao.getArborescence(user);
-    for (Map.Entry<String, FichiersUsers.Type> fichier: arborescence.entrySet()) {
+    Collection<FichiersUsers> arborescence = fichierUserDao.getArborescence(user);
+    for (FichiersUsers fichier: arborescence) {
         JSONObject response = new JSONObject();
-        if(fichier.getValue() == FichiersUsers.Type.FICHIER){
+        if(fichier.getType() == FichiersUsers.Type.FICHIER){
             try{
-                response.put("path","/Root"+fichier.getKey());
+                response.put("path","/Root"+fichier.getPathLogique());
                 response.put("type","fichier");
+                response.put("verrouillage",fichier.getVerrou());
             } catch(Exception e){
             }
         }else {
             try{
-                response.put("path", "/Root"+fichier.getKey());
+                response.put("path", "/Root"+fichier.getPathLogique());
                 response.put("type","dossier");
+                response.put("verrouillage",fichier.getVerrou());
             } catch(Exception e){
             }
         }
@@ -91,9 +102,22 @@ public class PrincipalController {
     }
 
     return  list.toString();
-
-       
     }
+    
+    @RequestMapping(value="/pull", method = RequestMethod.GET)
+    public String pull(HttpServletRequest request, ModelMap data) {
+        // On vérifie qu'une session n'est pas déjà ouverte
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+        if (user == null) // Pas de session ouverte
+            return "login";
+         // Une session déjà ouverte
+         Collection<Projet> projets = userProjetDao.getProjetsByUser(user);
+         data.addAttribute("projets", projets);
+         return "pull";
+
+    }
+    
     
 
 }

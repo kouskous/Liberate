@@ -35,8 +35,9 @@ $( document ).ready(function() {
                  data     :{
                              pathFichier: Logicpath
                            },
-                 success  : function(data) {  
-                                  $("#close_modal_btn").trigger("click");
+                 success  : function(data) { 
+                                if(data.response){
+                                    $("#close_modal_btn").trigger("click");
                                   var nodes = App.tree.getAllNodes();
                                   var sourceNode = {};
                                   sourceNode.text = filename;
@@ -46,10 +47,16 @@ $( document ).ready(function() {
                                   App.tree.rebuildTree();
                                   $("#"+sourceNode.id).addClass("isFile");
                                   $("#"+sourceNode.id).addClass("branche-arbre");
+                                  $("#"+sourceNode.id).addClass("verou-reserve");
                                   defineArbreEvents();
                                   $("#"+sourceNode.id).trigger("dblclick");
                                   $("#"+path).next().css("display","block");
                                   App.tree.activateNode(sourceNode.id);
+                                } else {
+                                    $("#close_modal_btn").trigger("click");
+                                    toastr.warning(data.errors);
+                                }
+                                  
                              }       
                  });
             }
