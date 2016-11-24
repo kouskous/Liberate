@@ -128,6 +128,7 @@ public class FileController {
                                 String path = ctx.getRealPath("/");
                                 
                                 // TODO: change this path when deploying to server
+                                // TODO: fermer le FileOutputStream
                                 FileOutputStream out = new FileOutputStream(path + "/../../files/" + idOne.toString());
                             }
                             catch(Exception e){
@@ -293,7 +294,8 @@ public class FileController {
                         try{
                             ServletContext ctx = request.getServletContext();
                             String path = ctx.getRealPath("/");
-                            
+
+                            //TODO: fermer le FileOutputStream
                             FileOutputStream out = new FileOutputStream(path + "/../../files/" + fichier.getNomPhysique());
                             out.write(contenuFichier.getBytes());
                         }
@@ -360,7 +362,7 @@ public class FileController {
         }      
           
         // Récupération du path physique
-        String pathPhysique =file.getNomPhysique();
+        String pathPhysique = file.getNomPhysique();
         if(pathPhysique == null){
             try{
                 response.put("pathLogique","");
@@ -372,7 +374,7 @@ public class FileController {
             // Json fail
             catch (Exception e){System.out.println(e.toString()); return null;}
         }
-        
+
         if(pathPhysique != null){
             try{
                 response.put("pathLogique",request.getParameter("pathLogique"));

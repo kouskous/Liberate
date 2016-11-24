@@ -5,8 +5,14 @@
  */
 package controllers;
 import dao.UserDao;
+
+import java.security.SecureRandom;
+import java.security.spec.KeySpec;
+import java.util.Base64;
 import java.util.Date;
 import java.util.regex.Pattern;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import models.User;
@@ -55,7 +61,7 @@ public class InscriptionController {
         HttpSession session= request.getSession();
         User user = (User)session.getAttribute("user");
  
-        if(user != null) // Pas de session ouverte
+        if(user != null) // session déjà ouverte
             return "redirect:/";
         
         String pseudo = request.getParameter("pseudo");
@@ -95,6 +101,13 @@ public class InscriptionController {
         }
         
         // TODO: génération de la clé mot de passe ici
+        /*byte[] salt = new byte[16];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(salt);
+        KeySpec spec = new PBEKeySpec(motDePasse.toCharArray(), salt, 65536, 128);
+        SecretKeyFactory f = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        byte[] hash = f.generateSecret(spec).getEncoded();
+        Base64.Encoder enc = Base64.getEncoder();*/
         
         // Création de l'utilisateur
         User newUser = userDao.createNewUser(request.getParameter("pseudo"),
