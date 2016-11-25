@@ -5,7 +5,6 @@
  */
 
 $( document ).ready(function() {
-        console.log(App.currentVoletElement);
         path = App.currentVoletElement.replace(/\//g,'-');
         path = path.replace('.','__');
         element = $("#"+path);
