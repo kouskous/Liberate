@@ -693,6 +693,9 @@ public class FileController {
                                      returnObject.put("errors", "Probleme de creation du nouveau fichier de version ");
                                      return returnObject.toString();
                                  } 
+                            String src ="/files/"+filesFromVersion.get(a).getNomPhysique();
+                            String dest="/files/"+newFichierUser.getNomPhysique();
+                            copier(src,dest);
                             }else{
                                  FichiersUsers newDossierUser = fichierUserDao.createNewFichierUser(filesFromVersion.get(a).getPathLogique(),null,filesFromVersion.get(a).getNomReel(),new Date(),FichiersUsers.Type.DOSSIER,user,4);
                                  if(newDossierUser==null){
