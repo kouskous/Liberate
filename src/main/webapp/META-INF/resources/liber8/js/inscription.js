@@ -86,7 +86,6 @@ function checkStrength(password)
 			$('#result').removeClass();
 			$('#result').addClass('offset3 span6 alert alert-error');
                         validpassword = false;
-                        console.log('in function pass'+validpassword);
 			return 'Trop court'; 
                         
 		}
@@ -204,19 +203,9 @@ function checkequals(password,passwordconfirm) {
 		else {
 			$('#passwordconfirm').removeClass("bordure");
 		}
+                    if(!validsend || !validnom || !validprenom || !validpseudo || !validmail || !validpassword || !validpasswordconfirm) {
+                                return false;
+                            }
 
-                
-		console.log('vide'+validsend);
-                console.log('nom'+validnom);
-                console.log('prenom'+validprenom);
-                console.log('pass'+validpassword);
-                console.log('passconf'+validpasswordconfirm);
-                console.log('pseudo'+validpseudo);
-                console.log('mail'+validmail);
-               
-        if(!validsend || !validnom || !validprenom || !validpseudo || !validmail || !validpassword || !validpasswordconfirm) {
-                    return false;
-                }
-		
-                });
+                            });
 });

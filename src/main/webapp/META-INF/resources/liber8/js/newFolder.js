@@ -31,9 +31,8 @@ $( document ).ready(function() {
             
             }
             else {
-                if ((path != "")&&(!$(element).hasClass("isFolder"))){
+                if ((path !== "")&&(!$(element).hasClass("isFolder"))){
                     Logicpath = (App.currentVoletElement+"/"+foldername).slice(4);
-                    console.log(Logicpath);
                     $.ajax({ 
                     url      : "/Liber8/newDossier",
                     dataType : "json",

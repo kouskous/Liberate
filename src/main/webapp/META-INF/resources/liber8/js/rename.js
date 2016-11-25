@@ -21,7 +21,7 @@ $( document ).ready(function() {
                 dataType : "json",
                 data     :{
                               pathFichier: path,
-                              filename: name,
+                              filename: name
                           },
                 success  : function(data) {  
                                   $.unblockUI();
@@ -47,7 +47,7 @@ $( document ).ready(function() {
                                         App.tree.rebuildTree(nodes);
                                         defineArbreEvents();
                                         $("#close_modal_btn").trigger("click");
-                                        toastr.success("Renommage réussie");
+                                        toastr.success("Renommage réussi");
                                   } else {
                                         $("#close_modal_btn").trigger("click");
                                         toastr.warning(data.errors);
