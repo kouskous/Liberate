@@ -10,31 +10,24 @@ import dao.VersionDao;
 import dao.ProjetDao;
 import dao.FichiersVersionDao;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.Base64;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.transaction.Transactional;
 import models.FichiersUsers;
 import models.FichiersVersion;
 import models.Projet;
 import models.User;
 import models.Version;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -422,6 +415,44 @@ public class FileController {
         }
         return  response.toString();
     }
+    private static boolean copier(String fichier_source, String fichier_dest)
+    { 
+        try{
+            FileInputStream src = new FileInputStream(fichier_source);
+           FileOutputStream dest = new FileOutputStream(fichier_dest);
+
+           FileChannel inChannel = src.getChannel();
+           FileChannel outChannel = dest.getChannel();
+
+           for (ByteBuffer buffer = ByteBuffer.allocate(1024*1024);
+                inChannel.read(buffer) != -1;
+                buffer.clear()) {
+              buffer.flip();
+              while (buffer.hasRemaining()) outChannel.write(buffer);
+           }
+
+           inChannel.close();
+           outChannel.close();
+           return true;
+        }catch(Exception e){
+            return false;
+            }
+    }
+    
+        
+        private boolean creerFichierVersion(HttpServletRequest request,String idOne){
+            try{                          
+                ServletContext ctx = request.getServletContext();
+                String path = ctx.getRealPath("/");
+                                
+                // TODO: change this path when deploying to server
+                FileOutputStream out = new FileOutputStream(path + "/../../files/" + idOne.toString());
+                return true;            
+                }
+                            catch(Exception e){
+                                return false;
+                            }
+        }
     
     @ResponseBody
     @RequestMapping(value="/pushProjet", method = RequestMethod.GET,produces = "application/json")
@@ -478,10 +509,18 @@ public class FileController {
                     }
                     //Une fois recu on les ajoute a la nouvelle version pis on repasse leur verrou à 0
                     for(int c=0;c<filesFromProjet.size();c++){
-                        FichiersVersion newFichierVersion = fichiersVersionDao.createNewFichierVersion(filesFromProjet.get(c).getPathLogique(),filesFromProjet.get(c).getNomPhysique(),filesFromProjet.get(c).getNomPhysique(),new Date(),FichiersVersion.Type.FICHIER,newVersion);
+                        UUID idOne = UUID.randomUUID();
+                        FichiersVersion newFichierVersion = fichiersVersionDao.createNewFichierVersion(filesFromProjet.get(c).getPathLogique(),idOne.toString(),filesFromProjet.get(c).getNomReel(),new Date(),FichiersVersion.Type.FICHIER,newVersion);
                         if(newFichierVersion==null){
                             returnObject.put("response",false);
                             returnObject.put("errors", "Le push n'a pas fonctionné: "+c);
+                            return returnObject.toString();
+                        }
+                        //On crée le fichier en physique
+                        boolean creation = creerFichierVersion(request,idOne.toString());
+                        if(!creation){
+                            returnObject.put("response",false);
+                            returnObject.put("errors", "Probleme de creation du nouveau fichier de version ");
                             return returnObject.toString();
                         }
                         boolean unlock = fichierUserDao.changeVerrou(filesFromProjet.get(c), 0);
@@ -490,6 +529,10 @@ public class FileController {
                             returnObject.put("errors", "Probleme de deverouillage lors du push ");
                             return returnObject.toString();
                         }
+                        //on copie ensuite le contenu de mes fichiers dans les fichiers de la nouvelle version
+                        String src ="/files/"+filesFromProjet.get(c).getNomPhysique();
+                        String dest="/files/"+newFichierVersion.getNomPhysique();
+                        copier(src,dest);
                     }
                 }else{
                        //On recupere tous les fichiers qu'on a verrouillé
