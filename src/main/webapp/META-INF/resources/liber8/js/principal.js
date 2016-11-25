@@ -36,10 +36,11 @@
         });
         
         //selection d'un fichier
-        $(".branche-arbre").on("click", function(){
+        $(".easytree-node").on("click", function(){
             id = $(this).attr("id");
             id = id.replace(/-/g,'/');
             id = id.replace('__','.');
+            console.log(id);
             App.currentVoletElement = id;
         });
     } 
@@ -86,20 +87,20 @@
                                 var element = document.getElementById(parent_id);
                                 parent_id=parent_id+"/"+slug[j];
                                 var element1 =document.getElementById(parent_id);
-                                type="isFolder ";
+                                type="isFolder"
                                 if ((data[i]["type"] === "fichier") && (j === slug.length - 1)){
-                                    type="isFile ";
+                                    type="isFile";
                                 } 
                                 verouillage = "";
                                 if((data[i]["type"] === "fichier") && (data[i]["verrouillage"] === 1)) {
-                                    verouillage = "verou-bloque ";
+                                    verouillage = "verou-bloque";
                                 } else if((data[i]["type"] === "fichier") && (data[i]["verrouillage"] === 2)) {
-                                    verouillage = "verou-reserve ";
+                                    verouillage = "verou-reserve";
                                 }
-                                if(element1=== null) {
+                                if(element1===null) {
                                     id = parent_id.replace(/\//g,'-');
                                     id = id.replace('.','__');
-                                    $(element).append('<li id="'+id+'" data-url="'+id+'" class="branche-arbre '+ type + verouillage+'noeud"><ul id='+parent_id+'><a>'+slug[j]+'</a></ul></li>');
+                                    $(element).append('<li id="'+id+'" data-url="'+id+'" class="branche-arbre '+type+' '+verouillage+' noeud"><ul id='+parent_id+'><a>'+slug[j]+'</a></ul></li>');
                                 }
                             }
                         });
@@ -129,9 +130,9 @@ $( document ).ready(function() {
     //volet gauche resizable
     $( "#sidebar-left" ).resizable();
     $( "#sidebar-left" ).resize(function(){
-       left = $( "#sidebar-left" ).css("width");
-       $("#content").css("margin-left", left);
-       $("#content").css("width", (100 - left) + "%" );
+    left = $( "#sidebar-left" ).css("width");
+    $("#content").css("margin-left", left);
+    $("#content").css("width", (100 - left) + "%" );
     });
     
     
@@ -242,7 +243,7 @@ $( document ).ready(function() {
         }
     });
     
-    $("#btn_déverrouiller").click(function(){
+    $("#btn_deverrouiller").click(function(){
         if(App.currentVoletElement != ""){
             path = App.currentVoletElement.replace(/\//g,'-');
             path = path.replace('.','__');
