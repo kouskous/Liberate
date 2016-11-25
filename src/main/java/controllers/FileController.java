@@ -476,6 +476,21 @@ public class FileController {
                         returnObject.put("errors", "Rien a pushé");
                         return returnObject.toString();
                     }
+                    //Une fois recu on les ajoute a la nouvelle version pis on repasse leur verrou à 0
+                    for(int c=0;c<filesFromProjet.size();c++){
+                        FichiersVersion newFichierVersion = fichiersVersionDao.createNewFichierVersion(filesFromProjet.get(c).getPathLogique(),filesFromProjet.get(c).getNomPhysique(),filesFromProjet.get(c).getNomPhysique(),new Date(),FichiersVersion.Type.FICHIER,newVersion);
+                        if(newFichierVersion==null){
+                            returnObject.put("response",false);
+                            returnObject.put("errors", "Le push n'a pas fonctionné: "+c);
+                            return returnObject.toString();
+                        }
+                        boolean unlock = fichierUserDao.changeVerrou(filesFromProjet.get(c), 0);
+                        if(!unlock){
+                            returnObject.put("response",false);
+                            returnObject.put("errors", "Probleme de deverouillage lors du push ");
+                            return returnObject.toString();
+                        }
+                    }
                 }else{
                        //On recupere tous les fichiers qu'on a verrouillé
                        List<FichiersUsers> lockedFiles = fichierUserDao.getLockedByUserAndProjet(user, request.getParameter("projet"));

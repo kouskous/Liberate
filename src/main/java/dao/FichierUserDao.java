@@ -233,9 +233,16 @@ public class FichierUserDao {
     }
     
     public List<FichiersUsers> getByUserAndProjet(User user,String projet){
-        TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findLockedByUserAndProjet", FichiersUsers.class);
+       System.out.println(1);
+        TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByUserAndProjet", FichiersUsers.class);
+        
         query.setParameter("user", user);
-        query.setParameter("projet", projet);
+        
+        String proj ="/"+projet+"/";
+        
+        query.setParameter("projet",proj);
+        
+        
         List<FichiersUsers> results = query.getResultList();
         
         if(results.size()!=0){

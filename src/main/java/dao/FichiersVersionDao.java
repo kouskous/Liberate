@@ -8,7 +8,9 @@ package dao;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
 import models.FichiersVersion;
 import models.Version;
 
@@ -16,8 +18,10 @@ import models.Version;
  *
  * @author Christopher
  */
+@Transactional
 public class FichiersVersionDao{
     
+    @PersistenceContext
     EntityManager em;
     
     public FichiersVersionDao(){
@@ -42,9 +46,9 @@ public class FichiersVersionDao{
 
         // On essaye d'ajouter l'utilisateur à la persistence
         try{
-            em.getTransaction().begin();
+           
             em.persist(newFichierVersion);
-            em.getTransaction().commit();
+            
             return newFichierVersion;
         }
         catch(Exception e){
