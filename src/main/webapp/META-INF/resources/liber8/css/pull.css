@@ -1,7 +1,6 @@
 #working_projects_list{
-    width: 93%;
-}
-
-.dashboard-list li:hover{
-    cursor: pointer;
+   width: 93%;
+   
+}.dashboard-list li:hover{
+   cursor: pointer;
 }

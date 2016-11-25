@@ -75,7 +75,7 @@
                                                     <li>
                                                         <a href="#">
                                                             <span>
-                                                                <a href="#">Gestion Utilisateurs</a>
+                                                                <a  class="user-action" href="#" data-toggle="modal" data-target="#projet" data-url="gestionsUsers">Gestion Utilisateurs</a>
                                                             </span> 
                                                         </a>
                                                     </li>

@@ -44,21 +44,20 @@ $(document).ready(function() {
                     }
                     else if(data.response==="true"){
                             $("#close_modal_btn").trigger("click");
-                            var nodes = App.tree.getAllNodes();
                             var sourceNode = {};
                             sourceNode.text = nomprojet;
                             sourceNode.id = "Root-"+nomprojet;
                             sourceNode.isFolder = true;
+                            sourceNode.isExpanded = true;
                             App.tree.addNode(sourceNode);
+                            var nodes = App.tree.getAllNodes();
+                            App.tree.rebuildTree(nodes);
                             App.tree.activateNode("Root-"+nomprojet);
-                            App.tree.rebuildTree();
-                            $("#"+sourceNode.id).addClass("branche-arbre");
                             defineArbreEvents();
                             App.currentVoletElement = "Root/"+nomprojet;
                     }
                 }
-            });
-                
+            });    
         };
                 
     });
