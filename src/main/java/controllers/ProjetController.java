@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controllers;
 
 import dao.FichierUserDao;
@@ -48,18 +43,33 @@ public class ProjetController {
     @Autowired
     FichierUserDao fichierUserDao;
     
-    // Regex1 utilisée pour le nom du projet
+    // Regex utilisée pour le nom du projet
     static String regex1 = "^([a-zA-Z]{3,50})";
-    static String regex2 = "^([a-zA-Z]{1,50})";
     
+    /**
+     * Constructeur du controleur de Projets
+     */
     public ProjetController(){
     }
     
+    /**
+     * Requête d'affichage de la pop-up de création d'un nouveau projet
+     * @param request
+     * @param model
+     * @return Renvoie le nom de la JSP à afficher
+     */
     @RequestMapping(value="/newProjet", method = RequestMethod.GET)
     public String index(HttpServletRequest request, ModelMap model){
         return "newProjet";
     }
     
+    /**
+     * Requête de création d'un nouveau projet
+     * La requête doit contenir les champs "nomProjet", "langageProjet", "utilisateurs" et "droits"
+     * @param request
+     * @param model
+     * @return Renvoie un Json contenant les champs "response" et "errors".
+     */
     @ResponseBody 
     @RequestMapping(value="/newProjet", method = RequestMethod.POST)
     public String nouveauProjet(HttpServletRequest request, ModelMap model){
@@ -138,11 +148,14 @@ public class ProjetController {
                                         User newUser = userDao.getUserByPseudo(usersProjet.get(i));
                                  
                                         userProjetDao.createNewUserProjet(droitsUsers.get(i), new Date(), new Date(), newUser, projet);
-                                        if(userProjetDao == null)
-                                            throw new Exception();
+                                        if(userProjetDao == null){
+                                            returnObject.put("errors", "Erreur pendant l'ajout de membres utilisateurs");
+                                            return returnObject.toString();
+                                        }
                                     }
                                 }
-                                catch(Exception e){
+                                catch(IllegalArgumentException e){
+                                    System.out.println("Erreur pendant l'ajout de membres utilisateurs: " + e);
                                     returnObject.put("response", Integer.toString(usersProjet.size()));
                                     returnObject.put("errors", "Erreur pendant l'ajout de membres utilisateurs");
                                     return returnObject.toString();
@@ -163,22 +176,28 @@ public class ProjetController {
                 }
             }
         }
-        catch(Exception e){
-            try{
-                return returnObject.toString();
-            }
-            catch(Exception e2){
-                return null;
-            }
+        catch(JSONException e){
+            System.out.println("Erreur pendant la création d'un nouveau projet: " + e);
+            return null;
         }
     }
     
+    /**
+     * Test d'acceptation d'une chaîne de caractères par une expression régulière
+     * @param regex Expression régulière considérée
+     * @param aTester Chaîne de caractères à tester
+     * @return Renvoie vrai si la chaine est acceptée, faux sinon
+     */
     private boolean testRegex(String regex, String aTester){
         return Pattern.compile(regex).matcher(aTester).matches();
     }
-            
-    // Récupération des pseudo d'utilisateurs qui ne sont pas celui connecté
-    // - La requête doit contenir un champs "name"
+
+    /**
+     * Requête d'obtention de tous les utilisateurs, sauf celui connecté
+     * @param request
+     * @param model
+     * @return Renvoie un Json contenant l'ensemble des pseudo d'utilisateurs trouvés
+     */
     @ResponseBody
     @RequestMapping(value="/getUsers", method = RequestMethod.GET, produces = "application/json")
     public String getUsers(HttpServletRequest request, ModelMap model){
@@ -208,23 +227,35 @@ public class ProjetController {
             returnObject.put("response", list.toString());
             return returnObject.toString();
         }
-        catch(Exception e){
+        catch(JSONException e){
+            System.out.println("Erreur pendant la récupération d'utilisateurs: " + e);
             return null;
         }
     }
    
+    /**
+     * Requête d'affichage de la pop-up de gestion des utilisateurs d'un projet
+     * @param request
+     * @param model
+     * @return Renvoie le nom de la JSP à afficher
+     */
     @RequestMapping(value="/gestionsUsers", method = RequestMethod.GET)
     public String getUsersP(HttpServletRequest request, ModelMap model){
         return "gestionsUsers";
     }
     
-    // Récupération des utilisateurs qui font partie d'un projet en particulier, avec leurs droits.
-    // - La requête doit contenir un champs "nomProjet"
+    /**
+     * Requête de récupération des utilisateurs qui font partie d'un projet en particulier, avec leurs droits.
+     * La requête doit contenir un champs "nomProjet"
+     * @param request
+     * @param model
+     * @return Renvoie un Json contenant l'ensemble des utilisateurs trouvés, associés à leurs droits
+     */
     @ResponseBody
     @RequestMapping(value="/getUsersInProject", method = RequestMethod.GET, produces = "application/json")
     public String getUsersInProject(HttpServletRequest request, ModelMap model){
         HttpSession session= request.getSession();
-       User user = (User)session.getAttribute("user");
+        User user = (User)session.getAttribute("user");
         // On créé l'objet à retourner
         JSONObject returnObject = new JSONObject();
 
@@ -238,7 +269,7 @@ public class ProjetController {
                 return returnObject.toString();
             }
             // JSon Fail
-            catch(Exception e){return null;}
+            catch(JSONException e){System.out.println("Erreur JSON: " + e);return null;}
         }
          
          // On cherche le projet dans la bdd
@@ -254,7 +285,7 @@ public class ProjetController {
                     return returnObject.toString();
                 }
                 // Json Fail
-                catch(Exception e2){return null;} 
+                catch(JSONException e2){System.out.println("Erreur JSON: " + e2); return null;} 
             }
         }
         catch(Exception e){
@@ -265,7 +296,7 @@ public class ProjetController {
                 return returnObject.toString();
             }
             // Json Fail
-            catch(Exception e2){return null;}  
+            catch(JSONException e2){System.out.println("Erreur JSON: " + e2); return null;}  
         }
         
         // On récupère tous les utilisateurs du projet
@@ -283,7 +314,7 @@ public class ProjetController {
                     return returnObject.toString();
                 }
                 // Json Fail
-                catch(Exception e2){return null;} 
+                catch(JSONException e2){System.out.println("Erreur JSON: " + e2); return null;} 
             }
             else{
          
@@ -304,20 +335,28 @@ public class ProjetController {
 
                   }
                   else{
-                      throw new Exception("Erreur pendant la récupération des utilisateurs du projet");
-                  }
+                    try{
+                        returnObject.put("response", "false");
+                        returnObject.put("content", "");
+                        returnObject.put("errors", "Erreur pendant la récupération des utilisateurs du projet");
+                        return returnObject.toString();
+                    }
+                    // Json Fail
+                    catch(JSONException e2){System.out.println("Erreur JSON: " + e2); return null;}  
+                }
               }
             }
         }
-        catch(Exception e){
+        catch(JSONException e){
             try{
+                System.out.println("Erreur pendant la récupération des utilisateurs du projet: " + e.getMessage());
                 returnObject.put("response", "false");
                 returnObject.put("content", "");
                 returnObject.put("errors", "Erreur pendant la récupération des utilisateurs du projet");
                 return returnObject.toString();
             }
             // Json Fail
-            catch(Exception e2){return null;}  
+            catch(JSONException e2){System.out.println("Erreur JSON: " + e2); return null;}  
         }
         
         // Réussite
@@ -328,11 +367,16 @@ public class ProjetController {
             return returnObject.toString();
         }
         // Json Fail
-        catch(Exception e2){return null;}  
+        catch(JSONException e2){System.out.println("Erreur JSON: " + e2); return null;}  
     }
-    
-    // Récupération des utilisateurs qui font partie d'un projet en particulier
-    // - La requête doit contenir un champs "nomProjet"
+
+    /**
+     * Requête de récupération des utilisateurs qui ne font pas partie d'un projet en particulier, avec leurs droits.
+     * La requête doit contenir un champs "nomProjet"
+     * @param request
+     * @param model
+     * @return Renvoie un Json contenant l'ensemble des utilisateurs trouvés, associés à leurs droits
+     */
     @ResponseBody
     @RequestMapping(value="/getUsersNotInProject", method = RequestMethod.GET, produces = "application/json")
     public String getUsersNotInProject(HttpServletRequest request, ModelMap model){
@@ -350,7 +394,7 @@ public class ProjetController {
                 return returnObject.toString();
             }
             // JSon Fail
-            catch(Exception e){return null;}
+            catch(JSONException e){System.out.println("Erreur JSON: " + e); return null;}
         }
          
          // On cherche le projet dans la bdd
@@ -366,7 +410,7 @@ public class ProjetController {
                     return returnObject.toString();
                 }
                 // Json Fail
-                catch(Exception e2){return null;} 
+                catch(JSONException e2){System.out.println("Erreur JSON: " + e2); return null;} 
             }
         }
         catch(Exception e){
@@ -377,39 +421,27 @@ public class ProjetController {
                 return returnObject.toString();
             }
             // Json Fail
-            catch(Exception e2){return null;}  
+            catch(JSONException e2){System.out.println("Erreur JSON: " + e2);return null;}  
         }
         
         // On récupère tous les utilisateurs qui n'appartiennent pas au projet
         List<User> myList = new ArrayList();
         List<String> pseudoUsers = new ArrayList();
-        try{
-            myList = userProjetDao.getAllUsersNotInProjet(projet);
-            if(myList == null){
-                try{
-                    returnObject.put("response", "false");
-                    returnObject.put("content", "");
-                    returnObject.put("errors", "Erreur pendant la récupération des utilisateurs");
-                    return returnObject.toString();
-                }
-                // Json Fail
-                catch(Exception e2){return null;} 
-            }
-            else{
-                for (int i = 0; i < myList.size(); i++){
-                    pseudoUsers.add(myList.get(i).getPseudo());
-                }
-            }
-        }
-        catch(Exception e){
+        myList = userProjetDao.getAllUsersNotInProjet(projet);
+        if(myList == null){
             try{
                 returnObject.put("response", "false");
                 returnObject.put("content", "");
-                returnObject.put("errors", "Erreur pendant la récupération des utilisateurs du projet");
+                returnObject.put("errors", "Erreur pendant la récupération des utilisateurs");
                 return returnObject.toString();
             }
             // Json Fail
-            catch(Exception e2){return null;}  
+            catch(JSONException e2){System.out.println("Erreur JSON: " + e2); return null;} 
+        }
+        else{
+            for (int i = 0; i < myList.size(); i++){
+                pseudoUsers.add(myList.get(i).getPseudo());
+            }
         }
         
         // Réussite
@@ -428,9 +460,16 @@ public class ProjetController {
            return returnObject.toString();
        }
         // Json Fail
-        catch(Exception e2){return null;}  
+        catch(JSONException e2){System.out.println("Erreur JSON: " + e2); return null;}  
     }
     
+    /**
+     * Requête de gestion des utilisateurs d'un projet (ajout, suppression, modification des droits).
+     * @param request
+     * @param model
+     * @return Renvoie un Json avec les champs "response", "content" et "errors".
+     * @throws JSONException
+     */
     @ResponseBody
     @RequestMapping(value="/gestionUsers", method = RequestMethod.POST, produces = "application/json")
     public String EditUserProject(HttpServletRequest request, ModelMap model) throws JSONException{
@@ -451,7 +490,7 @@ public class ProjetController {
                 return returnObject.toString();
             }
             // JSon Fail
-            catch(Exception e){return null;}
+            catch(JSONException e){System.out.println("Erreur JSON: " + e); return null;}
         }
         
         // Récupération de tous les pseudo et droits
@@ -484,7 +523,7 @@ public class ProjetController {
                     return returnObject.toString();
                 }
                 // Json Fail
-                catch(Exception e2){return null;} 
+                catch(JSONException e2){System.out.println("Erreur JSON: " + e2); return null;} 
             }
             List<User> users = userProjetDao.getAllUsersByProjet(projet);
       
@@ -506,7 +545,7 @@ public class ProjetController {
                     return returnObject.toString();
                 }
                 // Json Fail
-                catch(Exception e2){return null;} 
+                catch(JSONException e2){System.out.println("Erreur JSON: " + e2); return null;} 
                 
             }
             for (int i = 0; i < pseudoUsersProjet.size(); i++){
@@ -524,7 +563,7 @@ public class ProjetController {
                             return returnObject.toString();
                         }
                         // Json Fail
-                        catch(Exception e2){return null;} 
+                        catch(JSONException e2){System.out.println("Erreur JSON: " + e2); return null;} 
 
                     }
                 }else{
@@ -542,7 +581,7 @@ public class ProjetController {
                 return returnObject.toString();
             }
             // Json Fail
-            catch(Exception e2){return null;}  
+            catch(JSONException e2){System.out.println("Erreur JSON: " + e2); return null;}  
         }
         
         // Réussite
@@ -553,7 +592,7 @@ public class ProjetController {
             return returnObject.toString();
         }
         // Json Fail
-        catch(Exception e2){return null;}  
+        catch(JSONException e2){System.out.println("Erreur JSON: " + e2); return null;}  
     }
     
 }

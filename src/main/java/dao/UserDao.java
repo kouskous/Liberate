@@ -1,20 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package dao;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import models.User;
-import org.springframework.stereotype.Repository;
 
 /**
  *
@@ -26,11 +18,14 @@ public class UserDao {
     @PersistenceContext
     EntityManager em;
     
-    // Cherche l'utilisateur dans la BDD
-    // - renvoie null si il n'y est pas.
-    // - renvoie l'user si il y est
-    // - exception si il y a plusieurs utilisateur avec cet email dans la bdd
-    public User getUserByEmail(String email) throws Exception{
+    /**
+     * @author Luc Di Sanza
+     * Cherche l'utilisateur dans la BDD en fonction d'une adresse email
+     * @param email Email de l'utilisateur à rechercher
+     * @return Renvoie l'utilisateur si il a été trouvé, null sinon
+     * @throws IllegalArgumentException
+     */
+    public User getUserByEmail(String email) throws IllegalArgumentException{
         
         // Recherche de l'user par email (unique)
         TypedQuery<User> query = em.createNamedQuery("User.findByEmail", User.class);
@@ -47,15 +42,18 @@ public class UserDao {
         }
         // Anomalie: plusieurs utilisateurs ont été trouvé avec le même email
         else{
-            throw new Exception("Erreur BDD: plusieurs utilisateurs avec le même email");
+            return null;
         }
     }
     
-    // Cherche l'utilisateur dans la BDD
-    // - renvoie null si il n'y est pas.
-    // - renvoie l'user si il y est
-    // - exception si il y a plusieurs utilisateur avec ce pseudo dans la bdd
-    public User getUserByPseudo(String pseudo) throws Exception{
+    /**
+     * @author Luc Di Sanza
+     * Cherche l'utilisateur dans la BDD en fonction de son pseudo
+     * @param pseudo Pseudo d'utilisateur à rechercher
+     * @return Renvoie l'user si il a été trouvé, null sinon
+     * @throws IllegalArgumentException
+     */
+    public User getUserByPseudo(String pseudo) throws IllegalArgumentException{
         
         // Recherche de l'user par pseudo (unique)
         TypedQuery<User> query = em.createNamedQuery("User.findByPseudo", User.class);
@@ -72,13 +70,22 @@ public class UserDao {
         }
         // Anomalie: plusieurs utilisateurs ont été trouvé avec le même pseudo
         else{
-            throw new Exception("Erreur BDD: plusieurs utilisateurs avec le même pseudo");
+            return null;
         }
     }
-    
-    // Création d'un nouvel utilisateur
-    // Renvoie l'utilisateur si réussite
-    // Renvoie null sinon
+
+    /**
+     * @author Luc Di Sanza
+     * Création d'un nouvel utilisateur
+     * @param pseudo Pseudo de l'utilisateur à créer
+     * @param email Email de l'utilisateur à créer
+     * @param nom Nom de l'utilisateur à créer
+     * @param prenom Prénom de l'utilisateur à créer
+     * @param dateCreation Date actuelle
+     * @param dateModification Date actuelle
+     * @param cleMotDePasse Clé d'authentification de l'utilisateur
+     * @return Renvoie l'utilisateur si réussite, null sinon
+     */
     public User createNewUser(String pseudo, String email, String nom, String prenom, 
             Date dateCreation, Date dateModification, String cleMotDePasse){
         
@@ -92,15 +99,17 @@ public class UserDao {
             return newUser;
         }
         catch(Exception e){
-            System.out.println("Erreur lors de l'ajout d'un nouvel user :");
-            System.out.println(e.getMessage());
+            System.out.println("Erreur lors de l'ajout d'un nouvel user :" + e);
             return null;
         }
     } 
-    
-    // Suppression d'un utilisateur de la base de données
-    // Renvoie vrai si la suppression a réussie
-    // Renvoie faux sinon.
+
+    /**
+     * @author Luc Di Sanza
+     * Suppression d'un utilisateur en fonction de son adresse mail
+     * @param email Email de l'utilisateur à supprimer
+     * @return Renvoie vrai si la suppression a réussi, faux sinon
+     */
     public boolean deleteUserByEmail(String email){
         
         try{
@@ -120,14 +129,18 @@ public class UserDao {
         }
         catch(Exception e){
             System.out.println("Erreur dans la suppression d'un utilisateur");
-            System.out.println(e.getMessage());
+            System.out.println(e);
             return false;
         }
     }
-    
-    // Modifie l'adresse email d'un utilisateur
-    // Renvoie vrai si réussi
-    // Renvoie faux sinon (pas d'utilisateur avec oldEmail, ou déjà un utilisateur avec newEmail
+
+    /**
+     * @author Luc Di Sanza
+     * Modification de l'adresse email d'un utilisateur
+     * @param oldEmail Ancien email de l'utilisateur 
+     * @param newEmail Nouvel email de l'utilisateur
+     * @return Renvoie vrai si réussite, faux sinon
+     */
     public boolean changeUserEmail(String oldEmail, String newEmail){
         
         // On vérifie que l'adresse mail n'existe pas déjà dans la Bdd.
@@ -141,7 +154,7 @@ public class UserDao {
         }
         catch(Exception e){
             System.out.println("Erreur dans la modification d'email");
-            System.out.println(e.getMessage());
+            System.out.println(e);
             return false;
         }
         
@@ -164,41 +177,42 @@ public class UserDao {
         }
         catch(Exception e){
             System.out.println("Erreur dans la modification d'un email d'un utilisateur");
-            System.out.println(e.getMessage());
+            System.out.println(e);
             return false;
         }
     }
-    
-    // Cherche si l'email est déjà utilisé dans la BDD
-    // - Vrai si oui
-    // - Faux sinon
-    public boolean emailAlreadyUsed(String email) throws Exception{
 
+    /**
+     * @author Luc Di Sanza
+     * Cherche si l'email est déjà utilisé dans la BDD
+     * @param email Email à rechercher
+     * @return Renvoie vrai si l'email existe déjà, faux sinon
+     * @throws IllegalArgumentException
+     */
+    public boolean emailAlreadyUsed(String email) throws IllegalArgumentException{
         User testEmail = getUserByEmail(email);
-
-        if(testEmail != null){
-            // Email déjà utilisé
-            return true;
-        }
-        return false;
+        return testEmail != null;
     }
-    
-    // Cherche si le pseudo est déjà utilisé dans la BDD
-    // - Vrai si oui
-    // - Faux sinon
-    public boolean pseudoAlreadyUsed(String pseudo) throws Exception{
 
+    /**
+     * @author Luc Di Sanza
+     * Cherche si le pseudo est déjà utilisé dans la BDD
+     * @param pseudo Pseudo à rechercher dans la base de données
+     * @return Vrai si le pseudo existe déjà, faux sinon
+     * @throws IllegalArgumentException
+     */
+    public boolean pseudoAlreadyUsed(String pseudo) throws IllegalArgumentException{
         User testPseudo = getUserByPseudo(pseudo);
-
-        if(testPseudo != null){
-            // Pseudo déjà utilisé
-            return true;
-        }
-        return false;
+        return testPseudo != null;
     }
     
-    // Renvoi la liste de tous les pseudos d'utilisateurs
-    public List<String> getAllPseudo()
+    /**
+     * @author Luc Di Sanza
+     * Renvoi la liste de tous les pseudos d'utilisateurs
+     * @return Renvoie la liste des pseudo d'utilisateurs trouvés
+     * @throws IllegalArgumentException
+     */
+    public List<String> getAllPseudo() throws IllegalArgumentException
     {      
         // Recherche de users par pseudo
         TypedQuery<String> query = em.createNamedQuery("Pseudo.getAll", String.class);
