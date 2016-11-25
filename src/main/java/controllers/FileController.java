@@ -440,7 +440,7 @@ public class FileController {
     }
     
         
-        private boolean creerFichierVersion(HttpServletRequest request,String idOne){
+        private boolean creerFichier(HttpServletRequest request,String idOne){
             try{                          
                 ServletContext ctx = request.getServletContext();
                 String path = ctx.getRealPath("/");
@@ -453,6 +453,8 @@ public class FileController {
                                 return false;
                             }
         }
+        
+        
     
     @ResponseBody
     @RequestMapping(value="/pushProjet", method = RequestMethod.GET,produces = "application/json")
@@ -518,7 +520,7 @@ public class FileController {
                                 return returnObject.toString();
                             }
                             //On crée le fichier en physique
-                            boolean creation = creerFichierVersion(request,idOne.toString());
+                            boolean creation = creerFichier(request,idOne.toString());
                             if(!creation){
                                 returnObject.put("response",false);
                                 returnObject.put("errors", "Probleme de creation du nouveau fichier de version ");
@@ -631,7 +633,7 @@ public class FileController {
     }
     
     @ResponseBody
-    @RequestMapping(value="/pullProjet", method = RequestMethod.POST,produces = "application/json")
+    @RequestMapping(value="/pullProjet", method = RequestMethod.GET,produces = "application/json")
     public String pullerProjet(HttpServletRequest request) {
     
         
@@ -669,8 +671,40 @@ public class FileController {
                 List<FichiersUsers> filesFromProjet =fichierUserDao.getByUserAndProjet(user, projet.getNom());
                     if(filesFromProjet==null){
                         System.out.println("On clone le projet");
-                        
-                        
+                        List<FichiersVersion> filesFromVersion =fichiersVersionDao.getFileByVersion(lastVersion);
+                        if(filesFromVersion==null){
+                            returnObject.put("response",false);
+                            returnObject.put("errors", "Pas de fichiers dans la derniere version->ERROR");
+                            return returnObject.toString();
+                        }
+                        for(int a=0;a<filesFromVersion.size();a++){
+                            UUID idOne = UUID.randomUUID();
+                            if(filesFromVersion.get(a).getType()==FichiersVersion.Type.FICHIER){
+                                 FichiersUsers newFichierUser = fichierUserDao.createNewFichierUser(filesFromVersion.get(a).getPathLogique(),idOne.toString(),filesFromVersion.get(a).getNomReel(),new Date(),FichiersUsers.Type.FICHIER,user,0);
+                                 if(newFichierUser==null){
+                                     returnObject.put("response",false);
+                                     returnObject.put("errors", "Le pull n'a pas fonctionné: "+a);
+                                     return returnObject.toString();
+                                 }
+                                 //On crée le fichier en physique
+                                 boolean creation = creerFichier(request,idOne.toString());
+                                 if(!creation){
+                                     returnObject.put("response",false);
+                                     returnObject.put("errors", "Probleme de creation du nouveau fichier de version ");
+                                     return returnObject.toString();
+                                 } 
+                            }else{
+                                 FichiersUsers newDossierUser = fichierUserDao.createNewFichierUser(filesFromVersion.get(a).getPathLogique(),null,filesFromVersion.get(a).getNomReel(),new Date(),FichiersUsers.Type.DOSSIER,user,4);
+                                 if(newDossierUser==null){
+                                     returnObject.put("response",false);
+                                     returnObject.put("errors", "Le pull n'a pas fonctionné: "+a);
+                                     return returnObject.toString();
+                                 }
+                            }
+                        }
+                        returnObject.put("response",true);
+                        returnObject.put("errors", "");
+                        return returnObject.toString();
                     }else{
                         
                         System.out.println("Pas encore codé DSL");

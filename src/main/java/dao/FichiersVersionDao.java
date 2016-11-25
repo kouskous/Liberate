@@ -59,7 +59,7 @@ public class FichiersVersionDao{
     }
     
     public List<FichiersVersion> getFileByVersion(Version version){
-        TypedQuery<FichiersVersion> query = em.createNamedQuery("FichiersUsers.findByVersion", FichiersVersion.class);
+        TypedQuery<FichiersVersion> query = em.createNamedQuery("FichiersVersion.findByVersion", FichiersVersion.class);
         query.setParameter("version", version);
         List<FichiersVersion> results = query.getResultList();
         
