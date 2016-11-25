@@ -91,6 +91,11 @@
 				<div class="clearfix"></div>
                                 
                     </form>
+                    <fieldset>
+                        <div style="float: right; margin-right: 20px; margin-bottom: 20px">
+                            <a href="login" class="btn btn-default" >Retour</a>
+                        </div>
+                    </fieldset>
                 </div>
             </div>
         </div> 
