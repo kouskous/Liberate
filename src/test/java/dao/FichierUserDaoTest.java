@@ -149,10 +149,10 @@ public class FichierUserDaoTest {
         Assert.assertNotEquals("/dossier1/fichierInexistant", fichiersFlorian.get(0).getPathLogique());
     }
 
-    @Test
-    @Transactional
-    @Rollback
-    public void deleteFichierUserByNomPhysique() throws Exception {
+   /*@Test
+   @Transactional
+   @Rollback
+   public void deleteFichierUserByNomPhysique() throws Exception {
         User florian = userDAO.createNewUser("fbautry", "florian@test.test", "Bautry", "Florian", Date.from(Instant.now()), Date.from(Instant.now()), "mdp");
 
         fichierUserDAO.createNewFichierUser("/dossier1/fichierTest", "nomPhysiqueTest", "nomReelTest", Date.from(Instant.now()), FichiersUsers.Type.FICHIER, florian, 0);
@@ -168,7 +168,7 @@ public class FichierUserDaoTest {
 
         Assert.assertNull(fichierUserDAO.getFichierUserByNomPhysique("nomPhysiqueTest"));
         Assert.assertNull(fichierUserDAO.getFichierUserByNomPhysique("dossierTest"));
-    }
+    }*/
 
     @Test
     @Transactional

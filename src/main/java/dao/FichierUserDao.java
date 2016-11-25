@@ -176,7 +176,7 @@ public class FichierUserDao {
             FichiersUsers fichiersUsersToDelete = this.getFichierUserByNomPhysique(nomPhysique);
 
             // Si on l'a trouvé, on le supprime
-            if(fichiersUsersToDelete != null){                
+            if(fichiersUsersToDelete != null){
                 if (!em.contains(fichiersUsersToDelete)){
                     fichiersUsersToDelete = em.merge(fichiersUsersToDelete);
                 }
@@ -286,7 +286,7 @@ public class FichierUserDao {
         
         // Mise à jour du pathLogique
         String oldPath = fichier.getPathLogique();
-        String path = new File(oldPath).getPath();
+        String path = new File(oldPath).getParent();
         fichier.setPathLogique(path + "/" + newName);
         
         try{
