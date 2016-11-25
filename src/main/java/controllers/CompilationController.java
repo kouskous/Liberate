@@ -7,15 +7,17 @@ package controllers;
 
 import dao.FichierUserDao;
 import dao.ProjetDao;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,6 +25,7 @@ import javax.servlet.http.HttpSession;
 import models.FichiersUsers;
 import models.Projet;
 import models.User;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -70,7 +73,7 @@ public class CompilationController {
                 return returnObject.toString();
             }
             // Json fail
-            catch(Exception e){return null;}
+            catch(JSONException e){System.out.println("Erreur JSON: " + e);return null;}
         }
         
         // Récupération du nom de projet
@@ -83,29 +86,39 @@ public class CompilationController {
                 return returnObject.toString();
             }
             // Json fail
-            catch(Exception e){return null;}
+            catch(JSONException e){System.out.println("Erreur JSON: " + e);return null;}
         }
         
         // Vérification de l'existence en base
         Projet projet;
         try{
             projet = projetDao.getProjetByName(nomProjet);
-            if(projet == null) {throw new Exception("Erreur pendant la récupération du projet");}
+            if(projet == null) {
+                try{
+                    returnObject.put("response", "false");
+                    returnObject.put("content", "");
+                    returnObject.put("errors", "Erreur lors de la recuperation du projet en base de donnees");
+                    return returnObject.toString();
+                }
+                // Json fail
+                catch(JSONException e){System.out.println("Erreur JSON: " + e);return null;}
+            }
         }
         catch(Exception e){
             try{
+                System.out.println("Erreur lors de la récupération du projet en base de données" + e);
                 returnObject.put("response", "false");
                 returnObject.put("content", "");
                 returnObject.put("errors", "Erreur lors de la recuperation du projet en base de donnees");
                 return returnObject.toString();
             }
             // Json fail
-            catch(Exception e2){return null;}
+            catch(Exception e2){System.out.println("Erreur JSON: " + e2); return null;}
         }
         
         // Si projet Java, récupération de la classe principale en paramètre
         String mainClass = new String();
-        if(projet.getLangage() == "java"){
+        /*if(projet.getLangage().equals("java")){
             mainClass = (String)request.getParameter("mainClass");
             if(mainClass == null){
                 try{
@@ -115,9 +128,9 @@ public class CompilationController {
                     return returnObject.toString();
                 }
                 // Json fail
-                catch(Exception e2){return null;}
+                catch(Exception e2){System.out.println("Erreur JSON: " + e2);return null;}
             }
-        }
+        }*/
         
         // Création du dossier avec hiérarchie pour la compilation
         ServletContext ctx = request.getServletContext();
@@ -130,7 +143,7 @@ public class CompilationController {
                 return returnObject.toString();
             }
             // Json fail
-            catch(Exception e2){return null;}
+            catch(Exception e2){System.out.println("Erreur JSON: " + e2);return null;}
         }
         
         // Compilation pour projets C/C++
@@ -143,7 +156,7 @@ public class CompilationController {
                     return returnObject.toString();
                 }
                 // Json fail
-                catch(Exception e2){return null;}
+                catch(Exception e2){System.out.println("Erreur JSON: " + e2); return null;}
             }
         }
         
@@ -157,19 +170,27 @@ public class CompilationController {
                     return returnObject.toString();
                 }
                 // Json fail
-                catch(Exception e2){return null;}
+                catch(Exception e2){System.out.println("Erreur JSON: " + e2); return null;}
             }
+            
         }
         
         // Reussite
         try{
             returnObject.put("response", "true");
+            if(projet.getLangage().equals("c") || projet.getLangage().equals("c++")){
+                returnObject.put("nomExec", "exe");
+            }
+            else if(projet.getLangage().equals("java")){
+                returnObject.put("nomExec", nomProjet + ".jar");
+            }
             returnObject.put("content", getCompileErrors(path, user, nomProjet));
             returnObject.put("errors", "");
             return returnObject.toString();
         }
         // Json fail
         catch(Exception e){
+            System.out.println("Erreur JSON: " + e);
             return null;
         }        
     }
@@ -178,14 +199,8 @@ public class CompilationController {
         
         // Récupération du dossier racine du projet
         FichiersUsers racineProjet;
-        try{
-            racineProjet = fichierUserDao.getFichiersByUserAndPath(user, "/" + nomProjet);
-            if(racineProjet == null){throw new Exception("Impossible de trouver la racine du projet");}
-        }
-        catch(Exception e){
-            System.out.println("Erreur pendant la récupération de la racine du projet");
-            return false;
-        }
+        racineProjet = fichierUserDao.getFichiersByUserAndPath(user, "/" + nomProjet);
+        if(racineProjet == null){System.out.println("Erreur pendant la récupération de la racine du projet"); return false;}
         
         // Récupération de l'arborescence du projet
         Map<String, FichiersUsers.Type> arborescence = fichierUserDao.getArborescence(user, racineProjet);
@@ -217,7 +232,7 @@ public class CompilationController {
                     writer.close();
                 }
                 catch(Exception e){
-                    System.out.println("Erreur pendant la création du dossier de compilation");
+                    System.out.println("Erreur pendant la création du dossier de compilation" + e);
                     return false;
                 }
             }
@@ -242,11 +257,13 @@ public class CompilationController {
             else{
                 content = new String(Files.readAllBytes(Paths.get(directoryPath + "/../../scripts/makefile_c++")));
             }
-            if(content == null)
-                throw new Exception("Erreur pendant la récupération du contenu du makefile");
+            if(content == null){
+                System.out.println("Erreur pendant la récupération du contenu du makefile");
+                return false;
+            }
         }
-        catch(Exception e){
-            System.out.println("Erreur pendant la récupération du contenu du makefile");
+        catch(IOException e){
+            System.out.println("Erreur pendant la récupération du contenu du makefile" + e);
             return false;
         }
 
@@ -258,7 +275,7 @@ public class CompilationController {
             writer.close();
         }
         catch(Exception e){
-            System.out.println("Erreur pendant l'ecriture du makefile");
+            System.out.println("Erreur pendant l'ecriture du makefile" + e);
             return false;
         }
 
@@ -272,7 +289,7 @@ public class CompilationController {
             p.waitFor();
         }
         catch(Exception e){
-            System.out.println("Erreur pendant l'execution du makefile");
+            System.out.println("Erreur pendant l'execution du makefile" + e);
             return false;
         }
 
@@ -292,7 +309,7 @@ public class CompilationController {
             }
         }
         catch(Exception e){
-            System.out.println("Erreur pendant le déplacement de l'executable");
+            System.out.println("Erreur pendant le déplacement de l'executable" + e);
             return false;
         }
 
@@ -309,7 +326,7 @@ public class CompilationController {
             }
         }
         catch(Exception e){
-            System.out.println("Erreur pendant le déplacement du fichier d'erreurs");
+            System.out.println("Erreur pendant le déplacement du fichier d'erreurs" + e);
             return false;
         }
 
@@ -318,7 +335,7 @@ public class CompilationController {
             deleteFile(new File(pathToMakeFile + "/../../compile_" + user.getPseudo()));
         }
         catch(Exception e){
-            System.out.println("Erreur pendant la suppression du dossier de compile");
+            System.out.println("Erreur pendant la suppression du dossier de compile" + e);
             return false;
         }
 
@@ -336,8 +353,8 @@ public class CompilationController {
             Process p = builder.start();
             p.waitFor();
         }
-        catch(Exception e){
-            System.out.println("Erreur pendant la compilation javac: " + e.getMessage());
+        catch(IOException | InterruptedException e){
+            System.out.println("Erreur pendant la compilation javac: " + e);
             return false;
         }
         
@@ -351,49 +368,32 @@ public class CompilationController {
                 writer.close();
             }
             catch(Exception e){
-                System.out.println("Erreur pendant la création du manifest pour le jar");
+                System.out.println("Erreur pendant la création du manifest pour le jar" + e);
                 return false;
             }
 
             // Création du jar
             try{
                 // Init du jar
-                ProcessBuilder builder = new ProcessBuilder("jar", "-cvmf", "MANIFEST.MF", nomProjet+".jar");//, "main.class");
+                File file = new File(directoryPath + "/../../execs_" + user.getPseudo() + "/" + nomProjet + ".jar");
+                file.getParentFile().mkdirs();
+                
+                ProcessBuilder builder = new ProcessBuilder("jar", "-cvmf", "MANIFEST.MF", directoryPath + "/../../execs_" + user.getPseudo() + "/" + nomProjet+".jar");
                 builder.directory(new File(pathToProject));
                 Process p = builder.start();
                 p.waitFor();
                 
                 // Ajout de tous les .class
-                ProcessBuilder builder2 = new ProcessBuilder("find", "-name", "*.class", "-exec", "jar", "-uf", nomProjet+".jar", "{}", ";");
+                ProcessBuilder builder2 = new ProcessBuilder("find", "-name", "*.class", "-exec", "jar", "-uf", directoryPath + "/../../execs_" + user.getPseudo() + "/" + nomProjet+".jar", "{}", ";");
                 builder2.directory(new File(pathToProject));
                 Process p2 = builder2.start();
                 p.waitFor();
             }
             catch(Exception e){
-                System.out.println("Erreur pendant la création du jar");
+                System.out.println("Erreur pendant la création du jar:" + e);
                 return false;
             }
             
-            // Moving jar to right folder
-            /*try{                
-                File file = new File(directoryPath + "/../../execs_" + user.getPseudo() + "/" + nomProjet + ".jar");
-                file.getParentFile().mkdirs();
-
-                if(new File(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + nomProjet + ".jar").exists()){
-                    FileOutputStream fos = new FileOutputStream(file);
-                    fos.write(Files.readAllBytes(
-                            Paths.get(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + nomProjet + ".jar")));
-                    fos.close();
-                }
-                else{
-                    return false;
-                }
-            }
-            catch(Exception e){
-                System.out.println("Erreur pendant le déplacement de l'executable");
-                return false;
-            }
-
             // Moving errors to right folder
             try{                
                 File file = new File(directoryPath + "/../../execs_" + user.getPseudo() + "/" + "errors.txt");
@@ -409,16 +409,16 @@ public class CompilationController {
             catch(Exception e){
                 System.out.println("Erreur pendant le déplacement du fichier d'erreurs");
                 return false;
-            }*/
+            }
 
             // Deleting compile folder
-            /*try{
-                deleteFile(new File(pathToMakeFile + "/../../compile_" + user.getPseudo()));
+            try{
+                deleteFile(new File(directoryPath + "/../../compile_" + user.getPseudo()));
             }
             catch(Exception e){
                 System.out.println("Erreur pendant la suppression du dossier de compile");
                 return false;
-            }*/
+            }
             
             
             return true;
@@ -440,7 +440,7 @@ public class CompilationController {
     {
         File file = new File(directoryPath + "/../../execs_" + user.getPseudo() + "/" + "errors.txt");
         if(!file.exists()){
-            return new String("");
+            return "";
         }
         else{
             try{
@@ -448,7 +448,8 @@ public class CompilationController {
                         Paths.get(directoryPath + "/../../execs_" + user.getPseudo() + "/" + "errors.txt")));
             }
             catch(Exception e){
-                return new String("");
+                System.out.println("Erreur pendant la récupération des erreurs de compilation: " + e);
+                return "";
             }
         }
     }
@@ -467,13 +468,20 @@ public class CompilationController {
             return null;
         }
         
+        // Récupération du nom de l'executable à télécharger
+        String execName = (String)request.getParameter("nomExec");
+        if(execName == null){
+            return null;
+        }
+        
         try {
             ServletContext ctx = request.getServletContext();
             String path = ctx.getRealPath("/");
-            String pathToExec = path + "/../../execs_" + user.getPseudo() + "/" + "exe";
+            String pathToExec = path + "/../../execs_" + user.getPseudo() + "/" + execName;
             return new FileSystemResource(pathToExec); 
         } 
         catch (Exception e) {
+            System.out.println("Erreur pendant le téléchargement de l'executable: " + e);
             return null;
         }
     }
