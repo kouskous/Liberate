@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package dao;
 
 import java.util.ArrayList;
@@ -10,14 +5,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import models.Projet;
 import models.User;
 import models.UserProjet;
-import org.springframework.stereotype.Repository;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -29,11 +23,23 @@ public class UserProjetDao {
     @PersistenceContext
     EntityManager em;
     
-    // Cherche le UserProjet dans la BDD
+    @Autowired
+    ProjetDao projetDao;
+    
+    // 
     // - renvoie null si il n'y est pas.
     // - renvoie le UserProjet si il y est
     // - exception si il y a plusieurs UserProjets avec la même paire user/projet.
-    public UserProjet getUserProjetByUIdPId(int idUser, int idProjet) throws Exception{
+
+    /**
+     * @author Luc Di Sanza
+     * Cherche un userProjet en BDD
+     * @param idUser ID de l'utilisateur à rechercher
+     * @param idProjet ID du projet à rechercher
+     * @return Renvoie l'userProjet si réussite, null sinon
+     * @throws IllegalArgumentException
+     */
+    public UserProjet getUserProjetByUIdPId(int idUser, int idProjet) throws IllegalArgumentException{
         
         // Recherche du UserProjet par idUser et idProjet (unique)
         TypedQuery<UserProjet> query = em.createNamedQuery("UserProjet.findByIdUAndIdP", UserProjet.class);
@@ -51,11 +57,12 @@ public class UserProjetDao {
         }
         // Anomalie: plusieurs UserProjet ont été trouvé avec le même nom
         else{
-            throw new Exception("Erreur BDD: plusieurs UserProjets avec la même paire User/Projet");
+            return null;
         }
     }
 
     /**
+     * Récupération de tous les projets d'un utilisateur
      * @param user l'utilisateur
      * @return une collection vide si il n'y a rien.
      *          les projets de l'utilisateur sinon.
@@ -66,8 +73,6 @@ public class UserProjetDao {
         TypedQuery<UserProjet> query = em.createNamedQuery("UserProjet.findByIdU", UserProjet.class);
         query.setParameter("idU", user.getIdUser());
         List<UserProjet> userProjets = query.getResultList();
-
-        ProjetDao projetDao = new ProjetDao(em);
 
         Collection<Projet> result = new ArrayList<>();
         // Si aucun UserProjet n'est trouvé avec ces ID
@@ -81,7 +86,7 @@ public class UserProjetDao {
                     result.add(projetDao.getProjetByName(userProjet.getProjet().getNom()));
                 }
                 catch (Exception e) {
-                    System.err.println(e.getMessage());
+                    System.err.println(e);
                 }
             }
         }
@@ -89,9 +94,16 @@ public class UserProjetDao {
         return result;
     }
        
-    // Création d'un nouveau UserProjet
-    // Renvoie le UserProjet si réussite
-    // Renvoie null sinon
+    /**
+     * @author Luc Di Sanza
+     * Création d'un nouveau UserProjet
+     * @param typeDroit Droits de l'utilisateur relatifs au projet
+     * @param dateCreation Date actuelle
+     * @param dateModification Date actuelle
+     * @param user Utilisateur considéré
+     * @param projet Projet considéré
+     * @return Renvoie l'userProjet si réussite, null sinon
+     */
     public UserProjet createNewUserProjet(String typeDroit, Date dateCreation, Date dateModification, 
             User user, Projet projet){
         
@@ -112,16 +124,20 @@ public class UserProjetDao {
             }
             catch(Exception e){
                 System.out.println("Erreur lors de l'ajout d'un nouveau UserProjet");
-                System.out.println(e.getMessage());
+                System.out.println(e);
                 return null;
             }
         }
         return null;
     }
     
-    // Suppression d'un UserProjet de la base de données
-    // Renvoie vrai si la suppression a réussie
-    // Renvoie faux sinon.
+    /**
+     * @author Luc Di Sanza
+     * Suppression d'un userProjet 
+     * @param user Utilisateur considéré
+     * @param projet Projet considéré
+     * @return Renvoie vrai si réussite, faux sinon
+     */
     public boolean deleteUserProjet(User user, Projet projet){
         
         try{
@@ -142,16 +158,18 @@ public class UserProjetDao {
         }
         catch(Exception e){
             System.out.println("Erreur dans la suppression d'un UserProjet");
-            System.out.println(e.getMessage());
+            System.out.println(e);
             return false;
         }
     }
     
-    
-    // Change les droits d'un userProjet existant, ou le créé avec ces droits sinon.
-    // TypeDroit doit faire partie de {"Admin", "Dev", "Reporter"}
-    // - Renvoie vrai si réussite
-    // - Faux sinon
+    /**
+     * Change les droits d'un userProjet existant, ou le créé avec ces droits sinon.
+     * @param typeDroit Droits à attribuer à l'userProjet
+     * @param idUser Utilisateur considéré
+     * @param idProjet Projet considéré
+     * @return Renvoie vrai si réussite, faux sinon
+     */
     public boolean changeDroitsUserProjet(String typeDroit, int idUser, int idProjet){
         
         // On teste que typeDroit est une chaine de caractère valide
@@ -167,7 +185,7 @@ public class UserProjetDao {
             }
             catch(Exception e){
                 System.out.println("Erreur lors du changement de droits d'utilisateur");
-                System.out.println(e.getMessage());
+                System.out.println(e);
                 return false;
             }
         }
@@ -176,10 +194,12 @@ public class UserProjetDao {
         }
     }
     
-    // Change les droits d'un userProjet existant, ou le créé avec ces droits sinon.
-    // TypeDroit doit faire partie de {"Admin", "Dev", "Reporter"}
-    // - Renvoie vrai si réussite
-    // - Faux sinon
+    /**
+     * Change les droits d'un userProjet existant, ou le créé avec ces droits sinon.
+     * @param typeDroit Droits à attribuer à l'userProjet
+     * @param userProjet UserProjet considéré
+     * @return Renvoie vrai si réussite, faux sinon
+     */
     public boolean changeDroitsUserProjet(String typeDroit, UserProjet userProjet){
 
         
@@ -193,7 +213,7 @@ public class UserProjetDao {
             }
             catch (Exception e){
                 System.out.println("Erreur lors du changement de droits utilisateur projet");
-                System.out.println(e.getMessage());
+                System.out.println(e);
                 return false;
             }
         }
@@ -201,23 +221,32 @@ public class UserProjetDao {
             return false;
         }
     }
-    
-    // Renvoi la liste de tous les utilisateurs qui participent à un projet
+
+    /**
+     * @author Luc Di Sanza
+     * Renvoi la liste de tous les utilisateurs qui participent à un projet
+     * @param projet Projet considéré
+     * @return Renvoie la liste des utilisateurs qui participent au projet
+     */
     public List<User> getAllUsersByProjet(Projet projet)
     {      
         // Recherche de users du projet
         TypedQuery<UserProjet> query = em.createNamedQuery("UserProjet.findByIdP", UserProjet.class);
         query.setParameter("idP", projet.getIdProjet());
         List<UserProjet> results = query.getResultList();
-        List<User> listUsers = new ArrayList<User>();
+        List<User> listUsers = new ArrayList<>();
         for (int i = 0; i < results.size(); i++){
             listUsers.add(results.get(i).getUser());
         }
-        
         return listUsers;
     }
     
-    // Renvoi la liste de tous les utilisateurs qui ne participent pas à un projet
+    /**
+     * @author Luc Di Sanza
+     * Renvoi la liste de tous les utilisateurs qui ne participent pas à un projet
+     * @param projet Projet considéré
+     * @return Renvoie la liste des utilisateurs qui ne participent pas au projet
+     */
     public List<User> getAllUsersNotInProjet(Projet projet)
     {            
         // Recherche de tous les users
@@ -232,8 +261,13 @@ public class UserProjetDao {
         
         return allUsers;
     }
-    
-    // Renvoi les droits de l'utilisateurs donné associé au projet donné
+
+    /**
+     * Renvoi les droits de l'utilisateurs donné associé au projet donné
+     * @param user Utilisateur considéré
+     * @param projet Projet considéré
+     * @return Renvoie les droits de l'utilisateur si réussite, null sinon
+     */
     public String getDroits(User user, Projet projet)
     {
         try{
@@ -246,6 +280,8 @@ public class UserProjetDao {
             }
         }
         catch(Exception e){
+            System.out.println("Erreur pendant la récupération des droits d'un user");
+            System.out.println(e);
             return null;
         }
     }

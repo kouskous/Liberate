@@ -38,7 +38,7 @@ public class beanConfig {
     
     @Bean(name = "ProjetDao")
     public ProjetDao getProjetDao() {
-        return new ProjetDao(getEntityManager());
+        return new ProjetDao();
     }
     
     @Bean(name = "UserDao")

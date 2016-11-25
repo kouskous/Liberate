@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controllers;
 import dao.UserDao;
 
@@ -37,9 +32,17 @@ public class InscriptionController {
     // Regex2 utilisée pour email
     static String regex2 = "^([\\w-\\.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([\\w-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)";
     
+    /**
+     * Constructeur du controleur d'inscriptions
+     */
     public InscriptionController(){
     }
     
+    /**
+     * Requête d'affichage de la page d'inscription
+     * @param request
+     * @return Renvoie le nom de la jsp de la page d'inscription, ou redirige si une session est déjà ouverte
+     */
     @RequestMapping(value="/inscription", method = RequestMethod.GET)
     public String index(HttpServletRequest request){
         
@@ -52,8 +55,13 @@ public class InscriptionController {
         else // Une session déjà ouverte
             return "redirect:/";
     }
-    
-    // Nouvelle inscription
+
+    /**
+     * Requête d'inscription d'un nouvel utilisateur
+     * @param request
+     * @param model
+     * @return Redirige sur la page de connexion si réussite, ou sur la page d'inscription si echec.
+     */
     @RequestMapping(value="/inscription", method = RequestMethod.POST)
     public String newUser(HttpServletRequest request, ModelMap model){
         
@@ -61,7 +69,7 @@ public class InscriptionController {
         HttpSession session= request.getSession();
         User user = (User)session.getAttribute("user");
  
-        if(user != null) // session déjà ouverte
+        if(user != null) // Une session ouverte
             return "redirect:/";
         
         String pseudo = request.getParameter("pseudo");
@@ -94,8 +102,9 @@ public class InscriptionController {
                 return "inscription";
             }
         }
-        catch(Exception e){
+        catch(IllegalArgumentException e){
             // Erreur pendant le requetage.
+            System.out.println("Erreur pendant le test d'existence du pseudo ou du mail: " + e);
             model.addAttribute("Erreur", "Communication BDD");
             return "inscription";
         }
@@ -120,15 +129,8 @@ public class InscriptionController {
            
         // Si l'utilisateur a bien été créé
         if(newUser != null){
-            try{
-                // Réussite, redirection page principale
-                return "redirect:/login";
-            }
-            catch(Exception e){
-                // Erreur pendant le commit
-                model.addAttribute("Erreur", "Communication BDD");
-                return "inscription";
-            }
+            // Réussite, redirection page principale
+            return "redirect:/login";
         }
         else{
             // L'utilisateur n'a pas été créé
@@ -137,6 +139,12 @@ public class InscriptionController {
         }
     }
     
+    /**
+     * Test d'acceptation d'une chaîne de caractères par une expression régulière
+     * @param regex Expression régulière considérée
+     * @param aTester Chaîne de caractères à tester
+     * @return Renvoie vrai si la chaine est acceptée, faux sinon
+     */
     private boolean testRegex(String regex, String aTester){
         return Pattern.compile(regex).matcher(aTester).matches();
     }
