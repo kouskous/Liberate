@@ -40,7 +40,6 @@
             id = $(this).attr("id");
             id = id.replace(/-/g,'/');
             id = id.replace('__','.');
-            console.log(id);
             App.currentVoletElement = id;
         });
     } 
@@ -301,10 +300,14 @@ $( document ).ready(function() {
                       },
             success  : function(data) {  
                               $.unblockUI();
-                              if(data.response){
-                                    currentVolet = App.currentVoletElement.slice(4);
-                                    $(".close-onglet[data-id='"+ currentVolet +"']").trigger("click");
-                                    refreshTree();
+                              if(data.response==="true"){
+                                    currentVolet = App.currentVoletElement.replace(/\//g,'-');
+                                    currentVolet = currentVolet.replace('.','__');
+                                    $(".close-onglet[data-id='"+App.currentVoletElement+"']").trigger("click");
+                                    App.tree.removeNode(currentVolet);
+                                    var nodes = App.tree.getAllNodes();
+                                    App.tree.rebuildTree(nodes);
+                                    defineArbreEvents();
                                     toastr.success("Suppression réussie");
                               } else {
                                     toastr.warning(data.errors);
@@ -316,6 +319,5 @@ $( document ).ready(function() {
             toastr.warning("Vous ne pouvez supprimer que les fichiers que vous avez vérouillés");
         }   
     });
-
-  
+    
 });
