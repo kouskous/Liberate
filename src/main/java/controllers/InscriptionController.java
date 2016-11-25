@@ -1,7 +1,9 @@
 package controllers;
 import dao.UserDao;
 
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
 import java.util.Date;
@@ -32,6 +34,36 @@ public class InscriptionController {
     // Regex2 utilisée pour email
     static String regex2 = "^([\\w-\\.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([\\w-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)";
     
+    /**
+     * Hash a password for storage.
+     *
+     * @return a secure authentication token to be stored for later authentication
+     */
+    private String hash(String motDePasse)
+    {
+        //do magic (inspiration : http://stackoverflow.com/questions/2860943/how-can-i-hash-a-password-in-java)
+
+        // le "salage" permet d'avoir un mot de passe plus sécurisé
+        byte[] salt = new byte[16];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(salt);
+
+        KeySpec spec = new PBEKeySpec(motDePasse.toCharArray(), salt, 65536, 128);
+        try {
+            // PBKDF2WithHmacSHA256:
+            // Password-based key-derivation algorithm found in PKCS #5 2.0
+            // using the specified pseudo-random function SHA-256
+            SecretKeyFactory f = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+            byte[] hash = f.generateSecret(spec).getEncoded();
+            Base64.Encoder enc = Base64.getEncoder();
+            return Base64.getEncoder().encodeToString(salt) + "$" + enc.encodeToString(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("Missing algorithm: PBKDF2WithHmacSHA256", e);
+        } catch (InvalidKeySpecException e) {
+            throw new IllegalStateException("Invalid SecretKeyFactory", e);
+        }
+    }
+
     /**
      * Constructeur du controleur d'inscriptions
      */
@@ -69,7 +101,7 @@ public class InscriptionController {
         HttpSession session= request.getSession();
         User user = (User)session.getAttribute("user");
  
-        if(user != null) // Une session ouverte
+        if(user != null) // session déjà ouverte
             return "redirect:/";
         
         String pseudo = request.getParameter("pseudo");
@@ -108,16 +140,9 @@ public class InscriptionController {
             model.addAttribute("Erreur", "Communication BDD");
             return "inscription";
         }
-        
-        // TODO: génération de la clé mot de passe ici
-        /*byte[] salt = new byte[16];
-        SecureRandom random = new SecureRandom();
-        random.nextBytes(salt);
-        KeySpec spec = new PBEKeySpec(motDePasse.toCharArray(), salt, 65536, 128);
-        SecretKeyFactory f = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-        byte[] hash = f.generateSecret(spec).getEncoded();
-        Base64.Encoder enc = Base64.getEncoder();*/
-        
+
+        motDePasse = hash(motDePasse);
+
         // Création de l'utilisateur
         User newUser = userDao.createNewUser(request.getParameter("pseudo"),
                                             request.getParameter("mail"), 
