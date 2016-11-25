@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import models.FichiersUsers;
 import models.Projet;
-import models.User;
+import models.User; 
 import models.UserProjet;
 import org.json.JSONArray;
 import org.json.JSONException;
