@@ -132,7 +132,7 @@ public class FileController {
                             try{                          
                                 ServletContext ctx = request.getServletContext();
                                 String path = ctx.getRealPath("/");
-                                
+
                                 FileOutputStream out = new FileOutputStream(path + "/../../files/" + idOne.toString());
                                 out.close();
                             }
@@ -303,7 +303,8 @@ public class FileController {
                         try{
                             ServletContext ctx = request.getServletContext();
                             String path = ctx.getRealPath("/");
-                            
+
+                            //TODO: fermer le FileOutputStream
                             FileOutputStream out = new FileOutputStream(path + "/../../files/" + fichier.getNomPhysique());
                             out.write(contenuFichier.getBytes());
                             out.close();
@@ -378,8 +379,7 @@ public class FileController {
             }		
             // Json fail
             catch (Exception e){System.out.println("Erreur JSON: " + e); return null;}
-        }
-        
+        } 
         try{
             response.put("pathLogique",request.getParameter("pathLogique"));
             response.put("pathPhysique",pathPhysique);

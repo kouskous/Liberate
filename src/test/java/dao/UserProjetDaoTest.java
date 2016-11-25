@@ -41,9 +41,9 @@ public class UserProjetDaoTest {
 
         Projet projetFlorian = projetDAO.createNewProjet("MonProjet", Date.from(Instant.now()), Date.from(Instant.now()), "Java");
 
-        userProjetDao.createNewUserProjet("Admin", Date.from(Instant.now()), Date.from(Instant.now()), florian, projetFlorian);
+        userProjetDao.createNewUserProjet("admin", Date.from(Instant.now()), Date.from(Instant.now()), florian, projetFlorian);
 
-        Assert.assertEquals("Admin", userProjetDao.getUserProjetByUIdPId(florian.getIdUser(), projetFlorian.getIdProjet()).getTypeDroit());
+        Assert.assertEquals("admin", userProjetDao.getUserProjetByUIdPId(florian.getIdUser(), projetFlorian.getIdProjet()).getTypeDroit());
     }
 
     @Test
@@ -56,8 +56,8 @@ public class UserProjetDaoTest {
         Projet projetFlorian1 = projetDAO.createNewProjet("MonProjet1", Date.from(Instant.now()), Date.from(Instant.now()), "Java");
         Projet projetFlorian2 = projetDAO.createNewProjet("MonProjet2", Date.from(Instant.now()), Date.from(Instant.now()), "Java");
 
-        userProjetDao.createNewUserProjet("Admin", Date.from(Instant.now()), Date.from(Instant.now()), florian, projetFlorian1);
-        userProjetDao.createNewUserProjet("Admin", Date.from(Instant.now()), Date.from(Instant.now()), florian, projetFlorian2);
+        userProjetDao.createNewUserProjet("admin", Date.from(Instant.now()), Date.from(Instant.now()), florian, projetFlorian1);
+        userProjetDao.createNewUserProjet("admin", Date.from(Instant.now()), Date.from(Instant.now()), florian, projetFlorian2);
 
         Collection<Projet> projets = userProjetDao.getProjetsByUser(florian);
         Collection<Projet> projetsVide = userProjetDao.getProjetsByUser(remi);
@@ -76,7 +76,7 @@ public class UserProjetDaoTest {
 
         Projet projetFlorian = projetDAO.createNewProjet("MonProjet", Date.from(Instant.now()), Date.from(Instant.now()), "Java");
 
-        userProjetDao.createNewUserProjet("Admin", Date.from(Instant.now()), Date.from(Instant.now()), florian, projetFlorian);
+        userProjetDao.createNewUserProjet("admin", Date.from(Instant.now()), Date.from(Instant.now()), florian, projetFlorian);
 
         Assert.assertNotNull(userProjetDao.getUserProjetByUIdPId(florian.getIdUser(), projetFlorian.getIdProjet()));
     }
@@ -90,7 +90,7 @@ public class UserProjetDaoTest {
         Projet projetFlorian = projetDAO.createNewProjet("MonProjet", Date.from(Instant.now()), Date.from(Instant.now()), "Java");
         Projet projetAutreUtilisateur = projetDAO.createNewProjet("AutreProjet", Date.from(Instant.now()), Date.from(Instant.now()), "Java");
 
-        userProjetDao.createNewUserProjet("Admin", Date.from(Instant.now()), Date.from(Instant.now()), florian, projetFlorian);
+        userProjetDao.createNewUserProjet("admin", Date.from(Instant.now()), Date.from(Instant.now()), florian, projetFlorian);
 
         boolean resultTrue = userProjetDao.deleteUserProjet(florian, projetFlorian);
         boolean resultFalse = userProjetDao.deleteUserProjet(florian, projetAutreUtilisateur);
@@ -109,14 +109,14 @@ public class UserProjetDaoTest {
 
         Projet projetFlorian = projetDAO.createNewProjet("MonProjet", Date.from(Instant.now()), Date.from(Instant.now()), "Java");
 
-        UserProjet userProjetFlorian = userProjetDao.createNewUserProjet("Admin", Date.from(Instant.now()), Date.from(Instant.now()), florian, projetFlorian);
+        UserProjet userProjetFlorian = userProjetDao.createNewUserProjet("admin", Date.from(Instant.now()), Date.from(Instant.now()), florian, projetFlorian);
 
-        userProjetDao.changeDroitsUserProjet("Dev", userProjetFlorian);
+        userProjetDao.changeDroitsUserProjet("developpeur", userProjetFlorian);
 
-        Assert.assertEquals("Dev", userProjetDao.getUserProjetByUIdPId(florian.getIdUser(), projetFlorian.getIdProjet()).getTypeDroit());
+        Assert.assertEquals("developpeur", userProjetDao.getUserProjetByUIdPId(florian.getIdUser(), projetFlorian.getIdProjet()).getTypeDroit());
 
-        userProjetDao.changeDroitsUserProjet("Admin", florian.getIdUser(), projetFlorian.getIdProjet());
+        userProjetDao.changeDroitsUserProjet("admin", florian.getIdUser(), projetFlorian.getIdProjet());
 
-        Assert.assertEquals("Admin", userProjetDao.getUserProjetByUIdPId(florian.getIdUser(), projetFlorian.getIdProjet()).getTypeDroit());
+        Assert.assertEquals("admin", userProjetDao.getUserProjetByUIdPId(florian.getIdUser(), projetFlorian.getIdProjet()).getTypeDroit());
     }
 }
