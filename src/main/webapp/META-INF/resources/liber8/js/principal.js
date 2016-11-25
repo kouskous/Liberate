@@ -180,13 +180,32 @@ $( document ).ready(function() {
                     $.unblockUI();
                         if(data.response==="true"){
                             toastr.success("compilé");
-                        } else {
-                            toastr.warning(data.errors);
+                            $.ajax({ 
+                                 url      : "/Liber8/downloadExec?nomExec="+data.nomExec,
+                                 type     : 'GET',
+                                 dataType : "json",   
+                                    success  : function(data) {  
+                                        console.log(data);
+                                    }});
+                
+                            $(".console").css('display','block');
+                            $(".body_console").html(data.content+"Vous pouvez telecharger l'executable <a ");
+                            
+                        } else if((data.response==="false" && data.content!=="")|| (data.response==="true" && data.content!=="")) {
+                            toastr.warning("erreur pendant la compilation");
+                              $(".console").css('display','block');
+                              $(".body_console").html(data.content);
+                        }
+                        else {
+                              toastr.warning("un problème est survenu au niveau de l'application ! réessayer plus tard");
                         }
                         }       
             });
         
         
+    });
+    $('.closeconsole').click(function(){
+        $(".console").hide();
     });
     
 });
