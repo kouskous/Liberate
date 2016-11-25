@@ -415,11 +415,13 @@ public class FileController {
         }
         return  response.toString();
     }
-    private static boolean copier(String fichier_source, String fichier_dest)
+    private static boolean copier(HttpServletRequest request,String fichier_source, String fichier_dest)
     { 
         try{
-            FileInputStream src = new FileInputStream(fichier_source);
-           FileOutputStream dest = new FileOutputStream(fichier_dest);
+            ServletContext ctx = request.getServletContext();
+            String path = ctx.getRealPath("/");
+            FileInputStream src = new FileInputStream(path +fichier_source);
+           FileOutputStream dest = new FileOutputStream(path +fichier_dest);
 
            FileChannel inChannel = src.getChannel();
            FileChannel outChannel = dest.getChannel();
@@ -533,9 +535,9 @@ public class FileController {
                                 return returnObject.toString();
                             }
                             //on copie ensuite le contenu de mes fichiers dans les fichiers de la nouvelle version
-                            String src ="/files/"+filesFromProjet.get(c).getNomPhysique();
-                            String dest="/files/"+newFichierVersion.getNomPhysique();
-                            copier(src,dest);
+                            String src ="/../../files/"+filesFromProjet.get(c).getNomPhysique();
+                            String dest="/../../files/"+newFichierVersion.getNomPhysique();
+                            copier(request,src,dest);
                        }else{
                            FichiersVersion newDossierVersion = fichiersVersionDao.createNewFichierVersion(filesFromProjet.get(c).getPathLogique(),null,filesFromProjet.get(c).getNomReel(),new Date(),FichiersVersion.Type.DOSSIER,newVersion);
                            if(newDossierVersion==null){
@@ -554,7 +556,8 @@ public class FileController {
                         }
                 }else{
                        //On recupere tous les fichiers qu'on a verrouillé
-                       List<FichiersUsers> lockedFiles = fichierUserDao.getLockedByUserAndProjet(user, request.getParameter("projet"));
+                       
+                       List<FichiersUsers> lockedFiles = fichierUserDao.getLockedByUserAndProjet(user, projet.getNom());
                        if(lockedFiles==null){
                            System.out.println("lockedFiles null");
                            returnObject.put("response",false);
@@ -573,30 +576,56 @@ public class FileController {
                                return returnObject.toString();
                            }
                            for(int i=0;i<lockedFiles.size();i++){
-                               FichiersVersion file = fichiersVersionDao.createNewFichierVersion(lockedFiles.get(i).getPathLogique(), lockedFiles.get(i).getNomPhysique(),lockedFiles.get(i).getNomReel(), new Date(), FichiersVersion.Type.FICHIER, newVersion);
+                               UUID idOne = UUID.randomUUID();
+                               FichiersVersion file = fichiersVersionDao.createNewFichierVersion(lockedFiles.get(i).getPathLogique(),idOne.toString(),lockedFiles.get(i).getNomReel(), new Date(), FichiersVersion.Type.FICHIER, newVersion);
                                if(file==null){
                                    System.out.println("file null");
                                    returnObject.put("response",false);
                                     returnObject.put("errors", "Erreur lors de la creation du fichier :"+i);
                                     return returnObject.toString();
                                 }
-                               for(int j=0;j<fichiersLastVersion.size();j++){
-                                   if(lockedFiles.get(i).getPathLogique()!=fichiersLastVersion.get(j).getPathLogique()){
-                                       FichiersVersion file2 = fichiersVersionDao.createNewFichierVersion(fichiersLastVersion.get(j).getPathLogique(), fichiersLastVersion.get(j).getNomPhysique(),fichiersLastVersion.get(j).getNomReel(), new Date(), FichiersVersion.Type.FICHIER, newVersion);
-                                        if(file2==null){
-                                            System.out.println("file2 null");
-                                            returnObject.put("response",false);
-                                            returnObject.put("errors", "Erreur lors de la creation du fichier :"+j);
-                                            return returnObject.toString();
-                                        }
+                                String src ="/../../files/"+lockedFiles.get(i).getNomPhysique();
+                                String dest="/../../files/"+file.getNomPhysique();
+                                copier(request,src,dest);
+                               List<FichiersVersion> fichiersLastVersionTamp=fichiersLastVersion;
+                               for(int j=0;j<fichiersLastVersionTamp.size();j++){
+                                   if(lockedFiles.get(i).getPathLogique().equals(fichiersLastVersionTamp.get(j).getPathLogique())){
+                                       fichiersLastVersion.remove(j);
+                                      
                                    }
+                               }
+                               
+                           }
+                           
+                           for(int g=0;g<fichiersLastVersion.size();g++){
+                               UUID idTwo = UUID.randomUUID();
+                               if(fichiersLastVersion.get(g).getType()==FichiersVersion.Type.FICHIER){
+                               FichiersVersion file = fichiersVersionDao.createNewFichierVersion(fichiersLastVersion.get(g).getPathLogique(),idTwo.toString() ,fichiersLastVersion.get(g).getNomReel(), new Date(), FichiersVersion.Type.FICHIER, newVersion);
+                              if(file==null){
+                                   System.out.println("file null");
+                                   returnObject.put("response",false);
+                                    returnObject.put("errors", "Erreur lors de la creation du fichier :"+g);
+                                    return returnObject.toString();
+                                }
+                                String src ="/../../files/"+fichiersLastVersion.get(g).getNomPhysique();
+                                String dest="/../../files/"+file.getNomPhysique();
+                                copier(request,src,dest);
+                           }else{
+                                  FichiersVersion file = fichiersVersionDao.createNewFichierVersion(fichiersLastVersion.get(g).getPathLogique(),null,fichiersLastVersion.get(g).getNomReel(), new Date(), FichiersVersion.Type.DOSSIER, newVersion);
+                              if(file==null){
+                                   System.out.println("file null");
+                                   returnObject.put("response",false);
+                                    returnObject.put("errors", "Erreur lors de la creation du dossier :"+file);
+                                    return returnObject.toString();
+                                } 
+                               }
                            }
                            //Puis on ajoute les fichers verrouillés a cette nouvelle version:
                            //dans la base dans le cas de nouveaux fichiers, puis aussi en physique
                            //(càd copie du contenu des fichiers verrouillés dans les fichers correpondant dans la version)
                            
                            //On peut ensuite enlever le verrou sur ces fichiers.(seulement pour moi 2-->0)
-                           }
+                           
                            for(int k =0 ;k<lockedFiles.size();k++){
                            boolean test = fichierUserDao.changeVerrou(lockedFiles.get(k),0);
                            if(!test){
@@ -693,9 +722,9 @@ public class FileController {
                                      returnObject.put("errors", "Probleme de creation du nouveau fichier de version ");
                                      return returnObject.toString();
                                  } 
-                            String src ="/files/"+filesFromVersion.get(a).getNomPhysique();
-                            String dest="/files/"+newFichierUser.getNomPhysique();
-                            copier(src,dest);
+                            String src ="/../../files/"+filesFromVersion.get(a).getNomPhysique();
+                            String dest="/../../files/"+newFichierUser.getNomPhysique();
+                            copier(request,src,dest);
                             }else{
                                  FichiersUsers newDossierUser = fichierUserDao.createNewFichierUser(filesFromVersion.get(a).getPathLogique(),null,filesFromVersion.get(a).getNomReel(),new Date(),FichiersUsers.Type.DOSSIER,user,4);
                                  if(newDossierUser==null){
