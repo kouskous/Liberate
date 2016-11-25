@@ -2,14 +2,11 @@ package dao;
 
 import models.FichiersUsers;
 import models.User;
-
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.util.*;
-import javax.persistence.Persistence;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
-import org.springframework.stereotype.Repository;
 
 /**
  * Created by Florian on 20/10/2016.
@@ -22,13 +19,12 @@ public class FichierUserDao {
     @PersistenceContext
     EntityManager em;
 
-    public EntityManager getEntityManager() {
-        return em;
-    }
-
-    // Cherche les fichiers d'un utilisateur dans la BDD
-    // - renvoie la liste des fichiers de l'user si il y est
-    // - renvoie une liste vide sinon
+    /**
+     *
+     * Cherche les fichiers d'un utilisateur dans la BDD
+     * @param user L'utilisateur dont on veut les fichiers
+     * @return Renvoie la liste des fichiers de l'utilisateur.
+     */
     public Collection<FichiersUsers> getFichiersByUser(User user) {
 
         // Recherche des fichiers
@@ -44,9 +40,13 @@ public class FichierUserDao {
         return results;
     }
     
-    // Cherche les fichiers d'un utilisateur dans la BDD
-    // - renvoie null s'il n'a pas été trouvé
-    // - renvoie le fichier si il a été trouvé
+    /**
+     *
+     * Cherche les fichiers d'un utilisateur qui ont un certain pathLogique dans la BDD
+     * @param user L'utilisateur dont on veut les fichiers
+     * @param pathLogique Le path logique à rechercher
+     * @return Renvoie la liste des fichiers trouvés ou null si echec.
+     */
     public FichiersUsers getFichiersByUserAndPath(User user, String pathLogique){
 
         // Recherche des fichiers
@@ -67,10 +67,13 @@ public class FichierUserDao {
         }
     }
 
-    // Cherche un fichier dans la BDD par son nom
-    // - renvoie null si il n'y est pas.
-    // - renvoie le fichier si il y est
-    public FichiersUsers getFichierUserByNomPhysique(String nomPhysique) throws Exception {
+    /**
+     *
+     * Cherche un fichier dans la BDD par son nom physique
+     * @param nomPhysique Nom physique du fichier à rechercher
+     * @return Renvoie la liste des fichiers trouvés ou null si echec.
+     */
+    public FichiersUsers getFichierUserByNomPhysique(String nomPhysique) throws IllegalArgumentException {
 
         // Recherche de l'user par pseudo (unique)
         TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByNomPhysique", FichiersUsers.class);
@@ -85,15 +88,12 @@ public class FichierUserDao {
         else if(results.size() == 1){
             return results.get(0);
         }
-
         // Anomalie: plusieurs fichiers ont été trouvé avec le même nom physique
         else{
-            throw new Exception("Erreur BDD: plusieurs fichiers d'utilisateur ont le même nom physique");
+            return null;
         }
     }
     
-
-
     /**
      * @author Florian
      *
@@ -101,7 +101,7 @@ public class FichierUserDao {
      * @param user l'utilisateur dont on veux l'arborescence
      * @return Renvoie l'arborescence complete depuis la racine de l'utilisateur
      */
-    public Map<String, FichiersUsers.Type> getArborescence(User user){
+    public Collection<FichiersUsers> getArborescence(User user){
         return getArborescence(user, null);
     }
 
@@ -114,9 +114,8 @@ public class FichierUserDao {
      *                si null depuis la racine de l'utilisateur
      * @return Renvoie l'arborescence depuis le dossier en question, ou null si le dossier est un fichier
      */
-    public Map<String, FichiersUsers.Type> getArborescence(User user, FichiersUsers dossier){
+    public Collection<FichiersUsers> getArborescence(User user, FichiersUsers dossier){
         try {
-            Map<String, FichiersUsers.Type> arborescence = new Hashtable<>();
             Collection<FichiersUsers> fichiers;
 
             if(dossier == null) {
@@ -134,22 +133,28 @@ public class FichierUserDao {
                 fichiers = query.getResultList();
             }
 
-            for (FichiersUsers fichier : fichiers) {
-                arborescence.put(fichier.getPathLogique(), fichier.getType());
-            }
 
-            return arborescence;
+            return fichiers;
         }
         catch(IllegalArgumentException e){
-            System.out.println(e.getMessage());
             System.out.println("Erreur pour récupérer l'arborescence de fichiers de l'utilisateur : le dossier est un fichier");
+            System.out.println(e);
             return null;
         }
     }
 
-    // Création d'un fichier
-    // Renvoie le fichier si réussite
-    // Renvoie null sinon
+     /**
+     *
+     * Création d'un fichier utilisateur en base de données
+     * @param pathLogique Path logique du fichier à créer
+     * @param nomPhysique Nom physique du fichier à créer
+     * @param nomReel Nom du fichier à créer
+     * @param dateCreation Date actuelle
+     * @param type Type du fichier (fichier ou dossier)
+     * @param user Utilisateur auquel le fichier est rataché
+     * @param verrou Etat de verouillage du fichier
+     * @return Renvoie le fichier si la création est réussie, null sinon.
+     */
     public FichiersUsers createNewFichierUser(String pathLogique, String nomPhysique, String nomReel, Date dateCreation,
                                               FichiersUsers.Type type, User user, int verrou){
 
@@ -163,14 +168,17 @@ public class FichierUserDao {
         }
         catch(Exception e){
             System.out.println("Erreur lors de l'ajout d'un nouveau fichierUsers :");
-            System.out.println(e.getMessage());
+            System.out.println(e);
             return null;
         }
     }
 
-    // Suppression d'un fichier de la base de données
-    // Renvoie vrai si la suppression a réussie
-    // Renvoie faux sinon.
+     /**
+     *
+     * Suppression d'un fichier de la base de données
+     * @param nomPhysique Nom physique du fichier à supprimer
+     * @return Renvoie vrai si la suppression réussie, faux sinon
+     */
     public boolean deleteFichierUserByNomPhysique(String nomPhysique){
 
         try{
@@ -189,11 +197,14 @@ public class FichierUserDao {
         }
         catch(Exception e){
             System.out.println("Erreur dans la suppression d'un fichier d'utilisateur :");
-            System.out.println(e.getMessage());
+            System.out.println(e);
             return false;
         }
     }
 
+    /**
+     * TODO
+     */
     public FichiersUsers getPathByPathLogique(User user,String pathLogique){
         TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByUserAndPath", FichiersUsers.class);
         query.setParameter("user", user);
@@ -207,19 +218,25 @@ public class FichierUserDao {
         return null;
     }
 
+    /**
+     * TODO
+     */
     public List<FichiersUsers> getPathsByPathLogique(User user,String pathLogique){
         TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByNotUserAndPath", FichiersUsers.class);
         query.setParameter("user", user);
         query.setParameter("pathLogique", pathLogique);
         List<FichiersUsers> results = query.getResultList();
 
-        if(results.size()!=0){
+        if(!results.isEmpty()){
             if(results.get(0).getType() == FichiersUsers.Type.FICHIER)
              return results;
         }
         return null;
     }
 
+    /**
+     * TODO (duplication avec fichier = getFichierByUserAndPath, fichier.getVerrou)
+     */
     public int getVerrouByPathLogique(User user,String pathLogique){
         TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByUserAndPath", FichiersUsers.class);
         query.setParameter("user", user);
@@ -252,8 +269,13 @@ public class FichierUserDao {
         }
     }
 
-    // TODO: toutes les autres fonctions de modification qu'on aura besoin.
-
+    /**
+     *
+     * Modification de l'état de verouillage d'un fichier
+     * @param fichierToChange Fichier à modifier
+     * @param verrou Etat de verouillage à appliquer au fichier
+     * @return Renvoie vrai si la modification réussie, faux sinon
+     */
     public boolean changeVerrou(FichiersUsers fichierToChange, int verrou){
         if(fichierToChange != null){
             fichierToChange.setVerrou(verrou);
@@ -265,6 +287,13 @@ public class FichierUserDao {
         }
     }
 
+    /**
+     *
+     * Modification de l'état de verouillage d'une liste de fichiers
+     * @param fichiersToChange Liste des fichiers à modifier
+     * @param verrou Etat de vérouillage à appliquer à tous les fichiers
+     * @return Renvoie vrai si la modification réussie, faux sinon
+     */
     public boolean changeVerrouAutre(List<FichiersUsers> fichiersToChange, int verrou){
         if(fichiersToChange != null){
             for(int i=0;i<fichiersToChange.size();i++){

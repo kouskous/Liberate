@@ -34,6 +34,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "UserProjet.findByDateModification", query = "SELECT u FROM UserProjet u WHERE u.dateModification = :dateModification"),
     @NamedQuery(name = "UserProjet.findByIdU", query = "SELECT u FROM UserProjet u WHERE u.userProjetPK.idUser = :idU"),
     @NamedQuery(name = "UserProjet.findByIdP", query = "SELECT u FROM UserProjet u WHERE u.userProjetPK.idProjet = :idP"),
+    @NamedQuery(name = "UserProjet.findNotInProject", query = "SELECT u FROM UserProjet u WHERE u.userProjetPK.idProjet <> :idP"),
     @NamedQuery(name = "UserProjet.findByIdUAndIdP", query = "SELECT u FROM UserProjet u WHERE u.userProjetPK.idProjet = :idP AND u.userProjetPK.idUser = :idU")
 })
 public class UserProjet implements Serializable {
@@ -73,7 +74,7 @@ public class UserProjet implements Serializable {
         this.dateModification = dateModification;
         this.user = user;
         this.projet = projet;
-        userProjetPK = new UserProjetPK(user.getIdUser(), projet.getIdProjet());
+        this.userProjetPK = new UserProjetPK(user.getIdUser(), projet.getIdProjet());
     }
     
     public void setUserProjetPK(int idProj, int idUser){

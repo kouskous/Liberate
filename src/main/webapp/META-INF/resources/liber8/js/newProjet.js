@@ -39,28 +39,25 @@ $(document).ready(function() {
                            
                 success  : function(data) {
                    if(data.errors!==""){
-                    
-                         $('#projet .modal-content .alert-error').css('display','block');
-                          $('#listuser .modal-body .alert-error').css('display','none');
-                         $('#projet .modal-content .alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>'+data.errors+ '</span>');
+                         $("#close_modal_btn").trigger("click");
+                         toastr.warning(data.errors);
                     }
                     else if(data.response==="true"){
                             $("#close_modal_btn").trigger("click");
-                            var nodes = App.tree.getAllNodes();
                             var sourceNode = {};
                             sourceNode.text = nomprojet;
                             sourceNode.id = "Root-"+nomprojet;
                             sourceNode.isFolder = true;
+                            sourceNode.isExpanded = true;
                             App.tree.addNode(sourceNode);
+                            var nodes = App.tree.getAllNodes();
+                            App.tree.rebuildTree(nodes);
                             App.tree.activateNode("Root-"+nomprojet);
-                            App.tree.rebuildTree();
-                            $("#"+sourceNode.id).addClass("branche-arbre");
                             defineArbreEvents();
-                            App.currentVoletElement = "Root-"+nomprojet;
+                            App.currentVoletElement = "Root/"+nomprojet;
                     }
                 }
-            });
-                
+            });    
         };
                 
     });
@@ -74,7 +71,6 @@ $(document).ready(function() {
         dataType : "json",
         success  : function(data) { 
             var nameusers = data.response;
-            console.log(nameusers);
             availableTags = JSON.parse(nameusers);
             $( "#usersname" ).autocomplete({
                 source: availableTags

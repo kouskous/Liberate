@@ -36,10 +36,11 @@
         });
         
         //selection d'un fichier
-        $(".branche-arbre").on("click", function(){
+        $(".easytree-node").on("click", function(){
             id = $(this).attr("id");
             id = id.replace(/-/g,'/');
             id = id.replace('__','.');
+            console.log(id);
             App.currentVoletElement = id;
         });
     } 
@@ -74,25 +75,8 @@
         });
     }
     
-
-$( document ).ready(function() {
-    //inclusion de la coloration syntaxique
-    App.editeur = ace.edit("editeur");
-    App.editeur.setTheme("ace/theme/twilight");
-    App.editeur.session.setMode("ace/mode/javascript");   
-
-    //volet gauche resizable
-    $( "#sidebar-left" ).resizable();
-    $( "#sidebar-left" ).resize(function(){
-       left = $( "#sidebar-left" ).css("width");
-       $("#content").css("margin-left", left);
-       $("#content").css("width", (100 - left) + "%" );
-    });
-    
-    
-    defineOngletsEvents();
-    //Recuperation de l'arboresance de l'utilisateur
-    $.ajax({ 
+    function refreshTree(){
+        $.ajax({ 
           url      : "/Liber8/getTree",
           dataType : "json",
           success  : function(data) {  
@@ -104,26 +88,60 @@ $( document ).ready(function() {
                                 parent_id=parent_id+"/"+slug[j];
                                 var element1 =document.getElementById(parent_id);
                                 type="isFolder"
-                                if ((data[i]["type"] == "fichier") && (j == slug.length - 1)){
+                                if ((data[i]["type"] === "fichier") && (j === slug.length - 1)){
                                     type="isFile";
                                 } 
-                                if(element1==null) {
+                                verouillage = "";
+                                if((data[i]["type"] === "fichier") && (data[i]["verrouillage"] === 1)) {
+                                    verouillage = "verou-bloque";
+                                } else if((data[i]["type"] === "fichier") && (data[i]["verrouillage"] === 2)) {
+                                    verouillage = "verou-reserve";
+                                }
+                                if(element1===null) {
                                     id = parent_id.replace(/\//g,'-');
                                     id = id.replace('.','__');
-                                    $(element).append('<li id="'+id+'" data-url="'+id+'" class="branche-arbre '+type+' noeud"><ul id='+parent_id+'><a>'+slug[j]+'</a></ul></li>');
+                                    $(element).append('<li id="'+id+'" data-url="'+id+'" class="branche-arbre '+type+' '+verouillage+' noeud"><ul id='+parent_id+'><a>'+slug[j]+'</a></ul></li>');
                                 }
                             }
                         });
                         App.tree = $('#arbre').easytree();
                         defineArbreEvents();
                     }       
+        });
+    }
+    
+$( document ).ready(function() {
+    //inclusion de la coloration syntaxique
+    App.editeur = ace.edit("editeur");
+    App.editeur.setTheme("ace/theme/twilight");
+    App.editeur.session.setMode("ace/mode/javascript"); 
+    
+    $("#editeur").on('click',function(){
+        path = App.currentOnglet.replace(/\//g,'-');
+        path = path.replace('.','__');
+        element = $("#"+path);
+        if ($(element).hasClass("verou-reserve")){
+            App.editeur.setReadOnly(false);
+        } else {
+            App.editeur.setReadOnly(true);
+        }
     });
+
+    //volet gauche resizable
+    $( "#sidebar-left" ).resizable();
+    $( "#sidebar-left" ).resize(function(){
+    left = $( "#sidebar-left" ).css("width");
+    $("#content").css("margin-left", left);
+    $("#content").css("width", (100 - left) + "%" );
+    });
+    
+    
+    defineOngletsEvents();
+    //Recuperation de l'arboresance de l'utilisateur
+    refreshTree();
 
     $(".user-action").click(function(){
         url = $(this).data("url");
-        path = App.currentVoletElement.replace(/\//g,'-');
-        path = path.replace('.','__');
-        element = $("#"+path);
         $.ajax({ 
         url      : "/Liber8/"+ url,
         dataType : "html",
@@ -134,22 +152,35 @@ $( document ).ready(function() {
     });    
     
     /** Sauvegarder le fichier dont l'onglet est sélectionné **/
-    $("#saveAction").click(function(){
-       content = App.editeur.getValue();
-       path = (App.currentOnglet).slice(4);
-       $.blockUI({ message: '<h2><img src="/Liber8/resources/blockUi/busy.gif" /> Enregistrement...</h2>' });
-       $.ajax({ 
-      url      : "/Liber8/saveFile",
-      type     : 'POST',
-      dataType : "json",
-      data     :{
-                    pathFichier: path,
-                    contenuFichier: content
-                },
-      success  : function(data) {  
-                    $.unblockUI();
-                    }       
-        });
+    $("#btn_sauvegarder").click(function(){
+        path = App.currentOnglet.replace(/\//g,'-');
+        path = path.replace('.','__');
+        element = $("#"+path);
+        if(element.hasClass("verou-reserve")) {
+            content = App.editeur.getValue();
+            path = (App.currentOnglet).slice(4);
+            $.blockUI({ message: '<h2><img src="/Liber8/resources/blockUi/busy.gif" /> Enregistrement...</h2>' });
+            $.ajax({ 
+                url      : "/Liber8/saveFile",
+                type     : 'POST',
+                dataType : "json",
+                data     :{
+                              pathFichier: path,
+                              contenuFichier: content
+                          },
+                success  : function(data) {  
+                                  $.unblockUI();
+                                  if(data.response){
+                                      toastr.success("Enregistré");
+                                  } else {
+                                      toastr.warning(data.errors);
+                                  }
+                              }       
+                  });
+        }
+        else {
+            toastr.warning("Vous ne pouvez enregistrer que les fichiers vérouillés actuellement en cours d'édition");
+        }
     });
     
     $("#editeur").keyup(function(){
@@ -174,6 +205,117 @@ $( document ).ready(function() {
         
     });
     
+    $("#btn_verrouiller").click(function(){
+        if(App.currentVoletElement != ""){
+            path = App.currentVoletElement.replace(/\//g,'-');
+            path = path.replace('.','__');
+            element = $("#"+path);
+            if(element.hasClass("isFile")) {
+                if(!(element.hasClass("verou-reserve") || element.hasClass("verou-bloque"))) {
+                    appPath = App.currentVoletElement.slice(4);
+                    $.ajax({ 
+                        url      : "/Liber8/verrouillerFichier",
+                        type     : 'POST',
+                        dataType : "json",
+                        data     :{
+                                      pathLogique: appPath,
+                                  },
+                        success  : function(data) {  
+                                    if(data.response){
+                                        toastr.success("Fichier vérouillé");
+                                        path = App.currentVoletElement.replace(/\//g,'-');
+                                        path = path.replace('.','__');
+                                        element = $("#"+path);
+                                        $(element).addClass("verou-reserve");
+                                    } else {
+                                        toastr.warning(data.errors);
+                                    }
+                                }       
+                    });
+                }
+                else {
+                    toastr.warning("Le fichier selectionné est déjà vérrouillé");
+                }
+            }
+            else {
+                toastr.warning("Veuillez sélectionner un fichier");
+            }
+        }
+    });
+    
+    $("#btn_deverrouiller").click(function(){
+        if(App.currentVoletElement != ""){
+            path = App.currentVoletElement.replace(/\//g,'-');
+            path = path.replace('.','__');
+            element = $("#"+path);
+            if(element.hasClass("isFile")) {
+                if(element.hasClass("verou-reserve")) {
+                    appPath = App.currentVoletElement.slice(4);
+                    $.ajax({ 
+                        url      : "/Liber8/deverrouillerFichier",
+                        type     : 'POST',
+                        dataType : "json",
+                        data     :{
+                                      pathLogique: appPath,
+                                  },
+                        success  : function(data) {  
+                                    if(data.response){
+                                        toastr.success("Fichier vérouillé");
+                                        path = App.currentVoletElement.replace(/\//g,'-');
+                                        path = path.replace('.','__');
+                                        element = $("#"+path);
+                                        currentVolet = App.currentVoletElement.slice(4);
+                                        $(".close-onglet[data-id='"+ currentVolet +"']").trigger("click");
+                                        $(element).removeClass("verou-reserve");
+                                    } else {
+                                        toastr.warning(data.errors);
+                                    }
+                                }       
+                    });
+                }
+                else {
+                    toastr.warning("Le fichier selectionné doit être un fichier que vous avez vérrouillé");
+                }
+            }
+            else {
+                toastr.warning("Veuillez sélectionner un fichier");
+            }
+        }
+    });
+    
+    
+    /** Supprimer le fichier sélectionné dans le volet **/
+    $("#btn_supprimer").click(function(){
+        path = App.currentVoletElement.replace(/\//g,'-');
+        path = path.replace('.','__');
+        element = $("#"+path);
+        if(element.hasClass("verou-reserve")) {
+            path = (App.currentVoletElement).slice(4);
+            $.blockUI({ message: '<h2><img src="/Liber8/resources/blockUi/busy.gif" /> Suppression...</h2>' });
+            $.ajax({ 
+            url      : "/Liber8/removeFile",
+            type     : 'POST',
+            dataType : "json",
+            data     :{
+                          pathFichier: path,
+                      },
+            success  : function(data) {  
+                              $.unblockUI();
+                              if(data.response){
+                                    currentVolet = App.currentVoletElement.slice(4);
+                                    $(".close-onglet[data-id='"+ currentVolet +"']").trigger("click");
+                                    refreshTree();
+                                    toastr.success("Suppression réussie");
+                              } else {
+                                    toastr.warning(data.errors);
+                              }
+                        }       
+            });
+        }
+        else {
+            toastr.warning("Vous ne pouvez supprimer que les fichiers que vous avez vérouillés");
+        }   
+    });
+
+  
 });
-
-

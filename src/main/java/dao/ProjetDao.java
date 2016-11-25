@@ -1,20 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package dao;
 
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import models.Projet;
-import models.User;
-import org.springframework.stereotype.Repository;
 
 /**
  *
@@ -25,16 +17,14 @@ public class ProjetDao {
 
     @PersistenceContext
     EntityManager em;
-
-    public ProjetDao(EntityManager em){
-        this.em = em;
-    }
     
-    // Cherche le projet dans la BDD
-    // - renvoie null si il n'y est pas.
-    // - renvoie le projet si il y est
-    // - exception si il y a plusieurs projets avec ce nom dans la bdd
-    public Projet getProjetByName(String nom) throws Exception{
+    /**
+     *
+     * Récupération d'un projet en fonction de son nom
+     * @param nom Nom du projet à récupérer
+     * @return Renvoie le projet si réussite, null sinon
+     */
+    public Projet getProjetByName(String nom) throws IllegalArgumentException{
         
         // Recherche du projet par nom (unique)
         TypedQuery<Projet> query = em.createNamedQuery("Projet.findByNom", Projet.class);
@@ -51,13 +41,18 @@ public class ProjetDao {
         }
         // Anomalie: plusieurs projets ont été trouvé avec le même nom
         else{
-            throw new Exception("Erreur BDD: plusieurs projets avec le même nom");
+            return null;
         }
     }
        
-    // Création d'un nouveau projet
-    // Renvoie le projet si réussite
-    // Renvoie null sinon
+    /**
+     * Création d'un nouveau projet
+     * @param nom Nom du projet à créer
+     * @param dateCreation Date actuelle
+     * @param dateModification Date actuelle
+     * @param langage Langage de rpogrammation du projet à créer
+     * @return renvoie le projet si réussite, null sinon
+     */
     public Projet createNewProjet(String nom, Date dateCreation, Date dateModification, String langage){
 
         // On essaye d'ajouter le projet à la persistence
@@ -69,14 +64,16 @@ public class ProjetDao {
         }
         catch(Exception e){
             System.out.println("Erreur lors de l'ajout d'un nouveau projet");
-            System.out.println(e.getMessage());
+            System.out.println(e);
             return null;
         }
     }
     
-    // Suppression d'un projet de la base de données
-    // Renvoie vrai si la suppression a réussie
-    // Renvoie faux sinon.
+    /**
+     * Suppression d'un projet dans la base de données
+     * @param nom Nom du projet à supprimer
+     * @return Vrai si la suppression à réussie, faux sinon
+     */
     public boolean deleteProjetByName(String nom){
         
         try{
@@ -96,19 +93,19 @@ public class ProjetDao {
         }
         catch(Exception e){
             System.out.println("Erreur dans la suppression d'un projet");
-            System.out.println(e.getMessage());
+            System.out.println(e);
             return false;
         }
     }
 
-    public boolean projetNameAlreadyUsed(String nom) throws Exception{
+    /**
+     * Vérification de l'existence d'un nom de projet en base de donnée (pour l'unicité)
+     * @param nom Nom de projet à rechercher
+     * @return Vrai si il existe déja, Faux sinon
+     */
+    public boolean projetNameAlreadyUsed(String nom) throws IllegalArgumentException{
         Projet testProjet = getProjetByName(nom);
-
-        if(testProjet != null){
-            // Nom déjà utilisé
-            return true;
-        }
-        return false;
+        return testProjet != null;
     }
     
 }
