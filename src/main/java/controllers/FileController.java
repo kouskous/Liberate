@@ -327,9 +327,9 @@ public class FileController {
                 }
             }
         }
-        catch(Exception e){
+        catch(JSONException e){
             System.out.println("Erreur JSON");
-            System.out.println(e.getMessage());
+            System.out.println(e);
             return null;
         }
     }

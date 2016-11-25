@@ -148,10 +148,6 @@ public class ProjetController {
                                         User newUser = userDao.getUserByPseudo(usersProjet.get(i));
                                  
                                         userProjetDao.createNewUserProjet(droitsUsers.get(i), new Date(), new Date(), newUser, projet);
-                                        if(userProjetDao == null){
-                                            returnObject.put("errors", "Erreur pendant l'ajout de membres utilisateurs");
-                                            return returnObject.toString();
-                                        }
                                     }
                                 }
                                 catch(IllegalArgumentException e){
@@ -290,6 +286,7 @@ public class ProjetController {
         }
         catch(Exception e){
             try{
+                System.out.println("Erreur pendant la récupération du projet: " + e);
                 returnObject.put("response", "false");
                 returnObject.put("content", "");
                 returnObject.put("errors", "Erreur pendant la récupération du projet");
@@ -349,7 +346,7 @@ public class ProjetController {
         }
         catch(JSONException e){
             try{
-                System.out.println("Erreur pendant la récupération des utilisateurs du projet: " + e.getMessage());
+                System.out.println("Erreur pendant la récupération des utilisateurs du projet: " + e);
                 returnObject.put("response", "false");
                 returnObject.put("content", "");
                 returnObject.put("errors", "Erreur pendant la récupération des utilisateurs du projet");
@@ -415,6 +412,7 @@ public class ProjetController {
         }
         catch(Exception e){
             try{
+                System.out.println("Erreur pendant la récupération du projet: " + e);
                 returnObject.put("response", "false");
                 returnObject.put("content", "");
                 returnObject.put("errors", "Erreur pendant la récupération du projet");
@@ -548,12 +546,31 @@ public class ProjetController {
                 catch(JSONException e2){System.out.println("Erreur JSON: " + e2); return null;} 
                 
             }
+            
             for (int i = 0; i < pseudoUsersProjet.size(); i++){
                 user = userDao.getUserByPseudo(pseudoUsersProjet.get(i));
-                if(user == null){throw new Exception("Erreur pendant la récupération d'un utilisateur");}
+                if(user == null){
+                    try{
+                        returnObject.put("response", "false");
+                        returnObject.put("content", "");
+                        returnObject.put("errors", "Erreur pendant la récupération des utilisateurs");
+                        return returnObject.toString();
+                    }
+                    // Json Fail
+                    catch(JSONException e2){System.out.println("Erreur JSON: " + e2); return null;}
+                }
                 if(users.contains(user)){
                     userProjet = userProjetDao.getUserProjetByUIdPId(user.getIdUser(), projet.getIdProjet());
-                    if(userProjet == null){throw new Exception("Erreur pendant la récupération d'un utilisateur");}
+                    if(userProjet == null){
+                        try{
+                            returnObject.put("response", "false");
+                            returnObject.put("content", "");
+                            returnObject.put("errors", "Erreur pendant la récupération des userProjet");
+                            return returnObject.toString();
+                        }
+                        // Json Fail
+                        catch(JSONException e2){System.out.println("Erreur JSON: " + e2); return null;}
+                    }
                     b=userProjetDao.changeDroitsUserProjet(droitsUsers.get(i), user.getIdUser(), projet.getIdProjet());
                     if(!b){
                         try{
@@ -575,6 +592,7 @@ public class ProjetController {
         }
         catch(Exception e){
             try{
+                System.out.println("Erreur pendant la récupération du projet ou de l'utilisateur: " + e);
                 returnObject.put("response", "false");
                 returnObject.put("content", "");
                 returnObject.put("errors", "Erreur pendant la récupération du projet ou de l'utilisateur");

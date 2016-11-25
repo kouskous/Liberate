@@ -66,10 +66,10 @@ public class LoginController {
                 error = "mot de passe incorrect";
             }
         } catch (IllegalArgumentException e) {
-            System.out.println("Erreur pendant la connexion: " + e.getMessage());
+            System.out.println("Erreur pendant la connexion: " + e);
             error = "Erreur : illegal Argument ! "+e.getLocalizedMessage();
         }catch (Exception e) {
-            System.out.println("Erreur pendant la connexion: " + e.getMessage());
+            System.out.println("Erreur pendant la connexion: " + e);
             error = "Erreur : plusieurs utilisateurs ont le même pseudo ! "+e.getLocalizedMessage();
         }
         model.addAttribute("error", error);
