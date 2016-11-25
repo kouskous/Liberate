@@ -8,16 +8,12 @@ package controllers;
 import dao.FichierUserDao;
 import dao.ProjetDao;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
-import java.util.jar.JarEntry;
-import java.util.jar.JarOutputStream;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,10 +45,22 @@ public class CompilationController {
     @Autowired
     FichierUserDao fichierUserDao;
     
+    /**
+     *
+     */
     public CompilationController(){
     }
     
     // Compilation d'un projet. La requête doit contenir un champs "nomProjet"
+
+    /**
+     * @author Luc Di Sanza
+     * Traitement d'une requête de compilation.
+     * La requête doit contenir le champs "nomProjet"
+     * @param request
+     * @param model
+     * @return Renvoie un Json contenant les champs "response", "content", "errors" et "nomExec" si réussite
+     */
     @ResponseBody 
     @RequestMapping(value="/compile", method = RequestMethod.POST, produces = "application/json")
     public String compile(HttpServletRequest request, ModelMap model){  
@@ -218,7 +226,7 @@ public class CompilationController {
                 try{              
                     // On obtient le nom physique du fichier
                     FichiersUsers fileUser = fichierUserDao.getFichiersByUserAndPath(user, entry.getKey());
-                    if(fileUser == null){throw new Exception("Erreur dans la récupération du fichierUser");}
+                    if(fileUser == null){return false;}
                     
                     // Getting file content
                     String fileName = extractFileName(entry.getKey());
@@ -387,7 +395,7 @@ public class CompilationController {
                 ProcessBuilder builder2 = new ProcessBuilder("find", "-name", "*.class", "-exec", "jar", "-uf", directoryPath + "/../../execs_" + user.getPseudo() + "/" + nomProjet+".jar", "{}", ";");
                 builder2.directory(new File(pathToProject));
                 Process p2 = builder2.start();
-                p.waitFor();
+                p2.waitFor();
             }
             catch(Exception e){
                 System.out.println("Erreur pendant la création du jar:" + e);
@@ -407,7 +415,7 @@ public class CompilationController {
                 }
             }
             catch(Exception e){
-                System.out.println("Erreur pendant le déplacement du fichier d'erreurs");
+                System.out.println("Erreur pendant le déplacement du fichier d'erreurs: " + e);
                 return false;
             }
 
@@ -416,10 +424,9 @@ public class CompilationController {
                 deleteFile(new File(directoryPath + "/../../compile_" + user.getPseudo()));
             }
             catch(Exception e){
-                System.out.println("Erreur pendant la suppression du dossier de compile");
+                System.out.println("Erreur pendant la suppression du dossier de compile: " + e);
                 return false;
             }
-            
             
             return true;
         }
@@ -455,6 +462,14 @@ public class CompilationController {
     }
     
     // Téléchargement de l'executable
+
+    /**
+     *
+     * @param request
+     * @param model
+     * @param response
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value="/downloadExec", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public FileSystemResource downloadExec(HttpServletRequest request, ModelMap model, HttpServletResponse response)
