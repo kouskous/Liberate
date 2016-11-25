@@ -1,8 +1,8 @@
     /***** Definition du modele global ***************/
-    var App = new Object();
+    var App = {};
     App.currentOnglet = "";
     App.currentVoletElement = "";
-    App.onglets = new Array() ;
+    App.onglets = [];
     App.tree = "";
     App.editeur = "";
     /********************************************/
@@ -55,8 +55,8 @@
             App.currentOnglet = "";
             for (var key in App.onglets) {
                 App.currentOnglet = key;
-                break;
             }
+            
             if (App.currentOnglet !== ""){
                 App.editeur.setValue(App.onglets[App.currentOnglet]);
             } else {
@@ -87,7 +87,7 @@
                                 var element = document.getElementById(parent_id);
                                 parent_id=parent_id+"/"+slug[j];
                                 var element1 =document.getElementById(parent_id);
-                                type="isFolder"
+                                type="isFolder";
                                 if ((data[i]["type"] === "fichier") && (j === slug.length - 1)){
                                     type="isFile";
                                 } 
@@ -189,14 +189,14 @@ $( document ).ready(function() {
     
         
     $("#btn_compile").click(function(){
-        if(App.currentVoletElement != ""){
+        if(App.currentVoletElement !== ""){
             appPath = App.currentVoletElement.slice(4);
             $.ajax({ 
                 url      : "/Liber8/compile",
                 type     : 'POST',
                 dataType : "json",
                 data     :{
-                              projectPath: appPath,
+                              projectPath: appPath
                           },
                 success  : function(data) {  
                         }       
@@ -206,7 +206,7 @@ $( document ).ready(function() {
     });
     
     $("#btn_verrouiller").click(function(){
-        if(App.currentVoletElement != ""){
+        if(App.currentVoletElement !== ""){
             path = App.currentVoletElement.replace(/\//g,'-');
             path = path.replace('.','__');
             element = $("#"+path);
@@ -218,7 +218,7 @@ $( document ).ready(function() {
                         type     : 'POST',
                         dataType : "json",
                         data     :{
-                                      pathLogique: appPath,
+                                      pathLogique: appPath
                                   },
                         success  : function(data) {  
                                     if(data.response){
@@ -244,7 +244,7 @@ $( document ).ready(function() {
     });
     
     $("#btn_deverrouiller").click(function(){
-        if(App.currentVoletElement != ""){
+        if(App.currentVoletElement !== ""){
             path = App.currentVoletElement.replace(/\//g,'-');
             path = path.replace('.','__');
             element = $("#"+path);
@@ -256,7 +256,7 @@ $( document ).ready(function() {
                         type     : 'POST',
                         dataType : "json",
                         data     :{
-                                      pathLogique: appPath,
+                                      pathLogique: appPath
                                   },
                         success  : function(data) {  
                                     if(data.response){
@@ -297,7 +297,7 @@ $( document ).ready(function() {
             type     : 'POST',
             dataType : "json",
             data     :{
-                          pathFichier: path,
+                          pathFichier: path
                       },
             success  : function(data) {  
                               $.unblockUI();

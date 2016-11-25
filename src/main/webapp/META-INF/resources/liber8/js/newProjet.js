@@ -80,7 +80,7 @@ $(document).ready(function() {
             var adduser       = $("#adduser"); // div contenant tout les utilisateurs
             var add_button      = $("#adduserbouton"); //Ajouter bouton id
 
-            var arrname = new Array();
+            var arrname = [];
 
             $('.addbouton').click(function(e) {
             $('#adduser .usernew .control-group label').each(function() { 
