@@ -423,7 +423,7 @@ public class FileController {
     // - errors contient retour d'erreur si echec
     // - renvoie null si erreur Json
     @ResponseBody 
-    @RequestMapping(value="/deleteFile", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value="/removeFile", method = RequestMethod.POST, produces = "application/json")
     public String deleteFile(HttpServletRequest request, ModelMap model){           
         
         // On créé l'objet à retourner
