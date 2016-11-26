@@ -5,8 +5,7 @@
  */
 
 $( document ).ready(function() {
-        path = App.currentVoletElement.replace(/\//g,'-');
-        path = path.replace('.','__');
+        path = (App.currentVoletElement.replace(/\//g,'-')).replace('.','__');
         element = $("#"+path);
         $('#newfile .alert-error').css('display','none');
         $("#btn_new_file").click(function(){

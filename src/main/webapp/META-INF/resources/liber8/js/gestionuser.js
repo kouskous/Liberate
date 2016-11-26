@@ -7,7 +7,19 @@
 
  $( function() {
      // deja supprimer tableau 
-      
+     
+     
+    /** Correction Sonarqube (déclarer fonctions en dehors des boucles) **/
+    function ajouterUsers(){
+        $(".addbouton").click(function(){
+            $('.gestionsuser .alert-error').css("display","block");
+            $('.gestionsuser .alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>Vous n\'etes pas administrateur, Vous n\'avez pas le droit d\'ajouter un utilisateur. </span>');
+            return false; 
+        });
+        $('#submitaddusrer').click(function(){
+            $("#close_modal_btn").trigger("click");
+        });
+    }
      
      elementsprojects = App.currentVoletElement.split('/')[1];
       $('.addbouton').click(function(){
@@ -74,19 +86,18 @@
                                         $(".userproject").append('<li><div class="control-group">\n\
                                         <label class="control-label userline" for="selectError'+i+'">'+contenu[i+1].utilisateur+'</label>\n\
                                         <div class="controls userline"><input type ="text" value="'+contenu[i+1].droit+'" disabled></div></div>'); //add input box
-                                        $(".addbouton").click(function(){
+                                        /** Correction Sonarqube **/
+                                        ajouterUsers();
+                                        /*$(".addbouton").click(function(){
                                             $('.gestionsuser .alert-error').css("display","block");
                                             $('.gestionsuser .alert-error').html('<i class="icon-exclamation-sign" aria-hidden="true"></i><span>Vous n\'etes pas administrateur, Vous n\'avez pas le droit d\'ajouter un utilisateur. </span>');
                                             return false; 
                                         });
                                         $('#submitaddusrer').click(function(){
                                            $("#close_modal_btn").trigger("click");
-                                        });     
+                                        }); */    
                                     }
                             }
-                    } 
-                    else {
-                           
                     }
                 }
       
@@ -101,7 +112,7 @@
           dataType : "json",
           success  : function(data) { 
              
-               availableusers = new Array();
+               availableusers = [];
                
               for(i=0;i<Object.keys(data.content).length;i++) 
               {     

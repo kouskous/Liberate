@@ -42,7 +42,7 @@ $( document ).ready(function() {
                                         id = id.replace('.','__');
                                         noeud.text = name;
                                         noeud.id = id;
-                                        App.tree.currentVoletElement = finalPath;
+                                        App.currentVoletElement = finalPath;
                                         var nodes = App.tree.getAllNodes();
                                         App.tree.rebuildTree(nodes);
                                         defineArbreEvents();

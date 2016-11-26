@@ -6,7 +6,6 @@
  */
 
 $( document ).ready(function() {
-        console.log(App.currentVoletElement);
         $('#newfolder .alert-error').css('display','none');
         $("#btn_new_folder").click(function(){
         foldername = $("#input_name_folder").val();

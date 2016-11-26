@@ -39,8 +39,7 @@
         $(".easytree-node").on("click", function(){
             id = $(this).attr("id");
             id = id.replace(/-/g,'/');
-            id = id.replace('__','.');
-            App.currentVoletElement = id;
+            App.currentVoletElement = id.replace('__','.');
         });
     } 
     
@@ -305,6 +304,17 @@ $( document ).ready(function() {
                                     currentVolet = currentVolet.replace('.','__');
                                     $(".close-onglet[data-id='"+App.currentVoletElement+"']").trigger("click");
                                     App.tree.removeNode(currentVolet);
+                                    res = path.split("/");
+                                    res.pop();
+                                    finalPath = "Root";
+                                    for(var i=0; i<res.length; i++) {
+                                        finalPath = finalPath+res[i]+"/";
+                                    }
+                                    finalPath = finalPath.slice(0,-1);
+                                    id = finalPath.replace(/\//g,'-');
+                                    id = id.replace('.','__');
+                                    App.tree.activateNode(id);
+                                    App.currentVoletElement = finalPath;
                                     var nodes = App.tree.getAllNodes();
                                     App.tree.rebuildTree(nodes);
                                     defineArbreEvents();
