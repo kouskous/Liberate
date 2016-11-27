@@ -248,6 +248,7 @@ footer {
     left: 20% !important;
     width: 60% !important;
 }
+
 .console {
     display:none;
         height: 200px;
@@ -255,16 +256,24 @@ footer {
     width: 100%;
     bottom: 63px;
     z-index: 100;
- 
- color:#fff;
- 
+    color:#fff;
 }
+
+.verou-bloque span{
+    color: red !important;
+}
+
 .body_console {
     background: rgb(8, 77, 17);
         height: 180px;
         font-weight:bold;
         padding:10px;
 }
+
+.verou-reserve span{
+    color: green !important;
+}
+
 .title_console span {
     padding: 10px;
     border-radius: 10px 10px 0 0;
@@ -272,13 +281,44 @@ footer {
     -moz-border-radius:  10px 10px 0 0;
     background: rgb(8, 77, 17);
     margin-left: 10px;
-    
 }
+
+#toolbar{
+    margin:5px;
+    min-width: 400px;
+}
+
 .closeconsole {
     float:right;
     color:#fff;
     padding:20px;
 }
+    
+#btn_verrouiller{
+    color: green;
+}
+
 .closeconsole i {
     color:#fff;
+}
+
+#btn_deverrouiller{
+    color: red;
+}
+
+
+#btn_sauvegarder{
+    color: blue;
+}
+
+#btnNewFolder{
+    color: brown;
+}
+
+#btnNewFile{
+    color: white;
+}
+
+#btn_rename{
+    color: orange;
 }

@@ -13,6 +13,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -124,22 +125,6 @@ public class CompilationController {
             catch(Exception e2){System.out.println("Erreur JSON: " + e2); return null;}
         }
         
-        // Si projet Java, récupération de la classe principale en paramètre
-        String mainClass = new String();
-        /*if(projet.getLangage().equals("java")){
-            mainClass = (String)request.getParameter("mainClass");
-            if(mainClass == null){
-                try{
-                    returnObject.put("response", "false");
-                    returnObject.put("content", "");
-                    returnObject.put("errors", "Projet Java et pas de classe principale");
-                    return returnObject.toString();
-                }
-                // Json fail
-                catch(Exception e2){System.out.println("Erreur JSON: " + e2);return null;}
-            }
-        }*/
-        
         // Création du dossier avec hiérarchie pour la compilation
         ServletContext ctx = request.getServletContext();
         String path = ctx.getRealPath("/");
@@ -170,7 +155,7 @@ public class CompilationController {
         
         // Compilation pour projets Java
         if(projet.getLangage().equals("java")){
-            if(!buildAndCreateJarJava(path, user, nomProjet, mainClass)){
+            if(!buildAndCreateJarJava(path, user, nomProjet)){
                 try{
                     returnObject.put("response", "false");
                     returnObject.put("content", getCompileErrors(path, user, nomProjet));
@@ -211,7 +196,8 @@ public class CompilationController {
         if(racineProjet == null){System.out.println("Erreur pendant la récupération de la racine du projet"); return false;}
         
         // Récupération de l'arborescence du projet
-        Map<String, FichiersUsers.Type> arborescence = fichierUserDao.getArborescence(user, racineProjet);
+        List<FichiersUsers> arborescence = fichierUserDao.getArborescence(user, racineProjet);
+        
         if(arborescence == null){
             System.out.println("Erreur pendant la récupération de l'arborescence");
             return false;
@@ -219,30 +205,27 @@ public class CompilationController {
        
         // Construction du dossier à partir des paths logiques
         // Pour chaque entrée de l'arborescence
-        for (Map.Entry<String, FichiersUsers.Type> entry : arborescence.entrySet())
+        for (FichiersUsers entry : arborescence)
         {
-            // Si c'est un fichier
-            if(entry.getValue() == FichiersUsers.Type.FICHIER){
-                try{              
-                    // On obtient le nom physique du fichier
-                    FichiersUsers fileUser = fichierUserDao.getFichiersByUserAndPath(user, entry.getKey());
-                    if(fileUser == null){return false;}
-                    
-                    // Getting file content
-                    String fileName = extractFileName(entry.getKey());
-                    String content = new String(Files.readAllBytes(Paths.get(directoryPath + "/../../files/" + fileUser.getNomPhysique())));
-                    
-                    // Creating compile file and writing content to it
-                    File file = new File(directoryPath + "/../../compile_" + user.getPseudo() + "/" + entry.getKey());
-                    file.getParentFile().mkdirs();
-                    FileWriter writer = new FileWriter(file);
-                    writer.write(content);
-                    writer.close();
-                }
-                catch(Exception e){
-                    System.out.println("Erreur pendant la création du dossier de compilation" + e);
-                    return false;
-                }
+            try{              
+                // On obtient le nom physique du fichier
+                FichiersUsers fileUser = fichierUserDao.getFichiersByUserAndPath(user, entry.getPathLogique());
+                if(fileUser == null){return false;}
+
+                // Getting file content
+                String fileName = extractFileName(entry.getPathLogique());
+                String content = new String(Files.readAllBytes(Paths.get(directoryPath + "/../../files/" + fileUser.getNomPhysique())));
+
+                // Creating compile file and writing content to it
+                File file = new File(directoryPath + "/../../compile_" + user.getPseudo() + "/" + entry.getPathLogique());
+                file.getParentFile().mkdirs();
+                FileWriter writer = new FileWriter(file);
+                writer.write(content);
+                writer.close();
+            }
+            catch(Exception e){
+                System.out.println("Erreur pendant la création du dossier de compilation" + e);
+                return false;
             }
         }
         return true;
@@ -302,6 +285,7 @@ public class CompilationController {
         }
 
         // Moving exe to right folder
+        Boolean compileWorked;
         try{                
             File file = new File(directoryPath + "/../../execs_" + user.getPseudo() + "/" + "exe");
             file.getParentFile().mkdirs();
@@ -311,9 +295,11 @@ public class CompilationController {
                 fos.write(Files.readAllBytes(
                         Paths.get(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "exe")));
                 fos.close();
+                compileWorked = true;
             }
             else{
-                return false;
+                System.out.println("Pas trouvé d'executable, la compilation est un echec");
+                compileWorked = false;
             }
         }
         catch(Exception e){
@@ -332,6 +318,10 @@ public class CompilationController {
                         Paths.get(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "errors.txt")));
                 fos.close();
             }
+            else{
+                System.out.println("Pas trouvé le fichier errors.txt dans le dossier de compilation");
+                return false;
+            }
         }
         catch(Exception e){
             System.out.println("Erreur pendant le déplacement du fichier d'erreurs" + e);
@@ -347,10 +337,10 @@ public class CompilationController {
             return false;
         }
 
-        return true;
+        return compileWorked;
     }
         
-    private boolean buildAndCreateJarJava(String directoryPath, User user, String nomProjet, String mainClass)
+    private boolean buildAndCreateJarJava(String directoryPath, User user, String nomProjet)
     {
         // Compilation des sources java
         String pathToProject = directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet;
@@ -366,6 +356,7 @@ public class CompilationController {
             return false;
         }
         
+        Boolean compileWorked;
         if(new File(pathToProject + "/" + "main.class").exists()){
         
             // Création du manifest
@@ -402,36 +393,40 @@ public class CompilationController {
                 return false;
             }
             
-            // Moving errors to right folder
-            try{                
-                File file = new File(directoryPath + "/../../execs_" + user.getPseudo() + "/" + "errors.txt");
-                file.getParentFile().mkdirs();
-
-                if(new File(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "errors.txt").exists()){
-                    FileOutputStream fos = new FileOutputStream(file);
-                    fos.write(Files.readAllBytes(
-                            Paths.get(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "errors.txt")));
-                    fos.close();
-                }
-            }
-            catch(Exception e){
-                System.out.println("Erreur pendant le déplacement du fichier d'erreurs: " + e);
-                return false;
-            }
-
-            // Deleting compile folder
-            try{
-                deleteFile(new File(directoryPath + "/../../compile_" + user.getPseudo()));
-            }
-            catch(Exception e){
-                System.out.println("Erreur pendant la suppression du dossier de compile: " + e);
-                return false;
-            }
-            
-            return true;
+            compileWorked = true;
+        }
+        else{
+            System.out.println("Echec de la compilation");
+            compileWorked = false;
         }
 
-        return false;
+        // Moving errors to right folder
+        try{                
+            File file = new File(directoryPath + "/../../execs_" + user.getPseudo() + "/" + "errors.txt");
+            file.getParentFile().mkdirs();
+
+            if(new File(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "errors.txt").exists()){
+                FileOutputStream fos = new FileOutputStream(file);
+                fos.write(Files.readAllBytes(
+                        Paths.get(directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet + "/" + "errors.txt")));
+                fos.close();
+            }
+        }
+        catch(Exception e){
+            System.out.println("Erreur pendant le déplacement du fichier d'erreurs: " + e);
+            return false;
+        }
+
+        // Deleting compile folder
+        try{
+            deleteFile(new File(directoryPath + "/../../compile_" + user.getPseudo()));
+        }
+        catch(Exception e){
+            System.out.println("Erreur pendant la suppression du dossier de compile: " + e);
+            return false;
+        }
+        
+        return compileWorked;
     }
     
     private void deleteFile(File element) {
@@ -461,8 +456,6 @@ public class CompilationController {
         }
     }
     
-    // Téléchargement de l'executable
-
     /**
      *
      * @param request
