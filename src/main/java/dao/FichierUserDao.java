@@ -26,17 +26,12 @@ public class FichierUserDao {
      * @param user L'utilisateur dont on veut les fichiers
      * @return Renvoie la liste des fichiers de l'utilisateur.
      */
-    public Collection<FichiersUsers> getFichiersByUser(User user) {
-
+    public List<FichiersUsers> getFichiersByUser(User user) {
         // Recherche des fichiers
         TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByUser", FichiersUsers.class);
         query.setParameter("user", user);
-        Collection<FichiersUsers> results = query.getResultList();
+        List<FichiersUsers> results = query.getResultList();
 
-        // Si aucun fichier n'est trouvé avec cet user
-        if(results.isEmpty()){
-            return new ArrayList<>();
-        }
         // Des fichiers ont été trouvés
         return results;
     }
@@ -115,9 +110,9 @@ public class FichierUserDao {
      *                si null depuis la racine de l'utilisateur
      * @return Renvoie l'arborescence depuis le dossier en question, ou null si le dossier est un fichier
      */
-    public Collection<FichiersUsers> getArborescence(User user, FichiersUsers dossier){
+    public List<FichiersUsers> getArborescence(User user, FichiersUsers dossier){
         try {
-            Collection<FichiersUsers> fichiers;
+            List<FichiersUsers> fichiers;
 
             if(dossier == null) {
                 fichiers = getFichiersByUser(user);

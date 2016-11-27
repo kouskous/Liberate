@@ -249,12 +249,38 @@ footer {
     width: 60% !important;
 }
 
+.console {
+    display:none;
+        height: 200px;
+    position: absolute;
+    width: 100%;
+    bottom: 63px;
+    z-index: 100;
+    color:#fff;
+}
+
 .verou-bloque span{
     color: red !important;
 }
 
+.body_console {
+    background: rgb(8, 77, 17);
+        height: 180px;
+        font-weight:bold;
+        padding:10px;
+}
+
 .verou-reserve span{
     color: green !important;
+}
+
+.title_console span {
+    padding: 10px;
+    border-radius: 10px 10px 0 0;
+    -webkit-border-radius: 10px 10px 0 0;
+    -moz-border-radius:  10px 10px 0 0;
+    background: rgb(8, 77, 17);
+    margin-left: 10px;
 }
 
 #toolbar{
@@ -262,8 +288,18 @@ footer {
     min-width: 400px;
 }
 
+.closeconsole {
+    float:right;
+    color:#fff;
+    padding:20px;
+}
+    
 #btn_verrouiller{
     color: green;
+}
+
+.closeconsole i {
+    color:#fff;
 }
 
 #btn_deverrouiller{

@@ -185,22 +185,44 @@ $( document ).ready(function() {
        App.onglets[App.currentOnglet] = App.editeur.getValue(); 
     });
     
-        
+   
     $("#btn_compile").click(function(){
-        if(App.currentVoletElement !== ""){
-            appPath = App.currentVoletElement.slice(4);
+            apppa = App.currentVoletElement;
+            appPath =apppa.slice(5);
+             $.blockUI({ message: '<h2><img src="/Liber8/resources/blockUi/busy.gif" /> Compilation...</h2>' });
+
             $.ajax({ 
                 url      : "/Liber8/compile",
                 type     : 'POST',
                 dataType : "json",
                 data     :{
-                              projectPath: appPath
+                              nomProjet: appPath
                           },
                 success  : function(data) {  
+                    console.log(data);
+                    $.unblockUI();
+                        if(data.response==="true"){
+                            toastr.success("compilé");
+                            
+                
+                            $(".console").css('display','block');
+                            $(".body_console").html(data.content+"Vous pouvez telecharger l'executable <a href='/Liber8/downloadExec?nomExec="+data.nomExec+"' download='"+data.nomExec+"'>Cliquer ici </a> ");
+                            
+                        } else if((data.response==="false" && data.content!=="")|| (data.response==="true" && data.content!=="")) {
+                            toastr.warning("erreur pendant la compilation");
+                              $(".console").css('display','block');
+                              $(".body_console").html(data.content);
+                        }
+                        else {
+                              toastr.warning("un problème est survenu au niveau de l'application ! réessayer plus tard");
+                        }
                         }       
             });
-        }
         
+        
+    });
+    $('.closeconsole').click(function(){
+        $(".console").hide();
     });
     
     $("#btn_verrouiller").click(function(){

@@ -162,10 +162,18 @@
 
                             <div id="editeur"></div>
                         </div>
+                        <div class="console">
+                            <div class="title_console">
+                                <span>Console</span>
+                            </div>
+                            <a  href='#' class='closeconsole'><i class='halflings-icon remove'></i></a>
+                            <div class="body_console"></div>
+                        </div>
                     </div>
 		</div>
 	
 	<div class="clearfix"></div>
+        
 	
 	<footer class="principal-footer">
 
