@@ -47,7 +47,7 @@
 			<div class="row-fluid">
 				<div class="login-box">
 					<h2>Connexion à votre compte</h2>
-					<form class="form-horizontal" action="login" method="post">
+					<form class="form-horizontal" action="login" method="POST">
 						<fieldset>
 							<div>
                                                             ${error}
@@ -73,6 +73,11 @@
 						</fieldset>
 					</form>
 					<hr>
+					<fieldset>
+						<div style="float: right; margin-right: 20px">
+							<a href="inscription" class="btn btn-default" >S'inscrire</a>
+						</div>
+					</fieldset>
 					<h3>mot de passe oublié?</h3>
 		
 				</div><!--/span-->
