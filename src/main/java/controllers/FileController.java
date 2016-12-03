@@ -686,7 +686,7 @@ public class FileController {
         
     
     @ResponseBody
-    @RequestMapping(value="/pushProjet", method = RequestMethod.GET,produces = "application/json")
+    @RequestMapping(value="/pushProjet", method = RequestMethod.POST,produces = "application/json")
     public String pusherProjet(HttpServletRequest request) {
   
     // Pas de session ouverte
@@ -889,7 +889,7 @@ public class FileController {
     }
     
     @ResponseBody
-    @RequestMapping(value="/pullProjet", method = RequestMethod.GET,produces = "application/json")
+    @RequestMapping(value="/pullProjet", method = RequestMethod.POST,produces = "application/json")
     public String pullerProjet(HttpServletRequest request) {
     
         
