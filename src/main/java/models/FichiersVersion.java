@@ -24,7 +24,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "FichiersVersion.findByNomPhysique", query = "SELECT f FROM FichiersVersion f WHERE f.nomPhysique = :nomPhysique"),
     @NamedQuery(name = "FichiersVersion.findByNomReel", query = "SELECT f FROM FichiersVersion f WHERE f.nomReel = :nomReel"),
     @NamedQuery(name = "FichiersVersion.findByDateCreation", query = "SELECT f FROM FichiersVersion f WHERE f.dateCreation = :dateCreation"),
-    @NamedQuery(name = "FichiersVersion.findByType", query = "SELECT f FROM FichiersVersion f WHERE f.type = :type")})
+    @NamedQuery(name = "FichiersVersion.findByType", query = "SELECT f FROM FichiersVersion f WHERE f.type = :type"),
+    @NamedQuery(name = "FichiersVersion.findByVersion", query = "SELECT f FROM FichiersVersion f WHERE f.version = :version")})
 public class FichiersVersion implements Serializable {
 
     public enum Type {DOSSIER, FICHIER}
@@ -64,13 +65,8 @@ public class FichiersVersion implements Serializable {
     public FichiersVersion() {
     }
 
-    public FichiersVersion(Integer idF) {
-        this.idFichierVersion = idF;
-    }
-
-    public FichiersVersion(Integer idF, String pathLogique, String nomPhysique, String nomReel, Date dateCreation,
+    public FichiersVersion( String pathLogique, String nomPhysique, String nomReel, Date dateCreation,
                            Type type, Version version) {
-        this.idFichierVersion = idF;
         this.pathLogique = pathLogique;
         this.nomPhysique = nomPhysique;
         this.nomReel = nomReel;

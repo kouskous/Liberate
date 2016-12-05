@@ -228,12 +228,48 @@ public class FichierUserDao {
         List<FichiersUsers> results = query.getResultList();
 
         if(!results.isEmpty()){
-            if(results.get(0).getType() == FichiersUsers.Type.FICHIER)
+            if(results.get(0).getType() == FichiersUsers.Type.FICHIER){
+                System.out.println(results.size());
              return results;
+            }
         }
         return null;
     }
 
+    public List<FichiersUsers> getLockedByUserAndProjet(User user,String projet){
+        TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findLockedByUserAndProjet", FichiersUsers.class);
+        query.setParameter("user", user);
+         String proj ="/"+projet+"/";
+        query.setParameter("projet", proj);
+        List<FichiersUsers> results = query.getResultList();
+        
+        if(results.size()!=0){
+            
+             return results;
+        }
+        return null;
+    }
+    
+    public List<FichiersUsers> getByUserAndProjet(User user,String projet){
+       System.out.println(1);
+        TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findByUserAndProjet", FichiersUsers.class);
+        
+        query.setParameter("user", user);
+        
+        String proj ="/"+projet+"/";
+        
+        query.setParameter("projet",proj);
+        
+        
+        List<FichiersUsers> results = query.getResultList();
+        
+        if(results.size()!=0){
+            
+             return results;
+        }
+        return null;
+    }
+    
     /**
      * TODO (duplication avec fichier = getFichierByUserAndPath, fichier.getVerrou)
      */
@@ -248,6 +284,18 @@ public class FichierUserDao {
              return results.get(0).getVerrou();
         }
         return 5;
+    }
+    
+    public List<FichiersUsers> getLockedByUser(User user){
+        TypedQuery<FichiersUsers> query = em.createNamedQuery("FichiersUsers.findLockedByUser", FichiersUsers.class);
+        query.setParameter("user", user);
+        List<FichiersUsers> results = query.getResultList();
+        
+        if(results.size()!=0){
+           
+             return results;
+        }
+        return null;
     }
 
     /**
@@ -279,8 +327,14 @@ public class FichierUserDao {
     public boolean changeVerrou(FichiersUsers fichierToChange, int verrou){
         if(fichierToChange != null){
             fichierToChange.setVerrou(verrou);
-            em.persist(fichierToChange);
-            return true;
+            try{
+             em.merge(fichierToChange);
+             return true;
+            }catch(Exception e){
+            System.out.println("Erreur lors du changement de verrou a la valeur "+verrou);
+            System.out.println(e.getMessage());
+                return false;
+            }
         }
         else{
             return false;
@@ -296,10 +350,16 @@ public class FichierUserDao {
      */
     public boolean changeVerrouAutre(List<FichiersUsers> fichiersToChange, int verrou){
         if(fichiersToChange != null){
-            for(int i=0;i<fichiersToChange.size();i++){
-            fichiersToChange.get(i).setVerrou(verrou);
-            em.persist(fichiersToChange.get(i));
-            }
+            try{
+                for(int i=0;i<fichiersToChange.size();i++){
+                fichiersToChange.get(i).setVerrou(verrou);
+                em.merge(fichiersToChange.get(i));
+                }
+            }catch(Exception e){
+                    System.out.println("Erreur lors du changement du verrou sur le fichier. verrou= "+verrou);
+                    System.out.println(e.getMessage());
+                    return false;
+                    }
             return true;
         }
         else{

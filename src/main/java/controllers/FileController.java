@@ -1,21 +1,35 @@
 package controllers;
 
 import dao.FichierUserDao;
+import dao.VersionDao;
+import dao.ProjetDao;
+import dao.FichiersVersionDao;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Base64;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.persistence.EntityManager;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import models.FichiersUsers;
+import models.FichiersVersion;
+import models.Projet;
 import models.User;
+import org.json.JSONArray;
+import models.Version;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +49,12 @@ public class FileController {
     
     @Autowired
     FichierUserDao fichierUserDao;
+    @Autowired
+    VersionDao versionDao;
+    @Autowired
+    ProjetDao projetDao;
+    @Autowired
+    FichiersVersionDao fichiersVersionDao;
     
     /**
      * Constructeur du controleur de fichiers
@@ -406,10 +426,13 @@ public class FileController {
             buff.close();
 
             response.put("content",contenuPage);
+                
         }		
         catch (IOException | JSONException e){
             System.out.println("Erreur pendant la rÃ©cupÃ©ration du contenu du fichier: " + e);
+                        
             return e.toString();
+                    
         }
         return  response.toString();
     }
@@ -619,4 +642,505 @@ public class FileController {
         catch(Exception e2){System.out.println(e2.getMessage()); return null;}
     }
     
+    private static boolean copier(HttpServletRequest request,String fichier_source, String fichier_dest)
+    { 
+        try{
+            ServletContext ctx = request.getServletContext();
+            String path = ctx.getRealPath("/");
+            FileInputStream src = new FileInputStream(path +fichier_source);
+           FileOutputStream dest = new FileOutputStream(path +fichier_dest);
+
+           FileChannel inChannel = src.getChannel();
+           FileChannel outChannel = dest.getChannel();
+
+           for (ByteBuffer buffer = ByteBuffer.allocate(1024*1024);
+                inChannel.read(buffer) != -1;
+                buffer.clear()) {
+              buffer.flip();
+              while (buffer.hasRemaining()) outChannel.write(buffer);
+           }
+
+           inChannel.close();
+           outChannel.close();
+           return true;
+        }catch(Exception e){
+            return false;
+            }
+    }
+    
+        
+        private boolean creerFichier(HttpServletRequest request,String idOne){
+            try{                          
+                ServletContext ctx = request.getServletContext();
+                String path = ctx.getRealPath("/");
+                                
+                // TODO: change this path when deploying to server
+                FileOutputStream out = new FileOutputStream(path + "/../../files/" + idOne.toString());
+                return true;            
+                }
+                            catch(Exception e){
+                                return false;
+                            }
+        }
+        
+        
+    
+    @ResponseBody
+    @RequestMapping(value="/pushProjet", method = RequestMethod.POST,produces = "application/json")
+    public String pusherProjet(HttpServletRequest request) {
+  
+    // Pas de session ouverte
+    JSONObject returnObject = new JSONObject();
+    
+    
+    try{
+            returnObject.put("response", "");
+            returnObject.put("errors", "");
+            
+            // On vÃ©rifie qu'une session est bien ouverte
+            HttpSession session= request.getSession();
+            User user = (User)session.getAttribute("user");
+
+            if(user == null){
+                System.out.println("user null");
+                returnObject.put("response",false);
+                returnObject.put("errors", "No user");
+                return returnObject.toString();
+            }
+            else{
+                System.out.println("user pas null");
+                //Le projet qu'on souhaite pusher
+                Projet projet = projetDao.getProjetByName(request.getParameter("projet"));
+                System.out.println("user pas null");
+                if(projet==null){
+                    System.out.println("projet null");
+                    returnObject.put("response",false);
+                    returnObject.put("errors", "No project with this name");
+                    return returnObject.toString();
+                }
+                System.out.println("projet pas null");
+                //La derniere version existante du projet
+                Version lastVersion = versionDao.getLastVersionByProjet(projet);
+                
+                if(lastVersion==null){
+                    System.out.println("lastVersion null");
+                    Version newVersion = versionDao.createNewVersion(1,new Date(),user,projet,"test");
+                    if(newVersion==null){
+                        System.out.println("newVersion null");
+                        returnObject.put("response",false);
+                        returnObject.put("errors", "Erreur lors de la creation de la nouvelle version");
+                        return returnObject.toString();
+                        }
+                    //On recupere la liste des fichierUser pour ce projet puis on les met dans fichiersVersion
+                    List<FichiersUsers> filesFromProjet =fichierUserDao.getByUserAndProjet(user, projet.getNom());
+                    if(filesFromProjet==null){
+                        returnObject.put("response",false);
+                        returnObject.put("errors", "Rien a pushé");
+                        return returnObject.toString();
+                    }
+                    //Une fois recu on les ajoute a la nouvelle version pis on repasse leur verrou à 0
+                    for(int c=0;c<filesFromProjet.size();c++){
+                        UUID idOne = UUID.randomUUID();
+                       if(filesFromProjet.get(c).getType()==FichiersUsers.Type.FICHIER){
+                            FichiersVersion newFichierVersion = fichiersVersionDao.createNewFichierVersion(filesFromProjet.get(c).getPathLogique(),idOne.toString(),filesFromProjet.get(c).getNomReel(),new Date(),FichiersVersion.Type.FICHIER,newVersion);
+                            if(newFichierVersion==null){
+                                returnObject.put("response",false);
+                                returnObject.put("errors", "Le push n'a pas fonctionné: "+c);
+                                return returnObject.toString();
+                            }
+                            //On crée le fichier en physique
+                            boolean creation = creerFichier(request,idOne.toString());
+                            if(!creation){
+                                returnObject.put("response",false);
+                                returnObject.put("errors", "Probleme de creation du nouveau fichier de version ");
+                                return returnObject.toString();
+                            }
+                            boolean unlock = fichierUserDao.changeVerrou(filesFromProjet.get(c), 0);
+                            if(!unlock){
+                                returnObject.put("response",false);
+                                returnObject.put("errors", "Probleme de deverouillage lors du push ");
+                                return returnObject.toString();
+                            }
+                            //on copie ensuite le contenu de mes fichiers dans les fichiers de la nouvelle version
+                            String src ="/../../files/"+filesFromProjet.get(c).getNomPhysique();
+                            String dest="/../../files/"+newFichierVersion.getNomPhysique();
+                            copier(request,src,dest);
+                       }else{
+                           FichiersVersion newDossierVersion = fichiersVersionDao.createNewFichierVersion(filesFromProjet.get(c).getPathLogique(),null,filesFromProjet.get(c).getNomReel(),new Date(),FichiersVersion.Type.DOSSIER,newVersion);
+                           if(newDossierVersion==null){
+                                returnObject.put("response",false);
+                                returnObject.put("errors", "Le push n'a pas fonctionné pour un dossier :" +newDossierVersion);
+                                return returnObject.toString();
+                            }
+                       }
+                       
+                    }
+                    FichiersVersion newDossierVersion = fichiersVersionDao.createNewFichierVersion("/"+projet.getNom(),null,projet.getNom(),new Date(),FichiersVersion.Type.DOSSIER,newVersion);
+                        if(newDossierVersion==null){
+                                returnObject.put("response",false);
+                                returnObject.put("errors", "Le push n'a pas fonctionné pour un dossier :" +newDossierVersion);
+                                return returnObject.toString();
+                        }
+                }else{
+                       //On recupere tous les fichiers qu'on a verrouillé
+                       
+                       List<FichiersUsers> lockedFiles = fichierUserDao.getLockedByUserAndProjet(user, projet.getNom());
+                       if(lockedFiles==null){
+                           System.out.println("lockedFiles null");
+                           returnObject.put("response",false);
+                           returnObject.put("errors", "Rien a pushé");
+                           return returnObject.toString();
+                       }else{
+                           //On recupere les fichiers de la derniere version
+                           List<FichiersVersion> fichiersLastVersion = fichiersVersionDao.getFileByVersion(lastVersion);
+                           
+                           //Puis on cree une nouvelle version
+                           Version newVersion = versionDao.createNewVersion(lastVersion.getNumVersion()+1,new Date(),user,projet,"test");
+                           if(newVersion==null){
+                               System.out.println("newVersion null");
+                               returnObject.put("response",false);
+                               returnObject.put("errors", "Erreur lors de la creation de la nouvelle version");
+                               return returnObject.toString();
+                           }
+                           for(int i=0;i<lockedFiles.size();i++){
+                               UUID idOne = UUID.randomUUID();
+                               FichiersVersion file = fichiersVersionDao.createNewFichierVersion(lockedFiles.get(i).getPathLogique(),idOne.toString(),lockedFiles.get(i).getNomReel(), new Date(), FichiersVersion.Type.FICHIER, newVersion);
+                               if(file==null){
+                                   System.out.println("file null");
+                                   returnObject.put("response",false);
+                                    returnObject.put("errors", "Erreur lors de la creation du fichier :"+i);
+                                    return returnObject.toString();
+                                }
+                                String src ="/../../files/"+lockedFiles.get(i).getNomPhysique();
+                                String dest="/../../files/"+file.getNomPhysique();
+                                copier(request,src,dest);
+                               List<FichiersVersion> fichiersLastVersionTamp=fichiersLastVersion;
+                               for(int j=0;j<fichiersLastVersionTamp.size();j++){
+                                   if(lockedFiles.get(i).getPathLogique().equals(fichiersLastVersionTamp.get(j).getPathLogique())){
+                                       fichiersLastVersion.remove(j);
+                                      
+                                   }
+                               }
+                               
+                           }
+                           
+                           for(int g=0;g<fichiersLastVersion.size();g++){
+                               UUID idTwo = UUID.randomUUID();
+                               if(fichiersLastVersion.get(g).getType()==FichiersVersion.Type.FICHIER){
+                               FichiersVersion file = fichiersVersionDao.createNewFichierVersion(fichiersLastVersion.get(g).getPathLogique(),idTwo.toString() ,fichiersLastVersion.get(g).getNomReel(), new Date(), FichiersVersion.Type.FICHIER, newVersion);
+                              if(file==null){
+                                   System.out.println("file null");
+                                   returnObject.put("response",false);
+                                    returnObject.put("errors", "Erreur lors de la creation du fichier :"+g);
+                                    return returnObject.toString();
+                                }
+                                String src ="/../../files/"+fichiersLastVersion.get(g).getNomPhysique();
+                                String dest="/../../files/"+file.getNomPhysique();
+                                copier(request,src,dest);
+                           }else{
+                                  FichiersVersion file = fichiersVersionDao.createNewFichierVersion(fichiersLastVersion.get(g).getPathLogique(),null,fichiersLastVersion.get(g).getNomReel(), new Date(), FichiersVersion.Type.DOSSIER, newVersion);
+                              if(file==null){
+                                   System.out.println("file null");
+                                   returnObject.put("response",false);
+                                    returnObject.put("errors", "Erreur lors de la creation du dossier :"+file);
+                                    return returnObject.toString();
+                                } 
+                               }
+                           }
+                           //Puis on ajoute les fichers verrouillés a cette nouvelle version:
+                           //dans la base dans le cas de nouveaux fichiers, puis aussi en physique
+                           //(càd copie du contenu des fichiers verrouillés dans les fichers correpondant dans la version)
+                           
+                           //On peut ensuite enlever le verrou sur ces fichiers.(seulement pour moi 2-->0)
+                           
+                           for(int k =0 ;k<lockedFiles.size();k++){
+                           boolean test = fichierUserDao.changeVerrou(lockedFiles.get(k),0);
+                           if(!test){
+                               System.out.println("user null");
+                               returnObject.put("response",false);
+                               returnObject.put("errors","Le verrou n'a pas été relaché pour "+lockedFiles.get(k).getNomPhysique());
+                               return returnObject.toString();
+                           }
+                       }
+             
+                       }
+                   }
+                returnObject.put("response", true);
+                return returnObject.toString();
+            }
+        }
+        catch(Exception e){
+            System.out.println("Erreur JSON");
+            System.out.println(e.getMessage());
+            
+            //TODO: ce try-catch ne sert qu'Ã  afficher les erreurs
+            try{
+                JSONObject obj = new JSONObject();
+                System.out.println("catch");
+                obj.put("response",false);
+                obj.put("errors",e.getMessage());
+                return obj.toString();
+            }
+            catch(Exception er){
+                
+            }
+            return null;
+        }
+    }
+    
+    @ResponseBody
+    @RequestMapping(value="/pullProjet", method = RequestMethod.POST,produces = "application/json")
+    public String pullerProjet(HttpServletRequest request) {
+    
+        
+        JSONObject returnObject = new JSONObject();
+    
+    
+    try{
+            returnObject.put("response", "");
+            returnObject.put("errors", "");
+            
+            // On vÃ©rifie qu'une session est bien ouverte
+            HttpSession session= request.getSession();
+            User user = (User)session.getAttribute("user");
+
+            if(user == null){
+                returnObject.put("response",false);
+                returnObject.put("errors", "No user");
+                return returnObject.toString();
+            }else{
+               Projet projet = projetDao.getProjetByName(request.getParameter("projet"));
+               if(projet==null){
+                    returnObject.put("response",false);
+                    returnObject.put("errors", "Le projet demandé n'a pas pu etre trouvé");
+                    return returnObject.toString();
+               }
+               
+                Version lastVersion = versionDao.getLastVersionByProjet(projet);
+                
+                if(lastVersion==null){
+                    returnObject.put("response",false);
+                    returnObject.put("errors", "Le projet est vide.Rien a pushé");
+                    return returnObject.toString();
+                }
+                
+                List<FichiersUsers> filesFromProjet =fichierUserDao.getByUserAndProjet(user, projet.getNom());
+                    if(filesFromProjet==null){
+                        System.out.println("On clone le projet");
+                        List<FichiersVersion> filesFromVersion =fichiersVersionDao.getFileByVersion(lastVersion);
+                        if(filesFromVersion==null){
+                            returnObject.put("response",false);
+                            returnObject.put("errors", "Pas de fichiers dans la derniere version->ERROR");
+                            return returnObject.toString();
+                        }
+                        for(int a=0;a<filesFromVersion.size();a++){
+                            UUID idOne = UUID.randomUUID();
+                            if(filesFromVersion.get(a).getType()==FichiersVersion.Type.FICHIER){
+                                 FichiersUsers newFichierUser = fichierUserDao.createNewFichierUser(filesFromVersion.get(a).getPathLogique(),idOne.toString(),filesFromVersion.get(a).getNomReel(),new Date(),FichiersUsers.Type.FICHIER,user,0);
+                                 if(newFichierUser==null){
+                                     returnObject.put("response",false);
+                                     returnObject.put("errors", "Le pull n'a pas fonctionné: "+a);
+                                     return returnObject.toString();
+                                 }
+                                 //On crée le fichier en physique
+                                 boolean creation = creerFichier(request,idOne.toString());
+                                 if(!creation){
+                                     returnObject.put("response",false);
+                                     returnObject.put("errors", "Probleme de creation du nouveau fichier de version ");
+                                     return returnObject.toString();
+                                 } 
+                            String src ="/../../files/"+filesFromVersion.get(a).getNomPhysique();
+                            String dest="/../../files/"+newFichierUser.getNomPhysique();
+                            copier(request,src,dest);
+                            }else{
+                                 FichiersUsers newDossierUser = fichierUserDao.createNewFichierUser(filesFromVersion.get(a).getPathLogique(),null,filesFromVersion.get(a).getNomReel(),new Date(),FichiersUsers.Type.DOSSIER,user,4);
+                                 if(newDossierUser==null){
+                                     returnObject.put("response",false);
+                                     returnObject.put("errors", "Le pull n'a pas fonctionné: "+a);
+                                     return returnObject.toString();
+                                 }
+                            }
+                        }
+                        returnObject.put("response",true);
+                        returnObject.put("errors", "");
+                        return returnObject.toString();
+                    }else{
+                        
+                        System.out.println("On met a jour");
+                        List<FichiersVersion> filesFromVersion =fichiersVersionDao.getFileByVersion(lastVersion);
+                        if(filesFromVersion==null){
+                            returnObject.put("response",false);
+                            returnObject.put("errors", "Pas de fichiers dans la derniere version->ERROR");
+                            return returnObject.toString();
+                        }
+                        for(int compt=0;compt<filesFromVersion.size();compt++){
+                        System.out.println(filesFromVersion.get(compt).getPathLogique());
+                                }
+                        List<FichiersVersion> filesFromVersionTamp=filesFromVersion;
+                        for(int compt2=0;compt2<filesFromProjet.size();compt2++){
+                        System.out.println(filesFromProjet.get(compt2).getPathLogique());
+                        }
+                        //On copie les verrouillés dans notre local.On supprime ceux qu'on traite de la liste
+                        for(int u=0;u<filesFromVersion.size();u++){
+                            for(int v=0;v<filesFromProjet.size();v++){
+                                if(filesFromVersion.get(u).getPathLogique().equals(filesFromProjet.get(v).getPathLogique())){
+                                   if(filesFromProjet.get(v).getVerrou()==1){
+                                       
+                                       boolean delock = fichierUserDao.changeVerrou(filesFromProjet.get(v),0);
+                                       if(!delock){
+                                            returnObject.put("response",false);
+                                            returnObject.put("errors", "Le changement d'un verrou a echoué");
+                                            return returnObject.toString();
+                                       }
+                                        String src ="/../../files/"+filesFromVersion.get(u).getNomPhysique();
+                                        String dest="/../../files/"+filesFromProjet.get(v).getNomPhysique();
+                                        copier(request,src,dest);
+                                   }
+                                   filesFromVersionTamp.remove(u);
+                                }
+                            }
+                            
+                        }
+                        
+                        //on teste la liste
+                        if(!filesFromVersionTamp.isEmpty()){
+                            for(int e=0;e<filesFromVersionTamp.size();e++){
+                                UUID idOne = UUID.randomUUID();
+                                if(filesFromVersionTamp.get(e).getType()==FichiersVersion.Type.FICHIER){
+                                    FichiersUsers newFichierUser = fichierUserDao.createNewFichierUser(filesFromVersion.get(e).getPathLogique(),idOne.toString(),filesFromVersion.get(e).getNomReel(),new Date(),FichiersUsers.Type.FICHIER,user,0);
+                                 if(newFichierUser==null){
+                                     returnObject.put("response",false);
+                                     returnObject.put("errors", "Le pull n'a pas fonctionné: "+e);
+                                     return returnObject.toString();
+                                 }
+                                 //On crée le fichier en physique
+                                 boolean creation = creerFichier(request,idOne.toString());
+                                 if(!creation){
+                                     returnObject.put("response",false);
+                                     returnObject.put("errors", "Probleme de creation du nouveau fichier de version ");
+                                     return returnObject.toString();
+                                 } 
+                            String src ="/../../files/"+filesFromVersionTamp.get(e).getNomPhysique();
+                            String dest="/../../files/"+newFichierUser.getNomPhysique();
+                            copier(request,src,dest);
+                            }else{
+                                 FichiersUsers newDossierUser = fichierUserDao.createNewFichierUser(filesFromVersion.get(e).getPathLogique(),null,filesFromVersion.get(e).getNomReel(),new Date(),FichiersUsers.Type.DOSSIER,user,4);
+                                 if(newDossierUser==null){
+                                     returnObject.put("response",false);
+                                     returnObject.put("errors", "Le pull n'a pas fonctionné: "+e);
+                                     return returnObject.toString();
+                                 }
+                            }
+                                }
+                            }
+                        }
+                        
+                        returnObject.put("response",true);
+                        returnObject.put("errors", "");
+                        return returnObject.toString();
+                    }
+            
+            }
+            catch(Exception e){
+            System.out.println("Erreur JSON");
+            System.out.println(e.getMessage());
+            
+            //TODO: ce try-catch ne sert qu'Ã  afficher les erreurs
+            try{
+                JSONObject obj = new JSONObject();
+                obj.put("response",false);
+                obj.put("errors",e.getMessage());
+                return obj.toString();
+            }
+            catch(Exception er){
+                
+            }
+            }
+    return null;
+    }
+    
+    @ResponseBody
+    @RequestMapping(value="/verrouillerFichier", method = RequestMethod.POST,produces = "application/json")
+    public String verrouillerFichier(HttpServletRequest request){
+  
+    // Pas de session ouverte
+    JSONObject returnObject = new JSONObject();
+    
+    
+    try{
+            returnObject.put("response", "");
+            returnObject.put("errors", "");
+            
+            // On vÃ©rifie qu'une session est bien ouverte
+            HttpSession session= request.getSession();
+            User user = (User)session.getAttribute("user");
+
+            if(user == null){
+                returnObject.put("response",false);
+                returnObject.put("errors", "No user");
+                return returnObject.toString();
+            }
+            else
+            {
+                //On recupere le fichier grace a sn pathLogique
+                FichiersUsers file = fichierUserDao.getPathByPathLogique(user,request.getParameter("pathLogique"));
+                System.out.println("file : "+file);
+                if(file==null){
+                    returnObject.put("response",false);
+                    returnObject.put("errors", "Pas de fichier trouvé pour ce pathLogique");
+                    return returnObject.toString();
+                }
+                int verrou = file.getVerrou();
+                if(verrou==0){
+                    //On essaye de mettre le verrou sur le fichier pour nous
+                    
+                    boolean verrouMoi = fichierUserDao.changeVerrou(file, 2);
+                    
+                    if(!verrouMoi){
+                        returnObject.put("response",false);
+                        returnObject.put("errors", "La mise en place du verrou a échoué (val. 2)");
+                        return returnObject.toString();
+                    }
+                    //On recupere les fichiers qui correspondent au mien pour les autres utilisateurs
+                    List<FichiersUsers> files =fichierUserDao.getPathsByPathLogique(user,request.getParameter("pathLogique"));
+                    System.out.println("files : "+files);
+                    if(files!=null){
+                        boolean verrouAutre = fichierUserDao.changeVerrouAutre(files, 1);
+                        System.out.println("verrouAutre : "+verrouAutre);
+                        if(!verrouAutre){
+                            returnObject.put("response",false);
+                            returnObject.put("errors", "La mise en place du verrou sur les fichiers des autres utilisateurs a échoué (val. 1)");
+                            return returnObject.toString();
+                        }
+                    }
+                    returnObject.put("response",true);
+                    return returnObject.toString();
+                }else if (verrou==2){
+                    returnObject.put("response",false);
+                    returnObject.put("errors", "Vous avez deja verrouillé ce fichier!");
+                    return returnObject.toString();
+                }else{
+                    returnObject.put("response",false);
+                    returnObject.put("errors", "Ce fichier a deja été verrouillé par un autre utilisateur!");
+                    return returnObject.toString();
+                }
+            }
+        }
+        catch(Exception e){
+            System.out.println("Erreur JSON");
+            System.out.println(e.getMessage());
+            
+            //TODO: ce try-catch ne sert qu'Ã  afficher les erreurs
+            try{
+                JSONObject obj = new JSONObject();
+                obj.put("response",false);
+                obj.put("errors",e.getMessage());
+                return obj.toString();
+            }
+            catch(Exception er){
+                
+            }
+            return null;
+        }
+}
 }

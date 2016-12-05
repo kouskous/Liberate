@@ -27,16 +27,21 @@ public class ProjetDao {
     public Projet getProjetByName(String nom) throws IllegalArgumentException{
         
         // Recherche du projet par nom (unique)
+        
         TypedQuery<Projet> query = em.createNamedQuery("Projet.findByNom", Projet.class);
+        
         query.setParameter("nom", nom);
+        
         List<Projet> results = query.getResultList();
         
         // Si aucun projet n'est trouvé avec ce nom
         if(results.isEmpty()){
+            
             return null;
         }
         // Un projet a été trouvé
         else if(results.size() == 1){
+          
             return results.get(0);
         }
         // Anomalie: plusieurs projets ont été trouvé avec le même nom

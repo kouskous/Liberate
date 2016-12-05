@@ -6,18 +6,16 @@
 package config;
 
 import dao.FichierUserDao;
+import dao.FichiersVersionDao;
 import dao.ProjetDao;
 import dao.UserDao;
 import dao.UserProjetDao;
+import dao.VersionDao;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
-import javax.transaction.TransactionManager;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  *
@@ -34,7 +32,17 @@ public class beanConfig {
     @Bean(name = "FichierUserDao")
     public FichierUserDao getFichierUserDao() {
         return new FichierUserDao();
-    }    
+    } 
+    
+    @Bean(name = "FichiersVersionDao")
+    public FichiersVersionDao getFichiersVersionDao() {
+        return new FichiersVersionDao();
+    } 
+    
+    @Bean(name = "VersionDao")
+    public VersionDao getVersionDao() {
+        return new VersionDao(getEntityManager());
+    }
     
     @Bean(name = "ProjetDao")
     public ProjetDao getProjetDao() {
