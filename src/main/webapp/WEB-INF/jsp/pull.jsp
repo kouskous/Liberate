@@ -9,7 +9,7 @@
                     <c:choose>
                         <c:when test="${projets.size() > 0}">
                             <c:forEach items="${projets}" var="projet">
-                                <li class="project-to-pull" data-id="${projet.idProjet} data-name="${projet.nom}">
+                                <li class="project-to-pull" data-id="${projet.idProjet}" data-name="${projet.nom}">
                                         <a >
                                                 <i class="icon-folder-open green"></i>                               
                                                 <strong> ${projet.nom} </strong>  

@@ -76,6 +76,7 @@
     }
     
     function refreshTree(){
+        $("#arbre").html('<ul id ="Root"></ul>');
         $.ajax({ 
           url      : "/Liber8/getTree",
           dataType : "json",
@@ -354,4 +355,27 @@ $( document ).ready(function() {
         }   
     });
     
+    $("#btn_push").click(function(){
+            apppa = App.currentVoletElement;
+            appPath =apppa.slice(5);
+             $.blockUI({ message: '<h2><img src="/Liber8/resources/blockUi/busy.gif" /> push...</h2>' });
+
+            $.ajax({ 
+                url      : "/Liber8/pushProjet",
+                type     : 'POST',
+                dataType : "json",
+                data     :{
+                              projet: appPath
+                          },
+                success  : function(data) {
+                            $.unblockUI();
+                            if(data.response===true){
+                                toastr.success("push réalisé avec succés");
+                                refreshTree();
+                            } else {
+                                toastr.warning(data.errors);
+                            }
+                        }       
+            });
+    });   
 });

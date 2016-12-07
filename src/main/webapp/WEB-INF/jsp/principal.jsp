@@ -60,7 +60,7 @@
                                         </li>
                                         
                                         <li class="btn_action">
-                                            <a href="#"><i class="icon-upload-alt"></i>Push</a>
+                                            <a id="btn_push" href="#"><i class="icon-upload-alt"></i>Push</a>
                                         </li>
                                         
                                         <li class="btn_action">
