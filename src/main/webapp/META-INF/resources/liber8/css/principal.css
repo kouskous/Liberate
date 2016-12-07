@@ -285,7 +285,7 @@ footer {
 
 #toolbar{
     margin:5px;
-    min-width: 400px;
+    min-width: 450px;
 }
 
 .closeconsole {
@@ -293,7 +293,15 @@ footer {
     color:#fff;
     padding:20px;
 }
-    
+#sidebar-left {
+    width:16%;
+}    
+@media (min-width: 1200px){
+#content {
+
+    margin-left: 16.422%;
+}
+}
 #btn_verrouiller{
     color: green;
 }

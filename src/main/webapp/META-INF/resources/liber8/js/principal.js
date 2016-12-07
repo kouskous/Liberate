@@ -24,14 +24,18 @@
                     content=data["content"];
                     App.currentOnglet = id;
                     App.currentVoletElement = id;
+                     $("#onglets li").removeClass("active");
+                    
                     if(typeof App.onglets[id] === 'undefined'){
                         fileName = id.split('/');
                         fileName = fileName[fileName.length - 1];
-                        $("#onglets").append('<li class="onglet" data-id="'+ id +'" ><a href="#">'+fileName+' <i data-id="'+ id +'" class="icon-remove close-onglet"></i></a></li>');
+                        $("#onglets").append('<li class="onglet active" data-id="'+ id +'" ><a href="#">'+fileName+' <i data-id="'+ id +'" class="icon-remove close-onglet"></i></a></li>');
                         App.onglets[id] = content;
                         App.editeur.setValue(App.onglets[id]);
                     
                     }
+                   
+                   
                 }
             });
             
@@ -70,6 +74,9 @@
             if (!close) {
                 App.editeur.setValue(App.onglets[id]);
                 App.currentOnglet = id;
+                $("#onglets li").removeClass("active");
+                $(this).addClass("active");
+                
             }
             close = false;
         });
