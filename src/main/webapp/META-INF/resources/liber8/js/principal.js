@@ -191,7 +191,9 @@ $( document ).ready(function() {
    
     $("#btn_compile").click(function(){
             apppa = App.currentVoletElement;
-            appPath =apppa.slice(5);
+            appPath1 =apppa.slice(5);
+            appPath=appPath1.split('/')[0];
+        
              $.blockUI({ message: '<h2><img src="/Liber8/resources/blockUi/busy.gif" /> Compilation...</h2>' });
 
             $.ajax({ 
@@ -202,7 +204,7 @@ $( document ).ready(function() {
                               nomProjet: appPath
                           },
                 success  : function(data) {  
-                    console.log(data);
+                   
                     $.unblockUI();
                         if(data.response==="true"){
                             toastr.success("compilé");
@@ -214,7 +216,10 @@ $( document ).ready(function() {
                         } else if((data.response==="false" && data.content!=="")|| (data.response==="true" && data.content!=="")) {
                             toastr.warning("erreur pendant la compilation");
                               $(".console").css('display','block');
-                              $(".body_console").html(data.content);
+                              console.log(data.content);
+                              error_in_compile=data.content.split("^").join("<br />");
+                              console.log(error_in_compile);
+                              $(".body_console").html(error_in_compile);
                         }
                         else {
                               toastr.warning("un problème est survenu au niveau de l'application ! réessayer plus tard");
