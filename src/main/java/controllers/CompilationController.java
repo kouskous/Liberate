@@ -345,7 +345,7 @@ public class CompilationController {
         // Compilation des sources java
         String pathToProject = directoryPath + "/../../compile_" + user.getPseudo() + "/" + nomProjet;
         try{
-            ProcessBuilder builder = new ProcessBuilder("find", "-name", "*.java", "-exec", "javac", "{}", ";");
+            ProcessBuilder builder = new ProcessBuilder("find", ".","-name", "*.java", "-exec", "javac", "{}", ";");
             builder.directory(new File(pathToProject));
             builder.redirectError(new File(pathToProject + "/errors.txt"));
             Process p = builder.start();
@@ -383,7 +383,7 @@ public class CompilationController {
                 p.waitFor();
                 
                 // Ajout de tous les .class
-                ProcessBuilder builder2 = new ProcessBuilder("find", "-name", "*.class", "-exec", "jar", "-uf", directoryPath + "/../../execs_" + user.getPseudo() + "/" + nomProjet+".jar", "{}", ";");
+                ProcessBuilder builder2 = new ProcessBuilder("find","." ,"-name", "*.class", "-exec", "jar", "-uf", directoryPath + "/../../execs_" + user.getPseudo() + "/" + nomProjet+".jar", "{}", ";");
                 builder2.directory(new File(pathToProject));
                 Process p2 = builder2.start();
                 p2.waitFor();
