@@ -122,7 +122,9 @@ $( document ).ready(function() {
     //inclusion de la coloration syntaxique
     App.editeur = ace.edit("editeur");
     App.editeur.setTheme("ace/theme/twilight");
-    App.editeur.session.setMode("ace/mode/javascript"); 
+    App.editeur.setOptions({
+        fontSize: "12pt"
+    });
     
     $("#editeur").on('click',function(){
         path = App.currentOnglet.replace(/\//g,'-');

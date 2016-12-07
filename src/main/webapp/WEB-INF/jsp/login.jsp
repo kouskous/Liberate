@@ -63,22 +63,17 @@
 								<input class="input-large span10" name="password" id="password" type="password" placeholder=" Mot de passe"/>
 							</div>
 							<div class="clearfix"></div>
-							
-							<label class="remember" for="remember"><input type="checkbox" id="remember" />Se souvenir de moi</label>
 
-							<div class="button-login">	
-								<button type="submit" class="btn btn-primary">Se connecter</button>
+							<div class="button-login">
+                                                            <a href="inscription" class="btn-inscription btn btn-default" >S'inscrire</a>
+                                                            <button type="submit" class="btn-login btn btn-primary">Se connecter</button>
 							</div>
 							<div class="clearfix"></div>
+                                                        
+							
+						
 						</fieldset>
 					</form>
-					<hr>
-					<fieldset>
-						<div style="float: right; margin-right: 20px">
-							<a href="inscription" class="btn btn-default" >S'inscrire</a>
-						</div>
-					</fieldset>
-					<h3>mot de passe oublié?</h3>
 		
 				</div><!--/span-->
 			</div><!--/row-->

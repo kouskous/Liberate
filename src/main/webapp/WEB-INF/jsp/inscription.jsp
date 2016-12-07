@@ -85,17 +85,12 @@
                                 <div id="resultconfirm"></div>
                             </div>
                             <div class="clearfix"></div>
-				<div class="button-login">	
-                                    <button type="submit" class="btn btn-primary bouton">Créer un compte</button>
-				</div>
+				<div class="button-login">
+                                    <a href="login" class="btn btn-default btn_return" >Retour</a>
+                                    <button type="submit" class="btn btn-primary bouton btn_submit_inscription">Créer un compte</button>
+                                </div>
 				<div class="clearfix"></div>
-                                
                     </form>
-                    <fieldset>
-                        <div style="float: right; margin-right: 20px; margin-bottom: 20px">
-                            <a href="login" class="btn btn-default" >Retour</a>
-                        </div>
-                    </fieldset>
                 </div>
             </div>
         </div> 

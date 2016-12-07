@@ -2110,7 +2110,8 @@ fieldset[disabled] .btn-link:focus {
 .login-box .button-login {
 	margin-top: 20px;
 	margin-right: 20px;
-	float: right;
+	float: left;
+        width: 100%;
 }
 
 /* UI - Uniform
@@ -2938,6 +2939,18 @@ ul.messagesList li span.date {
 	padding: 5px 40px 5px 10px;
 }
 
+.btn-inscription{
+    margin-left: 40px;
+}
+
+.btn-login{
+    float: right;
+    margin-right: 50px;
+}
+
+#username, #password{
+    width: 80%;
+}
 /* Retina Display Hack
 =================================================================== */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
