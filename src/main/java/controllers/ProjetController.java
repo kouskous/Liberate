@@ -112,11 +112,11 @@ public class ProjetController {
                     ArrayList<String> droitsUsers = new ArrayList<String>();
                     
                     for (int i = 0; i <= 9; i++){
-                        if(jsonUsersProjet.has(Integer.toString(i)) && !"".equals(jsonUsersProjet.get(Integer.toString(i)))){
+                        if(jsonUsersProjet.has(Integer.toString(i)) && !jsonUsersProjet.get(Integer.toString(i)).equals("")){
                             usersProjet.add((String)jsonUsersProjet.get(Integer.toString(i)));
                         }
                         
-                        if(jsonDroitsProjet.has(Integer.toString(i)) && !"".equals(jsonDroitsProjet.get(Integer.toString(i)))){
+                        if(jsonDroitsProjet.has(Integer.toString(i)) && !jsonDroitsProjet.get(Integer.toString(i)).equals("")){
                             droitsUsers.add((String)jsonDroitsProjet.get(Integer.toString(i)));
                         }
                     }
@@ -141,7 +141,7 @@ public class ProjetController {
                                     // TODO: génération du nomPhysique ici
                                     
                                     // On créé le dossier vide du projet pour l'admin
-                                    fichierUserDao.createNewFichierUser("/" + nomProjet, nomProjet, nomProjet, new Date(), FichiersUsers.Type.DOSSIER, user, 4);
+                                    FichiersUsers newFile = fichierUserDao.createNewFichierUser("/" + nomProjet, nomProjet, nomProjet, new Date(), FichiersUsers.Type.DOSSIER, user, 4);
 
                                     // Pour chaque autre utilisateur a ajouter, on le trouve dans la BDD et on l'ajoute avec ses droits
                                     for (int i = 0; i < usersProjet.size(); i++){
@@ -298,6 +298,8 @@ public class ProjetController {
         
         // On récupère tous les utilisateurs du projet
         List<User> myList = new ArrayList();
+        List<String> pseudoUsers = new ArrayList();
+        List<String> droitsUsers = new ArrayList();
         JSONObject jsonPseudoDroits = new JSONObject();
         try{
             myList = userProjetDao.getAllUsersByProjet(projet);
@@ -493,11 +495,11 @@ public class ProjetController {
         ArrayList<String> pseudoUsersProjet = new ArrayList<String>();
         ArrayList<String> droitsUsers = new ArrayList<String>();                    
         for (int i = 0; i <= 9; i++){
-            if(jsonUsersProjet.has(Integer.toString(i)) && !"".equals(jsonUsersProjet.get(Integer.toString(i)))){
+            if(jsonUsersProjet.has(Integer.toString(i)) && !jsonUsersProjet.get(Integer.toString(i)).equals("")){
                 pseudoUsersProjet.add((String)jsonUsersProjet.get(Integer.toString(i)));
             }
 
-            if(jsonDroitsProjet.has(Integer.toString(i)) && !"".equals(jsonDroitsProjet.get(Integer.toString(i)))){
+            if(jsonDroitsProjet.has(Integer.toString(i)) && !jsonDroitsProjet.get(Integer.toString(i)).equals("")){
                 droitsUsers.add((String)jsonDroitsProjet.get(Integer.toString(i)));
             }
         }

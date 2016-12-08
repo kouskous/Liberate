@@ -53,7 +53,7 @@ public class FichiersVersionDao{
         }
         catch(Exception e){
             System.out.println("Erreur lors de l'ajout d'un nouveau fichierVersion :");
-            System.out.println(e);
+            System.out.println(e.getMessage());
             return null;
         }
     }
@@ -63,7 +63,7 @@ public class FichiersVersionDao{
         query.setParameter("version", version);
         List<FichiersVersion> results = query.getResultList();
         
-        if(!results.isEmpty()){
+        if(results.size()!=0){
             
              return results;
         }
