@@ -51,7 +51,7 @@ public class VersionDao {
     }
     
     
-    //Récupère la dernière version d'un projet
+    //Recupere la derniere version d'un projet
     //Si pas de resultats ou trop de resultats return null
     //sinon retourne la derniere version du projet
     public Version getLastVersionByProjet(Projet projet){
@@ -64,7 +64,7 @@ public class VersionDao {
         }else return null;
     }
     
-    //Retourne la dernière version d'un projet pushé par un utilisateur
+    //Retourne la derniere version d'un projet pushe par un utilisateur
     //Si vide ou trop de resultats on renvoie null 
     //Sinon on renvoie la version en question
     public Version getLastVersionByUserAndProjet(User user, Projet projet){
@@ -96,7 +96,7 @@ public class VersionDao {
         }
         catch(Exception e){
             System.out.println("Erreur lors de l'ajout d'une nouvelle version :");
-            System.out.println(e.getMessage());
+            System.out.println(e);
             return null;
         }
     } 

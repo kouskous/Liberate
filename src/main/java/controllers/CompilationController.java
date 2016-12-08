@@ -140,7 +140,7 @@ public class CompilationController {
         }
         
         // Compilation pour projets C/C++
-        if(projet.getLangage().equals("c") || projet.getLangage().equals("c++")){
+        if("c++".equals(projet.getLangage()) || "c".equals(projet.getLangage())){
             if(!buildAndCreateExecC(path, user, projet.getLangage(), nomProjet)){
                 try{
                     returnObject.put("response", "false");
@@ -154,7 +154,7 @@ public class CompilationController {
         }
         
         // Compilation pour projets Java
-        if(projet.getLangage().equals("java")){
+        if("java".equals(projet.getLangage())){
             if(!buildAndCreateJarJava(path, user, nomProjet)){
                 try{
                     returnObject.put("response", "false");
@@ -171,10 +171,10 @@ public class CompilationController {
         // Reussite
         try{
             returnObject.put("response", "true");
-            if(projet.getLangage().equals("c") || projet.getLangage().equals("c++")){
+            if("c".equals(projet.getLangage()) || "c++".equals(projet.getLangage())){
                 returnObject.put("nomExec", "exe");
             }
-            else if(projet.getLangage().equals("java")){
+            else if("java".equals(projet.getLangage())){
                 returnObject.put("nomExec", nomProjet + ".jar");
             }
             returnObject.put("content", getCompileErrors(path, user, nomProjet));
@@ -213,7 +213,6 @@ public class CompilationController {
                 if(fileUser == null){return false;}
 
                 // Getting file content
-                String fileName = extractFileName(entry.getPathLogique());
                 String content = new String(Files.readAllBytes(Paths.get(directoryPath + "/../../files/" + fileUser.getNomPhysique())));
 
                 // Creating compile file and writing content to it
@@ -242,15 +241,11 @@ public class CompilationController {
         // Getting file content
         String content;
         try{
-            if(language.equals("c")){
+            if("c".equals(language)){
                 content = new String(Files.readAllBytes(Paths.get(directoryPath + "/../../scripts/makefile_c")));
             }
             else{
                 content = new String(Files.readAllBytes(Paths.get(directoryPath + "/../../scripts/makefile_c++")));
-            }
-            if(content == null){
-                System.out.println("Erreur pendant la récupération du contenu du makefile");
-                return false;
             }
         }
         catch(IOException e){

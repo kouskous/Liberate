@@ -44,10 +44,7 @@ public class ProjetDao {
           
             return results.get(0);
         }
-        // Anomalie: plusieurs projets ont été trouvé avec le même nom
-        else{
-            return null;
-        }
+        return null;
     }
        
     /**

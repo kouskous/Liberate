@@ -41,9 +41,7 @@ public class UserDao {
             return results.get(0);
         }
         // Anomalie: plusieurs utilisateurs ont été trouvé avec le même email
-        else{
-            return null;
-        }
+        return null;
     }
     
     /**
@@ -69,9 +67,7 @@ public class UserDao {
             return results.get(0);
         }
         // Anomalie: plusieurs utilisateurs ont été trouvé avec le même pseudo
-        else{
-            return null;
-        }
+        return null;
     }
 
     /**

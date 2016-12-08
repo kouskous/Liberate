@@ -56,9 +56,7 @@ public class UserProjetDao {
             return results.get(0);
         }
         // Anomalie: plusieurs UserProjet ont été trouvé avec le même nom
-        else{
-            return null;
-        }
+        return null;
     }
 
     /**
@@ -109,7 +107,7 @@ public class UserProjetDao {
         
         if (user != null && projet != null){
             
-            if (!(typeDroit.equals("admin") || typeDroit.equals("developpeur") || typeDroit.equals("reporteur"))){
+            if (!("admin".equals(typeDroit) || "developpeur".equals(typeDroit) || "reporteur".equals(typeDroit))){
                 return null;
             }
             
@@ -173,7 +171,7 @@ public class UserProjetDao {
     public boolean changeDroitsUserProjet(String typeDroit, int idUser, int idProjet){
         
         // On teste que typeDroit est une chaine de caractère valide
-        if (typeDroit.equals("admin") || typeDroit.equals("developpeur") || typeDroit.equals("reporteur")){
+        if ("admin".equals(typeDroit) || "developpeur".equals(typeDroit) || "reporteur".equals(typeDroit)){
             try{
                 UserProjet userProjet = getUserProjetByUIdPId(idUser, idProjet);
 
@@ -204,7 +202,7 @@ public class UserProjetDao {
 
         
         // Vérification que typeDroit est une chaine de caractère valide
-        if (typeDroit.equals("admin") || typeDroit.equals("developpeur") || typeDroit.equals("reporteur")){
+        if ("admin".equals(typeDroit) || "developpeur".equals(typeDroit) || "reporteur".equals(typeDroit)){
             userProjet.setTypeDroit(typeDroit);
       
             try{

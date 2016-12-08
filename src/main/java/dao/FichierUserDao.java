@@ -58,9 +58,8 @@ public class FichierUserDao {
         else if(results.size() == 1){
             return results.get(0);
         }
-        else{ // Anomalie, plus d'un résultat
-            return null;
-        }
+        // Anomalie, plus d'un résultat
+        return null;
     }
 
     /**
@@ -84,10 +83,7 @@ public class FichierUserDao {
         else if(results.size() == 1){
             return results.get(0);
         }
-        // Anomalie: plusieurs fichiers ont été trouvé avec le même nom physique
-        else{
-            return null;
-        }
+        return null;
     }
     
     /**
@@ -243,7 +239,7 @@ public class FichierUserDao {
         query.setParameter("projet", proj);
         List<FichiersUsers> results = query.getResultList();
         
-        if(results.size()!=0){
+        if(!results.isEmpty()){
             
              return results;
         }
@@ -263,7 +259,7 @@ public class FichierUserDao {
         
         List<FichiersUsers> results = query.getResultList();
         
-        if(results.size()!=0){
+        if(!results.isEmpty()){
             
              return results;
         }
@@ -332,7 +328,7 @@ public class FichierUserDao {
              return true;
             }catch(Exception e){
             System.out.println("Erreur lors du changement de verrou a la valeur "+verrou);
-            System.out.println(e.getMessage());
+            System.out.println(e);
                 return false;
             }
         }
@@ -357,7 +353,7 @@ public class FichierUserDao {
                 }
             }catch(Exception e){
                     System.out.println("Erreur lors du changement du verrou sur le fichier. verrou= "+verrou);
-                    System.out.println(e.getMessage());
+                    System.out.println(e);
                     return false;
                     }
             return true;
@@ -383,7 +379,7 @@ public class FichierUserDao {
         }
         catch(Exception e){
             System.out.println("Erreur pendant le renommage d'un fichier");
-            System.out.println(e.getMessage());
+            System.out.println(e);
             return false;
         }
     }
