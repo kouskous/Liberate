@@ -15,6 +15,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -814,8 +815,8 @@ public class FileController {
                                 String src ="/../../files/"+lockedFiles.get(i).getNomPhysique();
                                 String dest="/../../files/"+file.getNomPhysique();
                                 copier(request,src,dest);
-                               List<FichiersVersion> fichiersLastVersionTamp=fichiersLastVersion;
-                               for(int j=0;j<fichiersLastVersionTamp.size();j++){
+                               List<FichiersVersion> fichiersLastVersionTamp=new ArrayList<FichiersVersion>(fichiersLastVersion);
+                               for(int j=fichiersLastVersionTamp.size()-1;j>=0;j--){
                                    if(lockedFiles.get(i).getPathLogique().equals(fichiersLastVersionTamp.get(j).getPathLogique())){
                                        fichiersLastVersion.remove(j);
                                       
@@ -968,20 +969,27 @@ public class FileController {
                         
                         System.out.println("On met a jour");
                         List<FichiersVersion> filesFromVersion =fichiersVersionDao.getFileByVersion(lastVersion);
+                        
                         if(filesFromVersion==null){
                             returnObject.put("response",false);
                             returnObject.put("errors", "Pas de fichiers dans la derniere version->ERROR");
                             return returnObject.toString();
                         }
+                        List<FichiersVersion> filesFromVersionTamp = new ArrayList<FichiersVersion>();
+                        System.out.println("fichers de la version :");
                         for(int compt=0;compt<filesFromVersion.size();compt++){
-                        System.out.println(filesFromVersion.get(compt).getPathLogique());
+                            filesFromVersionTamp.add(new FichiersVersion(filesFromVersion.get(compt)));
+                            
+                        System.out.println(filesFromVersion.get(compt).getPathLogique()+"-");
                                 }
-                        List<FichiersVersion> filesFromVersionTamp=filesFromVersion;
+                        
+                        System.out.println("fichers du projet :");
                         for(int compt2=0;compt2<filesFromProjet.size();compt2++){
-                        System.out.println(filesFromProjet.get(compt2).getPathLogique());
+                        System.out.println(filesFromProjet.get(compt2).getPathLogique()+"-");
                         }
                         //On copie les verrouillés dans notre local.On supprime ceux qu'on traite de la liste
-                        for(int u=0;u<filesFromVersion.size();u++){
+                        for(int u=filesFromVersion.size()-1;u>=0;u--){
+                            
                             for(int v=0;v<filesFromProjet.size();v++){
                                 if(filesFromVersion.get(u).getPathLogique().equals(filesFromProjet.get(v).getPathLogique())){
                                    if(filesFromProjet.get(v).getVerrou()==1){
@@ -996,18 +1004,23 @@ public class FileController {
                                         String dest="/../../files/"+filesFromProjet.get(v).getNomPhysique();
                                         copier(request,src,dest);
                                    }
+                                   
+                                   System.out.println(filesFromVersion.get(u).getPathLogique()+"="+filesFromProjet.get(v).getPathLogique());
                                    filesFromVersionTamp.remove(u);
                                 }
                             }
                             
                         }
-                        
+                        System.out.println(filesFromVersion.size());
+                        System.out.println(filesFromVersionTamp.size());
                         //on teste la liste
                         if(!filesFromVersionTamp.isEmpty()){
+                            System.out.println("Les fichiers qui seront créé");
                             for(int e=0;e<filesFromVersionTamp.size();e++){
+                                System.out.println(filesFromVersionTamp.get(e).getPathLogique());
                                 UUID idOne = UUID.randomUUID();
                                 if(filesFromVersionTamp.get(e).getType()==FichiersVersion.Type.FICHIER){
-                                    FichiersUsers newFichierUser = fichierUserDao.createNewFichierUser(filesFromVersion.get(e).getPathLogique(),idOne.toString(),filesFromVersion.get(e).getNomReel(),new Date(),FichiersUsers.Type.FICHIER,user,0);
+                                    FichiersUsers newFichierUser = fichierUserDao.createNewFichierUser(filesFromVersionTamp.get(e).getPathLogique(),idOne.toString(),filesFromVersionTamp.get(e).getNomReel(),new Date(),FichiersUsers.Type.FICHIER,user,0);
                                  if(newFichierUser==null){
                                      returnObject.put("response",false);
                                      returnObject.put("errors", "Le pull n'a pas fonctionné: "+e);
@@ -1024,7 +1037,7 @@ public class FileController {
                             String dest="/../../files/"+newFichierUser.getNomPhysique();
                             copier(request,src,dest);
                             }else{
-                                 FichiersUsers newDossierUser = fichierUserDao.createNewFichierUser(filesFromVersion.get(e).getPathLogique(),null,filesFromVersion.get(e).getNomReel(),new Date(),FichiersUsers.Type.DOSSIER,user,4);
+                                 FichiersUsers newDossierUser = fichierUserDao.createNewFichierUser(filesFromVersionTamp.get(e).getPathLogique(),null,filesFromVersionTamp.get(e).getNomReel(),new Date(),FichiersUsers.Type.DOSSIER,user,4);
                                  if(newDossierUser==null){
                                      returnObject.put("response",false);
                                      returnObject.put("errors", "Le pull n'a pas fonctionné: "+e);

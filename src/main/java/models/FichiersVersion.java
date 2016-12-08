@@ -74,6 +74,15 @@ public class FichiersVersion implements Serializable {
         this.type = type;
         this.version = version;
     }
+    public FichiersVersion(FichiersVersion file){
+        this.pathLogique = file.pathLogique;
+ 
+        this.nomPhysique = file.nomPhysique;
+        this.nomReel = file.nomReel;
+        this.dateCreation = new Date();
+        this.type = file.type;
+        this.version = file.version;
+    }
 
     public String getPathLogique() {
         return pathLogique;
