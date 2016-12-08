@@ -291,7 +291,6 @@ public class FileController {
             returnObject.put("errors", "");
             
             String pathFichier = (String)request.getParameter("pathFichier");
-            String fileName = extractFileName((String)request.getParameter("pathFichier"));
             String contenuFichier = (String)request.getParameter("contenuFichier");
             
             // On vérifie les paramètres de la requête
@@ -422,10 +421,10 @@ public class FileController {
             String contenuPage="";
 
             while ((ligne=buff.readLine())!=null){
-                contenuPage=contenuPage +ligne+"\n";
+                contenuPage= new String(contenuPage +ligne+"\n");
             }
             buff.close();
-
+            flux.close();
             response.put("content",contenuPage);
                 
         }		
@@ -465,7 +464,7 @@ public class FileController {
                 return returnObject.toString();
             }
             // Json fail
-            catch(Exception e){System.out.println(e.getMessage()); return null;}
+            catch(Exception e){System.out.println("Erreur Json: " + e); return null;}
         }
 
         // Récupération paramètre pathFichier
@@ -478,7 +477,7 @@ public class FileController {
                 return returnObject.toString();
             }
             // Json fail
-            catch(Exception e){System.out.println(e.getMessage()); return null;}
+            catch(Exception e){System.out.println("Erreur Json: " + e); return null;}
         }
         
         // Récupération du fichier en base
@@ -493,18 +492,19 @@ public class FileController {
                 return returnObject.toString();
             }
             // Json fail
-            catch(Exception e2){System.out.println(e2.getMessage()); return null;}
+            catch(Exception e2){System.out.println("Erreur Json: " + e2); return null;}
             }
         }
         catch(Exception e){
             try{
+                System.out.println(e);
                 returnObject.put("response", "false");
                 returnObject.put("content","");
                 returnObject.put("errors", "Une erreur est survenue pendant la récupération du fichier en base");
                 return returnObject.toString();
             }
             // Json fail
-            catch(Exception e2){System.out.println(e2.getMessage()); return null;}
+            catch(Exception e2){System.out.println(e2); return null;}
         }
             
         // Suppression physique du fichier
@@ -516,6 +516,7 @@ public class FileController {
         }
         catch(Exception e){
             try{
+                System.out.println(e);
                 returnObject.put("response", "false");
                 returnObject.put("content","");
                 returnObject.put("errors", "Echec de la suppression du fichier physique");
@@ -535,10 +536,10 @@ public class FileController {
                     return returnObject.toString();
                 }
                 // Json fail
-                catch(Exception e2){System.out.println(e2.getMessage()); return null;}
+                catch(Exception e2){System.out.println(e2); return null;}
             }
         }
-        catch(Exception e){System.out.println(e.getMessage()); return null;}
+        catch(Exception e){System.out.println(e); return null;}
         
         // Réussite
         try{
@@ -548,7 +549,7 @@ public class FileController {
             return returnObject.toString();
         }
         // Json fail
-        catch(Exception e2){System.out.println(e2.getMessage()); return null;}
+        catch(Exception e2){System.out.println(e2); return null;}
     }
     
     // Rennomage d'un fichier
@@ -577,7 +578,7 @@ public class FileController {
                 return returnObject.toString();
             }
             // Json fail
-            catch(Exception e){System.out.println(e.getMessage()); return null;}
+            catch(Exception e){System.out.println(e); return null;}
         }
 
         // Récupération paramètres pathFichier et nomFichier
@@ -591,7 +592,7 @@ public class FileController {
                 return returnObject.toString();
             }
             // Json fail
-            catch(Exception e){System.out.println(e.getMessage()); return null;}
+            catch(Exception e){System.out.println(e); return null;}
         }
         
         // Récupération du fichier en base
@@ -606,18 +607,19 @@ public class FileController {
                 return returnObject.toString();
             }
             // Json fail
-            catch(Exception e2){System.out.println(e2.getMessage()); return null;}
+            catch(Exception e2){System.out.println(e2); return null;}
             }
         }
         catch(Exception e){
             try{
+                System.out.println(e);
                 returnObject.put("response", "false");
                 returnObject.put("content","");
                 returnObject.put("errors", "Une erreur est survenue pendant la récupération du fichier en base");
                 return returnObject.toString();
             }
             // Json fail
-            catch(Exception e2){System.out.println(e2.getMessage()); return null;}
+            catch(Exception e2){System.out.println(e2); return null;}
         }
             
         // Renommage du fichier
@@ -629,7 +631,7 @@ public class FileController {
                 return returnObject.toString();
             }
             // Json fail
-            catch(Exception e2){System.out.println(e2.getMessage()); return null;}
+            catch(Exception e2){System.out.println(e2); return null;}
         }
         
         // Réussite
@@ -640,7 +642,7 @@ public class FileController {
             return returnObject.toString();
         }
         // Json fail
-        catch(Exception e2){System.out.println(e2.getMessage()); return null;}
+        catch(Exception e2){System.out.println(e2); return null;}
     }
     
     private static boolean copier(HttpServletRequest request,String fichier_source, String fichier_dest)
@@ -663,8 +665,11 @@ public class FileController {
 
            inChannel.close();
            outChannel.close();
+           src.close();
+           dest.close();
            return true;
         }catch(Exception e){
+            System.out.println(e);
             return false;
             }
     }
@@ -680,6 +685,7 @@ public class FileController {
                 return true;            
                 }
                             catch(Exception e){
+                                System.out.println(e);
                                 return false;
                             }
         }
@@ -736,7 +742,7 @@ public class FileController {
                     List<FichiersUsers> filesFromProjet =fichierUserDao.getByUserAndProjet(user, projet.getNom());
                     if(filesFromProjet==null){
                         returnObject.put("response",false);
-                        returnObject.put("errors", "Rien a pushe");
+                        returnObject.put("errors", "Rien a push");
                         return returnObject.toString();
                     }
                     //Une fois recu on les ajoute a la nouvelle version pis on repasse leur verrou 0
@@ -749,7 +755,7 @@ public class FileController {
                                 returnObject.put("errors", "Le push n'a pas fonctionne: "+c);
                                 return returnObject.toString();
                             }
-                            //On cr�e le fichier en physique
+                            //On cree le fichier en physique
                             boolean creation = creerFichier(request,idOne.toString());
                             if(!creation){
                                 returnObject.put("response",false);
@@ -871,20 +877,7 @@ public class FileController {
             }
         }
         catch(Exception e){
-            System.out.println("Erreur JSON");
-            System.out.println(e.getMessage());
-            
-            //TODO: ce try-catch ne sert qu'à afficher les erreurs
-            try{
-                JSONObject obj = new JSONObject();
-                System.out.println("catch");
-                obj.put("response",false);
-                obj.put("errors",e.getMessage());
-                return obj.toString();
-            }
-            catch(Exception er){
-                
-            }
+            System.out.println("Erreur JSON" + e);
             return null;
         }
     }
@@ -943,7 +936,7 @@ public class FileController {
                                      returnObject.put("errors", "Le pull n'a pas fonctionne: "+a);
                                      return returnObject.toString();
                                  }
-                                 //On cr�e le fichier en physique
+                                 //On cree le fichier en physique
                                  boolean creation = creerFichier(request,idOne.toString());
                                  if(!creation){
                                      returnObject.put("response",false);
@@ -1026,7 +1019,7 @@ public class FileController {
                                      returnObject.put("errors", "Le pull n'a pas fonctionne: "+e);
                                      return returnObject.toString();
                                  }
-                                 //On cr�e le fichier en physique
+                                 //On cree le fichier en physique
                                  boolean creation = creerFichier(request,idOne.toString());
                                  if(!creation){
                                      returnObject.put("response",false);
@@ -1040,7 +1033,7 @@ public class FileController {
                                  FichiersUsers newDossierUser = fichierUserDao.createNewFichierUser(filesFromVersionTamp.get(e).getPathLogique(),null,filesFromVersionTamp.get(e).getNomReel(),new Date(),FichiersUsers.Type.DOSSIER,user,4);
                                  if(newDossierUser==null){
                                      returnObject.put("response",false);
-                                     returnObject.put("errors", "Le pull n'a pas fonctionne: "+e);
+                                     returnObject.put("errors", "Le pull n'a pas fonctionn�: "+e);
                                      return returnObject.toString();
                                  }
                             }
@@ -1055,19 +1048,7 @@ public class FileController {
             
             }
             catch(Exception e){
-            System.out.println("Erreur JSON");
-            System.out.println(e.getMessage());
-            
-            //TODO: ce try-catch ne sert qu'à afficher les erreurs
-            try{
-                JSONObject obj = new JSONObject();
-                obj.put("response",false);
-                obj.put("errors",e.getMessage());
-                return obj.toString();
-            }
-            catch(Exception er){
-                
-            }
+            System.out.println("Erreur JSON" + e);
             }
     return null;
     }
@@ -1140,19 +1121,7 @@ public class FileController {
             }
         }
         catch(Exception e){
-            System.out.println("Erreur JSON");
-            System.out.println(e.getMessage());
-            
-            //TODO: ce try-catch ne sert qu'à afficher les erreurs
-            try{
-                JSONObject obj = new JSONObject();
-                obj.put("response",false);
-                obj.put("errors",e.getMessage());
-                return obj.toString();
-            }
-            catch(Exception er){
-                
-            }
+            System.out.println("Erreur JSON" + e);
             return null;
         }
 }
